@@ -1,0 +1,611 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		40DA6D092E8C009300AD069D /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 40DA6D082E8C009300AD069D /* Localizable.xcstrings */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		40DA6CC92E8BB7FC00AD069D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 40DA6CAF2E8BB7FB00AD069D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 40DA6CB62E8BB7FB00AD069D;
+			remoteInfo = KnitAndCalc;
+		};
+		40DA6CD32E8BB7FC00AD069D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 40DA6CAF2E8BB7FB00AD069D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 40DA6CB62E8BB7FB00AD069D;
+			remoteInfo = KnitAndCalc;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		40DA6CB72E8BB7FB00AD069D /* KnitAndCalc.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KnitAndCalc.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		40DA6CC82E8BB7FC00AD069D /* KnitAndCalcTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KnitAndCalcTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		40DA6CD22E8BB7FC00AD069D /* KnitAndCalcUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KnitAndCalcUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		40DA6D082E8C009300AD069D /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		40DA6CDA2E8BB7FC00AD069D /* Exceptions for "KnitAndCalc" folder in "KnitAndCalc" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 40DA6CB62E8BB7FB00AD069D /* KnitAndCalc */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		40DA6CB92E8BB7FB00AD069D /* KnitAndCalc */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				40DA6CDA2E8BB7FC00AD069D /* Exceptions for "KnitAndCalc" folder in "KnitAndCalc" target */,
+			);
+			path = KnitAndCalc;
+			sourceTree = "<group>";
+		};
+		40DA6CCB2E8BB7FC00AD069D /* KnitAndCalcTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = KnitAndCalcTests;
+			sourceTree = "<group>";
+		};
+		40DA6CD52E8BB7FC00AD069D /* KnitAndCalcUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = KnitAndCalcUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		40DA6CB42E8BB7FB00AD069D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		40DA6CC52E8BB7FC00AD069D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		40DA6CCF2E8BB7FC00AD069D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4078CF7D2E8C6B570046E70A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		40DA6CAE2E8BB7FB00AD069D = {
+			isa = PBXGroup;
+			children = (
+				40DA6D082E8C009300AD069D /* Localizable.xcstrings */,
+				40DA6CB92E8BB7FB00AD069D /* KnitAndCalc */,
+				40DA6CCB2E8BB7FC00AD069D /* KnitAndCalcTests */,
+				40DA6CD52E8BB7FC00AD069D /* KnitAndCalcUITests */,
+				4078CF7D2E8C6B570046E70A /* Frameworks */,
+				40DA6CB82E8BB7FB00AD069D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		40DA6CB82E8BB7FB00AD069D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				40DA6CB72E8BB7FB00AD069D /* KnitAndCalc.app */,
+				40DA6CC82E8BB7FC00AD069D /* KnitAndCalcTests.xctest */,
+				40DA6CD22E8BB7FC00AD069D /* KnitAndCalcUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		40DA6CB62E8BB7FB00AD069D /* KnitAndCalc */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 40DA6CDB2E8BB7FC00AD069D /* Build configuration list for PBXNativeTarget "KnitAndCalc" */;
+			buildPhases = (
+				40DA6CB32E8BB7FB00AD069D /* Sources */,
+				40DA6CB42E8BB7FB00AD069D /* Frameworks */,
+				40DA6CB52E8BB7FB00AD069D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				40DA6CB92E8BB7FB00AD069D /* KnitAndCalc */,
+			);
+			name = KnitAndCalc;
+			packageProductDependencies = (
+			);
+			productName = KnitAndCalc;
+			productReference = 40DA6CB72E8BB7FB00AD069D /* KnitAndCalc.app */;
+			productType = "com.apple.product-type.application";
+		};
+		40DA6CC72E8BB7FC00AD069D /* KnitAndCalcTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 40DA6CE02E8BB7FC00AD069D /* Build configuration list for PBXNativeTarget "KnitAndCalcTests" */;
+			buildPhases = (
+				40DA6CC42E8BB7FC00AD069D /* Sources */,
+				40DA6CC52E8BB7FC00AD069D /* Frameworks */,
+				40DA6CC62E8BB7FC00AD069D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				40DA6CCA2E8BB7FC00AD069D /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				40DA6CCB2E8BB7FC00AD069D /* KnitAndCalcTests */,
+			);
+			name = KnitAndCalcTests;
+			packageProductDependencies = (
+			);
+			productName = KnitAndCalcTests;
+			productReference = 40DA6CC82E8BB7FC00AD069D /* KnitAndCalcTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		40DA6CD12E8BB7FC00AD069D /* KnitAndCalcUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 40DA6CE32E8BB7FC00AD069D /* Build configuration list for PBXNativeTarget "KnitAndCalcUITests" */;
+			buildPhases = (
+				40DA6CCE2E8BB7FC00AD069D /* Sources */,
+				40DA6CCF2E8BB7FC00AD069D /* Frameworks */,
+				40DA6CD02E8BB7FC00AD069D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				40DA6CD42E8BB7FC00AD069D /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				40DA6CD52E8BB7FC00AD069D /* KnitAndCalcUITests */,
+			);
+			name = KnitAndCalcUITests;
+			packageProductDependencies = (
+			);
+			productName = KnitAndCalcUITests;
+			productReference = 40DA6CD22E8BB7FC00AD069D /* KnitAndCalcUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		40DA6CAF2E8BB7FB00AD069D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1640;
+				LastUpgradeCheck = 1640;
+				TargetAttributes = {
+					40DA6CB62E8BB7FB00AD069D = {
+						CreatedOnToolsVersion = 16.4;
+					};
+					40DA6CC72E8BB7FC00AD069D = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 40DA6CB62E8BB7FB00AD069D;
+					};
+					40DA6CD12E8BB7FC00AD069D = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 40DA6CB62E8BB7FB00AD069D;
+					};
+				};
+			};
+			buildConfigurationList = 40DA6CB22E8BB7FB00AD069D /* Build configuration list for PBXProject "KnitAndCalc" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				nb,
+				sv,
+				da,
+				de,
+				fr,
+				fi,
+			);
+			mainGroup = 40DA6CAE2E8BB7FB00AD069D;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 40DA6CB82E8BB7FB00AD069D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				40DA6CB62E8BB7FB00AD069D /* KnitAndCalc */,
+				40DA6CC72E8BB7FC00AD069D /* KnitAndCalcTests */,
+				40DA6CD12E8BB7FC00AD069D /* KnitAndCalcUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		40DA6CB52E8BB7FB00AD069D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				40DA6D092E8C009300AD069D /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		40DA6CC62E8BB7FC00AD069D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		40DA6CD02E8BB7FC00AD069D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		40DA6CB32E8BB7FB00AD069D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		40DA6CC42E8BB7FC00AD069D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		40DA6CCE2E8BB7FC00AD069D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		40DA6CCA2E8BB7FC00AD069D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 40DA6CB62E8BB7FB00AD069D /* KnitAndCalc */;
+			targetProxy = 40DA6CC92E8BB7FC00AD069D /* PBXContainerItemProxy */;
+		};
+		40DA6CD42E8BB7FC00AD069D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 40DA6CB62E8BB7FB00AD069D /* KnitAndCalc */;
+			targetProxy = 40DA6CD32E8BB7FC00AD069D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		40DA6CDC2E8BB7FC00AD069D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = KnitAndCalc/KnitAndCalc.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = JMVLAK9C92;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = KnitAndCalc/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = KnitAndCalc;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = punnerud.KnitAndCalc;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		40DA6CDD2E8BB7FC00AD069D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = KnitAndCalc/KnitAndCalc.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = JMVLAK9C92;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = KnitAndCalc/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = KnitAndCalc;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = punnerud.KnitAndCalc;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		40DA6CDE2E8BB7FC00AD069D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = JMVLAK9C92;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		40DA6CDF2E8BB7FC00AD069D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = JMVLAK9C92;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		40DA6CE12E8BB7FC00AD069D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = JMVLAK9C92;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = punnerud.KnitAndCalcTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/KnitAndCalc.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/KnitAndCalc";
+			};
+			name = Debug;
+		};
+		40DA6CE22E8BB7FC00AD069D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = JMVLAK9C92;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = punnerud.KnitAndCalcTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/KnitAndCalc.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/KnitAndCalc";
+			};
+			name = Release;
+		};
+		40DA6CE42E8BB7FC00AD069D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = JMVLAK9C92;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = punnerud.KnitAndCalcUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = KnitAndCalc;
+			};
+			name = Debug;
+		};
+		40DA6CE52E8BB7FC00AD069D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = JMVLAK9C92;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = punnerud.KnitAndCalcUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = KnitAndCalc;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		40DA6CB22E8BB7FB00AD069D /* Build configuration list for PBXProject "KnitAndCalc" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				40DA6CDE2E8BB7FC00AD069D /* Debug */,
+				40DA6CDF2E8BB7FC00AD069D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		40DA6CDB2E8BB7FC00AD069D /* Build configuration list for PBXNativeTarget "KnitAndCalc" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				40DA6CDC2E8BB7FC00AD069D /* Debug */,
+				40DA6CDD2E8BB7FC00AD069D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		40DA6CE02E8BB7FC00AD069D /* Build configuration list for PBXNativeTarget "KnitAndCalcTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				40DA6CE12E8BB7FC00AD069D /* Debug */,
+				40DA6CE22E8BB7FC00AD069D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		40DA6CE32E8BB7FC00AD069D /* Build configuration list for PBXNativeTarget "KnitAndCalcUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				40DA6CE42E8BB7FC00AD069D /* Debug */,
+				40DA6CE52E8BB7FC00AD069D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 40DA6CAF2E8BB7FB00AD069D /* Project object */;
+}

@@ -1,0 +1,308 @@
+================================================================================
+APP STORE PROMOTIONAL TEXT (170 characters max)
+================================================================================
+
+Your complete knitting companion! Organize yarn stash, projects and patterns. Includes smart calculators for yarn and stitches. Perfect for knitters! 🧶
+
+
+================================================================================
+APP STORE DESCRIPTION
+================================================================================
+
+Knit&Calc is the ultimate app for everyone who loves to knit! Keep track of your yarn stash, organize projects, save patterns, and use smart calculators that make knitting easier.
+
+🧶 YARN STASH
+• Register all your yarn with brand, type, color and color number
+• Keep track of weight, length and number of skeins
+• See how much yarn is reserved for projects
+• Grouping by brand and type for easy overview
+• Tracking history for used yarn
+
+📋 PROJECTS
+• Organize your knitting projects
+• Link yarn from stash to projects
+• See overview of reserved yarn with % of stash
+• Connect patterns to projects
+• Add row counters for easy progress tracking
+• Register needle size, gauge and size
+• Keep track of start date and finish date
+
+📖 PATTERNS
+• Save patterns as PDF, images or website links
+• Organize in categories (sweaters, pants, hats, socks, mittens, or custom)
+• Search and filter among your patterns
+• Connect patterns directly to projects
+
+🔢 YARN CALCULATOR
+• Calculate how much yarn you need when switching to another yarn with different yardage
+• Enter pattern yarn and the yarn you want to use
+• Get immediate calculation of number of skeins you need
+
+📐 STITCH CALCULATOR
+• Generate instructions for even distribution of increases or decreases
+• Calculate how to distribute stitch changes across a needle
+• Perfect for when the pattern says "increase/decrease evenly distributed"
+• Shows step-by-step instructions with checkboxes
+
+📏 RULER
+• Built-in digital ruler
+• Support for both centimeters and inches
+• Calibratable for accurate measurements
+• Perfect for measuring gauge and projects
+
+💾 BACKUP & IMPORT
+• Export all data as JSON backup
+• Optionally include images and PDF files (Base64)
+• Import backup to restore data
+• Share backup between devices
+
+🌍 MULTILINGUAL
+• Norwegian and English
+• Easy to switch language in settings
+
+⚖️ METRIC & IMPERIAL
+• Support for both metric (m/g) and imperial (yd/oz) units
+• Easy to switch in settings
+
+Knit&Calc is made by knitters for knitters, with focus on simplicity and functionality. Perfect for both beginners and experienced knitters who want better control over yarn stash, projects and tools.
+
+Download today and get full control of your knitting hobby! 🧵
+
+
+================================================================================
+KEYWORDS (100 characters max, comma-separated, no spaces in individual words)
+================================================================================
+
+knitting,yarn,stash,project,pattern,calculator,gauge,increase,decrease,needles,wool,craft,skeins,knitwear,stitches,row,counter,fiber,handmade
+
+
+================================================================================
+DETAILED FEATURE INFORMATION (For website/marketing)
+================================================================================
+
+YARN STASH MANAGEMENT
+----------------------------------
+Detailed overview:
+• Register yarn with full information:
+  - Brand - choose from existing or add new
+  - Type - choose from existing or add new
+  - Color (name/description)
+  - Color number
+  - Weight per skein
+  - Length/yardage per skein
+  - Number of skeins
+  - Dye lot/batch number
+  - Gauge recommendation
+  - Notes
+
+• Smart grouping:
+  - Yarn automatically grouped by brand and type
+  - Show/hide color variants with expandable list
+  - Clear display with color, number of skeins, total length and weight
+
+• Reservation system:
+  - See how much yarn is reserved for projects
+  - Percentage display of reserved yarn
+  - Support for over-allocation (>100%) with red indication
+  - Automatic calculation based on all linked projects
+
+• Tracking function:
+  - Register used yarn with weight in grams
+  - See automatically calculated remaining amount
+  - History of all usage with date
+
+• Total overview:
+  - See total amount of yarn in stash (grams and meters)
+  - "Just for fun" statistics at bottom of list
+
+
+PROJECT MANAGEMENT
+---------------------------------
+Complete project management:
+• Basic information:
+  - Project name
+  - Status (planned, started, finished)
+  - Size
+  - Needle size
+  - Gauge
+  - Start and finish date
+  - Notes
+
+• Yarn linking:
+  - Link yarn from yarn stash to projects
+  - Choose quantity in skeins, meters or grams
+  - See automatic conversion between units
+  - Shows percentage of available yarn
+  - Ability to create new yarn directly from project
+
+• Pattern integration:
+  - Link pattern to project
+  - Quick access to pattern from project view
+
+• Row counters:
+  - Add multiple counters per project
+  - Reset or delete counters individually
+  - Perfect for keeping track of progression
+
+• Yarn display in project:
+  - See all linked yarns with quantity
+  - Edit or remove yarn links
+  - Automatic update of reserved % in yarn stash
+
+
+PATTERN MANAGEMENT
+-----------------------------------------
+Flexible pattern storage:
+• Three formats:
+  - PDF: Upload and save PDF patterns
+  - Images: Save pattern as image sequence
+  - Website: Save URL to online patterns
+
+• Categorization:
+  - Predefined categories: Sweaters, Pants, Hats, Socks, Mittens
+  - Custom categories: Create your own categories
+  - Filter by category with tabs
+
+• Display and use:
+  - PDF reader integrated in app
+  - Image gallery for image patterns
+  - Open website patterns in Safari
+  - Edit or delete patterns easily
+
+
+YARN CALCULATOR
+----------------------------------
+Smart calculation for yarn substitution:
+• Functionality:
+  - Enter pattern yarn (weight per skein, length, number of skeins)
+  - Enter yarn you want to use (yardage per skein)
+  - Get immediate calculation of required number of skeins
+  - Automatic calculation of approx. total length
+
+• Use cases:
+  - Perfect when you want to use different yarn than pattern
+  - Compare different yarn alternatives
+  - Plan yarn purchases
+
+• Important note:
+  - Requires that gauge is equal between yarns
+
+
+STITCH CALCULATOR
+---------------------------------------
+Even distribution of increases and decreases:
+• Functionality:
+  - Number of stitches on needle (current stitch count)
+  - Number of increases/decreases
+  - Choose knitting direction (flat/round)
+
+• Calculation:
+  - Uses Bresenham-like algorithm for optimal distribution
+  - Generates step-by-step instructions
+  - Groups identical segments for better readability
+  - Shows checkboxes for each instruction
+
+• Example output:
+  "Knit 5 stitches, increase 1 stitch" x 10 times
+  "Knit 4 stitches, increase 1 stitch" x 5 times
+
+• Benefits:
+  - Perfect when pattern says "increase/decrease evenly distributed"
+  - Mathematically optimal distribution
+  - No guessing or miscalculations
+
+
+RULER
+-----------------------
+Built-in measuring tool:
+• Functions:
+  - Digital on-screen ruler
+  - Switch between centimeters and inches
+  - Synchronized axis marks (top and bottom)
+  - Scroll horizontally to measure longer distances
+
+• Calibration:
+  - Adjustable for screen size
+  - Accurate measurement on your device
+
+• Use cases:
+  - Measure gauge (gauge swatches)
+  - Check project size during work
+  - General measuring tool
+
+
+SETTINGS
+--------------------------
+Customization and backup:
+• Language:
+  - Norwegian (Bokmål)
+  - English
+  - Requires app restart to take effect
+
+• Units:
+  - Metric system (meters, grams)
+  - Imperial system (yards, ounces)
+
+• Backup:
+  - Export all data as JSON file
+  - Optionally include images and PDF files (Base64-encoded)
+  - Import backup to restore data
+  - Share backup between devices or as backup
+
+• Data:
+  - All data stored locally on device (UserDefaults)
+  - No cloud requirement or internet connection needed
+  - Full control over own data
+
+
+TECHNICAL DETAILS
+------------------
+Platform: iOS (SwiftUI)
+Languages: Norwegian, English
+Data storage: Local (UserDefaults + Documents directory)
+Backup format: JSON
+Files: Base64 encoding for portability
+Units: Metric and Imperial
+Offline: Works completely without internet (except website patterns)
+
+
+TARGET AUDIENCE
+----------
+• Hobby knitters who want better overview
+• Enthusiasts with large yarn stash
+• Organized knitters who plan projects
+• Those who like to experiment with yarn substitution
+• Knitters who need help with stitch calculations
+• Everyone who wants to save time and avoid mistakes
+
+
+FUTURE FEATURES (Potentially)
+------------------------------------
+• iCloud synchronization between devices
+• Sharing of projects and yarn stash with others
+• Statistics and graphs over usage
+• Yarn store integration (price comparison)
+• Social features (community, sharing)
+• More advanced calculators
+• Widget support for quick counters
+• Apple Watch app for counters
+• Ravelry integration
+
+
+MARKETING TAGLINES
+-------------------
+• "Your complete knitting companion"
+• "Everything you need to knit smarter"
+• "Yarn stash, projects and calculators in one app"
+• "From yarn to finished project"
+• "Knit with control"
+• "Less guessing, more knitting"
+
+
+SUPPORT & CONTACT
+------------------
+For support, questions or feedback:
+• GitHub: https://github.com/punnerud/KnitAndCalc
+• Email: [your email]
+
+Developed with ❤️ for the knitting community

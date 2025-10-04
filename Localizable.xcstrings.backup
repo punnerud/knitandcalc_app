@@ -1,0 +1,443 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    "(Ny kategori)" : {
+
+    },
+    "%.0f m/nøste" : {
+
+    },
+    "%@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@"
+          }
+        }
+      }
+    },
+    "%@ g" : {
+
+    },
+    "%@ m" : {
+
+    },
+    "%lld" : {
+
+    },
+    "%lld / %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld / %2$lld"
+          }
+        }
+      }
+    },
+    "%lld nøster" : {
+
+    },
+    "%lld nøster (%@ g)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld nøster (%2$@ g)"
+          }
+        }
+      }
+    },
+    "%lld%%" : {
+
+    },
+    "•" : {
+
+    },
+    "🧶🧶🧶" : {
+
+    },
+    "Antall fellinger:" : {
+
+    },
+    "Antall masker på pinnen:" : {
+
+    },
+    "Antall nøster" : {
+
+    },
+    "Antall nøster i oppskriften" : {
+
+    },
+    "Antall økninger:" : {
+
+    },
+    "Avbryt" : {
+
+    },
+    "Beregn" : {
+
+    },
+    "Brukt garn" : {
+
+    },
+    "Bytt oppskrift" : {
+
+    },
+    "Ca. %@ m" : {
+
+    },
+    "Ca. lengde" : {
+
+    },
+    "Detaljer" : {
+
+    },
+    "Du reserverer" : {
+
+    },
+    "Er du sikker på at du vil fjerne \"%@ %@\"?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Er du sikker på at du vil fjerne \"%1$@ %2$@\"?"
+          }
+        }
+      }
+    },
+    "Er du sikker på at du vil fjerne dette garnet?" : {
+
+    },
+    "Er du sikker på at du vil koble fra dette garnet fra \"%@\"? Prosjektet vil også miste garnet i sin oversikt." : {
+
+    },
+    "Er du sikker på at du vil slette \"%@ %@\"?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Er du sikker på at du vil slette \"%1$@ %2$@\"?"
+          }
+        }
+      }
+    },
+    "Er du sikker på at du vil slette \"%@\"?" : {
+
+    },
+    "Er du sikker på at du vil slette denne brukt garn-registreringen (%@ g)?" : {
+
+    },
+    "Ferdig" : {
+
+    },
+    "Finn ut hvor mye garn du trenger når du bytter til et annet med forskjellig løpelengde. Husk at strikkefastheten skal være lik." : {
+
+    },
+    "Fjern oppskrift" : {
+
+    },
+    "For morro skyld" : {
+
+    },
+    "Garn" : {
+
+    },
+    "Garnet du vil bruke" : {
+
+    },
+    "Garnet i oppskriften" : {
+
+    },
+    "Garninformasjon" : {
+
+    },
+    "Garnkalkulator" : {
+
+    },
+    "Garnlager" : {
+
+    },
+    "gram" : {
+
+    },
+    "Gram" : {
+
+    },
+    "Gram:" : {
+
+    },
+    "https://eksempel.no/oppskrift" : {
+
+    },
+    "Informasjon" : {
+
+    },
+    "Ingen bilder funnet" : {
+
+    },
+    "Ingen brukt garn registrert" : {
+
+    },
+    "Ingen garn" : {
+
+    },
+    "Ingen garn på lager" : {
+
+    },
+    "Ingen oppskrifter" : {
+
+    },
+    "Ingen prosjekter" : {
+
+    },
+    "Ingen treff" : {
+
+    },
+    "Innhold" : {
+
+    },
+    "Kalibrering" : {
+
+    },
+    "Kategori" : {
+
+    },
+    "kg garn" : {
+
+    },
+    "Knit&Calc" : {
+
+    },
+    "Knytt til prosjekt" : {
+
+    },
+    "Koble fra" : {
+
+    },
+    "Koble fra prosjekt" : {
+
+    },
+    "Koblet til prosjekter" : {
+
+    },
+    "Kunne ikke laste PDF" : {
+
+    },
+    "Lagre" : {
+
+    },
+    "Legg til brukt garn" : {
+
+    },
+    "Legg til ferdigdato" : {
+
+    },
+    "Legg til garn" : {
+
+    },
+    "Legg til i prosjekt" : {
+
+    },
+    "Legg til oppskrift" : {
+
+    },
+    "Legg til startdato" : {
+
+    },
+    "Legg til teller" : {
+
+    },
+    "Lengde per nøste" : {
+
+    },
+    "Lengde per nøste (m)" : {
+
+    },
+    "Linjal" : {
+
+    },
+    "Løpelengde per nøste" : {
+
+    },
+    "Mengde" : {
+
+    },
+    "Merke" : {
+
+    },
+    "meter" : {
+
+    },
+    "meter totalt" : {
+
+    },
+    "Meter:" : {
+
+    },
+    "Navn" : {
+
+    },
+    "Navn på ny kategori" : {
+
+    },
+    "Navn på oppskrift" : {
+
+    },
+    "Nøster:" : {
+
+    },
+    "Notater" : {
+
+    },
+    "Nullstill" : {
+
+    },
+    "Ny oppskrift" : {
+
+    },
+    "Nytt garn" : {
+
+    },
+    "Nytt prosjekt" : {
+
+    },
+    "Omgangsteller" : {
+
+    },
+    "Opprett nytt garn" : {
+
+    },
+    "Oppskrift" : {
+
+    },
+    "Oppskrifter" : {
+
+    },
+    "Oversikt" : {
+
+    },
+    "På lager:" : {
+
+    },
+    "Partinummer" : {
+
+    },
+    "PDF valgt" : {
+
+    },
+    "Pinnestørrelse" : {
+
+    },
+    "Prosent av lager:" : {
+
+    },
+    "Prosjekt" : {
+
+    },
+    "Prosjekter" : {
+
+    },
+    "Prosjektnavn" : {
+
+    },
+    "Prøv et annet søk" : {
+
+    },
+    "Rediger" : {
+
+    },
+    "Rediger garn" : {
+
+    },
+    "Rediger mengde" : {
+
+    },
+    "Rediger oppskrift" : {
+
+    },
+    "Rediger prosjekt" : {
+
+    },
+    "reservert" : {
+
+    },
+    "Reservert til prosjekter" : {
+
+    },
+    "Slett" : {
+
+    },
+    "Slett brukt garn" : {
+
+    },
+    "Slett garn" : {
+
+    },
+    "Slett oppskrift" : {
+
+    },
+    "Slett prosjekt" : {
+
+    },
+    "Slett teller" : {
+
+    },
+    "Søk i garnlager" : {
+
+    },
+    "Startet" : {
+
+    },
+    "Status" : {
+
+    },
+    "Størrelse" : {
+
+    },
+    "Strikkefasthet" : {
+
+    },
+    "Strikkekalkulator" : {
+
+    },
+    "Tilbakestill" : {
+
+    },
+    "Totalt på lager" : {
+
+    },
+    "Totalt reservert:" : {
+
+    },
+    "Trykk + for å legge til" : {
+
+    },
+    "Type" : {
+
+    },
+    "Vekt per nøste" : {
+
+    },
+    "Vekt per nøste (g)" : {
+
+    },
+    "Velg bilder" : {
+
+    },
+    "Velg garn" : {
+
+    },
+    "Velg oppskrift" : {
+
+    },
+    "Velg PDF" : {
+
+    }
+  },
+  "version" : "1.0"
+}

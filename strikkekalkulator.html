@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Strikkekalkulator — Øke / Felle</title>
+<style>
+body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin: 24px; color: #2b2b2b; }
+.card { max-width: 680px; margin: 0 auto; padding: 20px; border-radius: 12px; background:#fbf7f5; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+label { display:block; margin:10px 0 6px; font-weight:600; }
+input[type="number"] { width:140px; padding:8px; border-radius:8px; border:1px solid #d7cfc9; }
+.mode { display:flex; gap:8px; margin:10px 0; }
+.mode button { padding:10px 14px; border-radius:10px; border:1px solid #c9b0a5; background:#fff; cursor:pointer; }
+.mode button.active { background:#b86f5f; color:white; border-color:#b86f5f; }
+button.calc { margin-top:14px; padding:12px 18px; background:#b86f5f; color:white; border:none; border-radius:10px; cursor:pointer; }
+.output { margin-top:18px; background:white; padding:16px; border-radius:10px; border:1px solid #efe6e2; }
+.line { margin:8px 0; }
+.final { margin-top:14px; padding:10px; background:#f4e9e6; border-radius:30px; text-align:center; font-weight:700; }
+.error { color: #9b2b2b; font-weight:700; }
+small { color:#6b6b6b; }
+</style>
+</head>
+<body>
+<div class="card">
+<h2>Øke / felle kalkulator</h2>
+
+<div class="mode" role="tablist">
+<button id="mode-felle" class="active">Felle</button>
+<button id="mode-oke">Øke</button>
+</div>
+
+<label for="start">Antall masker på pinnen</label>
+<input id="start" type="number" min="0" value="166">
+
+<label for="count">Antall fellinger / økninger</label>
+<input id="count" type="number" min="0" value="52">
+
+<div>
+<button class="calc" id="beregn">Beregn</button>
+</div>
+
+<div class="output" id="output" aria-live="polite">
+<div class="line small">Resultat vises her.</div>
+</div>
+</div>
+
+<script>
+// Elementer
+const btnFelle = document.getElementById('mode-felle');
+const btnOke = document.getElementById('mode-oke');
+const startInput = document.getElementById('start');
+const countInput = document.getElementById('count');
+const beregnBtn = document.getElementById('beregn');
+const output = document.getElementById('output');
+
+let mode = 'felle'; // 'felle' eller 'oke'
+
+btnFelle.addEventListener('click', () => { mode = 'felle'; btnFelle.classList.add('active'); btnOke.classList.remove('active'); });
+btnOke.addEventListener('click', () => { mode = 'oke'; btnOke.classList.add('active'); btnFelle.classList.remove('active'); });
+
+beregnBtn.addEventListener('click', () => {
+const S = parseInt(startInput.value, 10);
+const D = parseInt(countInput.value, 10);
+renderResult(S, D, mode);
+});
+
+// Funksjon for å slå sammen like instruksjoner til "X ganger"
+function groupRuns(arr) {
+if (!arr.length) return [];
+const out = [];
+let cur = { text: arr[0], count: 1 };
+for (let i=1;i<arr.length;i++){
+if (arr[i] === cur.text) cur.count++;
+else { out.push(cur); cur = { text: arr[i], count: 1 }; }
+}
+out.push(cur);
+return out;
+}
+
+// Lag human-friendly tekst for et repeat-element
+function instruksjonTekst(type, knitBefore) {
+if (type === 'felle') {
+if (knitBefore <= 0) return 'Strikk 2 sammen';
+if (knitBefore === 1) return 'Strikk 1 maske, strikk 2 sammen';
+return `Strikk ${knitBefore} masker, strikk 2 sammen`;
+} else { // øke
+// øk 1 maske: vi skriver "øke 1 maske (f.eks. kast eller øk)"
+if (knitBefore <= 0) return 'Øk 1 maske';
+if (knitBefore === 1) return 'Strikk 1 maske, øk 1 maske';
+return `Strikk ${knitBefore} masker, øk 1 maske`;
+}
+}
+
+// Hovedlogikk:
+function renderResult(S, D, mode) {
+output.innerHTML = '';
+if (isNaN(S) || isNaN(D) || S < 0 || D < 0) {
+output.innerHTML = `<div class="error">Ugyldig inndata.</div>`; return;
+}
+if (D === 0) {
+output.innerHTML = `<div class="line">Ingen ${mode === 'felle' ? 'fellinger' : 'økninger'} valgt. Du har fortsatt ${S} masker på pinnen.</div>`;
+return;
+}
+
+if (mode === 'felle') {
+// For felling: må ha S - 2*D >= 0 (minst 2 masker brukt ved hver felling: strikk 2 sammen + noen mellom)
+const totalKnit = S - 2*D;
+if (totalKnit < 0) {
+output.innerHTML = `<div class="error">Du prøver å felle for mange masker. Maks antall fellinger for ${S} masker er ${Math.floor(S/2)}.</div>`;
+return;
+}
+
+// base antall masker mellom hver felling:
+const base = Math.floor(totalKnit / D);// kan være 0,1,2,...
+const extra = totalKnit % D;// antall repetisjoner som får +1 maske mellom
+// fordel ekstra symmetrisk: litt i starten og litt i slutten
+const startExtra = Math.floor(extra / 2);
+const endExtra = extra - startExtra;
+const middleCount = D - extra; // antall rep med 'base' stitches
+
+// Bygg instruksjon-array (rekkefølge rundt omgangen):
+const seq = [];
+
+// start ekstra (base+1)
+for (let i=0;i<startExtra;i++) seq.push(instruksjonTekst('felle', base+1));
+// midtre (base)
+for (let i=0;i<middleCount;i++) seq.push(instruksjonTekst('felle', base));
+// slutt ekstra (base+1)
+for (let i=0;i<endExtra;i++) seq.push(instruksjonTekst('felle', base+1));
+
+// grupper like tekstlinjer sammen
+const grouped = groupRuns(seq);
+
+// vis
+const el = document.createElement('div');
+el.innerHTML = `<div><small>Felle - fordel ${D} fellinger jevnt på ${S} masker</small></div>`;
+grouped.forEach(g => {
+el.innerHTML += `<div class="line">*${g.text}* ${g.count} ${g.count===1? 'gang' : 'ganger'}</div>`;
+});
+
+el.innerHTML += `<div class="final">Du har nå ${S - D} masker på pinnen</div>`;
+output.appendChild(el);
+
+} else { // mode === 'oke'
+// For økning: vi skal fordele de D økningene på de S eksisterende maskene.
+// Summen av "strikk mellom" må være S (du må strikke alle S masker mens du fordeler økningene).
+// base = Math.floor(S / D), extra = S % D
+const totalKnit = S;
+const base = Math.floor(totalKnit / D);
+const extra = totalKnit % D;
+const startExtra = Math.floor(extra / 2);
+const endExtra = extra - startExtra;
+const middleCount = D - extra;
+
+const seq = [];
+for (let i=0;i<startExtra;i++) seq.push(instruksjonTekst('oke', base+1));
+for (let i=0;i<middleCount;i++) seq.push(instruksjonTekst('oke', base));
+for (let i=0;i<endExtra;i++) seq.push(instruksjonTekst('oke', base+1));
+
+const grouped = groupRuns(seq);
+
+const el = document.createElement('div');
+el.innerHTML = `<div><small>Øke - fordel ${D} økninger jevnt på ${S} masker</small></div>`;
+grouped.forEach(g => {
+el.innerHTML += `<div class="line">*${g.text}* ${g.count} ${g.count===1? 'gang' : 'ganger'}</div>`;
+});
+el.innerHTML += `<div class="final">Du har nå ${S + D} masker på pinnen</div>`;
+output.appendChild(el);
+}
+}
+
+// init: vis eksempel
+renderResult(166, 52, 'felle');
+
+</script>
+</body>
+</html>

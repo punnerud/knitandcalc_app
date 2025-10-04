@@ -1,0 +1,308 @@
+================================================================================
+APP STORE PROMOTIONAL TEXT (170 characters max)
+================================================================================
+
+Din komplette strikkekompanjong! Organiser garnlager, prosjekter og oppskrifter. Inkluderer smarte kalkulatorer for garn og masker. Perfekt for strikkere! 🧶
+
+
+================================================================================
+APP STORE DESCRIPTION
+================================================================================
+
+Knit&Calc er den ultimate appen for alle som elsker å strikke! Hold orden på garnlageret ditt, organiser prosjekter, lagre oppskrifter, og bruk smarte kalkulatorer som gjør strikking enklere.
+
+🧶 GARNLAGER
+• Registrer alt ditt garn med merke, type, farge og fargenummer
+• Hold styr på vekt, lengde og antall nøster
+• Se hvor mye garn som er reservert til prosjekter
+• Gruppering etter merke og type for enkel oversikt
+• Sporingshistorikk for brukt garn
+
+📋 PROSJEKTER
+• Organiser strikkeprosjektene dine
+• Knytt garn fra lageret til prosjekter
+• Se oversikt over reservert garn med % av lager
+• Koble oppskrifter til prosjekter
+• Legg til omgangstellere for enkel progresjonssporing
+• Registrer pinnestørrelse, strikkefasthet og størrelse
+• Hold styr på startdato og ferdigdato
+
+📖 OPPSKRIFTER
+• Lagre oppskrifter som PDF, bilder eller nettsidelenker
+• Organiser i kategorier (gensere, bukser, luer, sokker, votter, eller egendefinert)
+• Søk og filtrer blant oppskriftene dine
+• Koble oppskrifter direkte til prosjekter
+
+🔢 GARNKALKULATOR
+• Beregn hvor mye garn du trenger når du bytter til et annet med forskjellig løpelengde
+• Skriv inn oppskriftens garn og garnet du vil bruke
+• Få umiddelbar beregning av antall nøster du trenger
+
+📐 STRIKKEKALKULATOR
+• Generer instruksjoner for jevn fordeling av økninger eller fellinger
+• Beregn hvordan du skal distribuere maskeendringer over en pinne
+• Perfekt for når oppskriften sier "øk/fell jevnt fordelt"
+• Viser steg-for-steg instruksjoner med avkryssingsbokser
+
+📏 LINJAL
+• Innebygd digital linjal
+• Støtte for både centimeter og tommer
+• Kalibrerbar for nøyaktige målinger
+• Perfekt for å måle strikkefasthet og prosjekter
+
+💾 BACKUP & IMPORT
+• Eksporter all data som JSON-backup
+• Valgfritt inkluder bilder og PDF-filer (Base64)
+• Importer backup for å gjenopprette data
+• Del backup mellom enheter
+
+🌍 FLERSPRÅKLIG
+• Norsk og engelsk
+• Enkelt å bytte språk i innstillinger
+
+⚖️ METRISK & IMPERIAL
+• Støtte for både metriske (m/g) og imperiale (yd/oz) enheter
+• Bytt enkelt i innstillinger
+
+Knit&Calc er laget av strikkere for strikkere, med fokus på enkelhet og funksjonalitet. Perfekt for både nybegynnere og erfarne strikkere som vil ha bedre kontroll på garnlager, prosjekter og verktøy.
+
+Last ned i dag og få full kontroll på strikkehobbyien din! 🧵
+
+
+================================================================================
+KEYWORDS (100 characters max, comma-separated, no spaces in individual words)
+================================================================================
+
+strikking,garn,garnlager,prosjekt,oppskrift,kalkulator,masker,økning,felling,strikkefasthet,nøster,ull,hobby,håndarbeid,knitwear,knitting,yarn,stash,pattern,calculator,gauge,needles,wool,craft
+
+
+================================================================================
+DETAILED FEATURE INFORMATION (For website/marketing)
+================================================================================
+
+GARNLAGER (YARN STASH MANAGEMENT)
+----------------------------------
+Detaljert oversikt:
+• Registrer garn med full informasjon:
+  - Merke (brand) - velg fra eksisterende eller legg til nye
+  - Type (yarn type) - velg fra eksisterende eller legg til nye
+  - Farge (color name/description)
+  - Fargenummer (color number)
+  - Vekt per nøste (weight per skein)
+  - Lengde per nøste (length/yardage per skein)
+  - Antall nøster (number of skeins)
+  - Innfarging/Partinummer (dye lot/batch number)
+  - Strikkefasthet (gauge recommendation)
+  - Notater (notes)
+
+• Smart gruppering:
+  - Garn grupperes automatisk etter merke og type
+  - Vis/skjul fargevarianter med expanderbar liste
+  - Oversiktlig visning med farge, antall nøster, total lengde og vekt
+
+• Reservasjonsystem:
+  - Se hvor mye garn som er reservert til prosjekter
+  - Prosentvis visning av reservert garn
+  - Støtte for over-allokering (>100%) med rød indikering
+  - Automatisk beregning basert på alle koblede prosjekter
+
+• Sporingsfunksjon:
+  - Registrer brukt garn med vekt i gram
+  - Se automatisk beregnet gjenværende mengde
+  - Historikk over all bruk med dato
+
+• Totaloversikt:
+  - Se total mengde garn på lager (gram og meter)
+  - "For morro skyld"-statistikk nederst i listen
+
+
+PROSJEKTER (PROJECT MANAGEMENT)
+---------------------------------
+Komplett prosjektstyring:
+• Grunnleggende informasjon:
+  - Prosjektnavn
+  - Status (planlagt, påbegynt, ferdig)
+  - Størrelse (size)
+  - Pinnestørrelse (needle size)
+  - Strikkefasthet (gauge)
+  - Start- og sluttdato
+  - Notater
+
+• Garnkobling:
+  - Knytt garn fra garnlageret til prosjekter
+  - Velg mengde i nøster, meter eller gram
+  - Se automatisk omregning mellom enheter
+  - Viser prosentandel av tilgjengelig garn
+  - Mulighet for å opprette nytt garn direkte fra prosjekt
+
+• Oppskriftsintegrasjon:
+  - Koble oppskrift til prosjekt
+  - Rask tilgang til oppskrift fra prosjektvisning
+
+• Omgangstellere:
+  - Legg til flere tellere per prosjekt
+  - Tilbakestill eller slett tellere individuelt
+  - Perfekt for å holde styr på progresjon
+
+• Garnvisning i prosjekt:
+  - Se alle koblede garn med mengde
+  - Rediger eller fjern garnkoblinger
+  - Automatisk oppdatering av reservert % i garnlager
+
+
+OPPSKRIFTER (RECIPE/PATTERN MANAGEMENT)
+-----------------------------------------
+Fleksibel oppskriftslagring:
+• Tre formater:
+  - PDF: Last opp og lagre PDF-oppskrifter
+  - Bilder: Lagre oppskrift som bildesekvens
+  - Nettside: Lagre URL til online oppskrifter
+
+• Kategorisering:
+  - Forhåndsdefinerte kategorier: Gensere, Bukser, Luer, Sokker, Votter
+  - Egendefinerte kategorier: Lag dine egne kategorier
+  - Filtrer etter kategori med tabs
+
+• Visning og bruk:
+  - PDF-leser integrert i appen
+  - Bildegalleri for bildeoppskrifter
+  - Åpne nettside-oppskrifter i Safari
+  - Rediger eller slett oppskrifter enkelt
+
+
+GARNKALKULATOR (YARN CALCULATOR)
+----------------------------------
+Smart beregning for garnsubstitusjon:
+• Funksjonalitet:
+  - Skriv inn oppskriftens garn (vekt per nøste, lengde, antall nøster)
+  - Skriv inn garnet du vil bruke (løpelengde per nøste)
+  - Få umiddelbar beregning av nødvendig antall nøster
+  - Automatisk beregning av ca. total lengde
+
+• Bruksområde:
+  - Perfekt når du vil bruke et annet garn enn oppskriften
+  - Sammenlign ulike garnalternativer
+  - Planlegg garninnkjøp
+
+• Viktig merknad:
+  - Krever at strikkefastheten er lik mellom garnene
+
+
+STRIKKEKALKULATOR (STITCH CALCULATOR)
+---------------------------------------
+Jevn fordeling av økninger og fellinger:
+• Funksjonalitet:
+  - Antall masker på pinnen (current stitch count)
+  - Antall økninger/fellinger (number of increases/decreases)
+  - Velg strikkeretning (flat/rundt)
+
+• Beregning:
+  - Bruker Bresenham-lignende algoritme for optimal fordeling
+  - Genererer steg-for-steg instruksjoner
+  - Grupperer identiske segmenter for bedre lesbarhet
+  - Viser avkryssingsbokser for hver instruksjon
+
+• Eksempel output:
+  "Strikk 5 masker, øk 1 maske" x 10 ganger
+  "Strikk 4 masker, øk 1 maske" x 5 ganger
+
+• Fordeler:
+  - Perfekt når oppskriften sier "øk/fell jevnt fordelt"
+  - Matematisk optimal fordeling
+  - Ingen gjetning eller feilberegninger
+
+
+LINJAL (DIGITAL RULER)
+-----------------------
+Innebygd måleverktøy:
+• Funksjoner:
+  - Digital on-screen linjal
+  - Bytt mellom centimeter og tommer
+  - Synkroniserte aksemarkeringer (topp og bunn)
+  - Scroll horisontalt for å måle lengre avstander
+
+• Kalibrering:
+  - Justerbar for skjermstørrelse
+  - Nøyaktig måling på din enhet
+
+• Bruksområder:
+  - Mål strikkefasthet (gauge swatches)
+  - Sjekk prosjektstørrelse under arbeid
+  - Generelt måleverktøy
+
+
+INNSTILLINGER (SETTINGS)
+--------------------------
+Tilpasning og backup:
+• Språk:
+  - Norsk (Bokmål)
+  - Engelsk
+  - Krever app-restart for å tre i kraft
+
+• Enheter:
+  - Metrisk system (meter, gram)
+  - Imperial system (yards, ounces)
+
+• Backup:
+  - Eksporter all data som JSON-fil
+  - Valgfritt inkluder bilder og PDF-filer (Base64-encoded)
+  - Import backup for å gjenopprette data
+  - Del backup mellom enheter eller som sikkerhetskopi
+
+• Data:
+  - All data lagres lokalt på enheten (UserDefaults)
+  - Ingen skykrav eller internettilkobling nødvendig
+  - Full kontroll over egne data
+
+
+TEKNISKE DETALJER
+------------------
+Plattform: iOS (SwiftUI)
+Språk: Norsk, Engelsk
+Datalagring: Lokal (UserDefaults + Documents directory)
+Backup format: JSON
+Filer: Base64 encoding for portabilitet
+Enheter: Metrisk og Imperial
+Offline: Fungerer helt uten internett (unntatt nettside-oppskrifter)
+
+
+MÅLGRUPPE
+----------
+• Hobbystrikker som vil ha bedre oversikt
+• Entusiaster med stort garnlager
+• Organiserte strikkere som planlegger prosjekter
+• De som liker å eksperimentere med garnsubstitusjon
+• Strikkere som trenger hjelp med maskeberegninger
+• Alle som vil spare tid og unngå feil
+
+
+FREMTIDIGE FUNKSJONER (Potensielt)
+------------------------------------
+• iCloud synkronisering mellom enheter
+• Deling av prosjekter og garnlager med andre
+• Statistikk og grafer over bruk
+• Garnbutikk-integrasjon (prissammenligning)
+• Sosiale funksjoner (community, deling)
+• Mer avanserte kalkulatorer
+• Widget support for raske tellere
+• Apple Watch app for tellere
+• Ravelry-integrasjon
+
+
+MARKETING TAGLINES
+-------------------
+• "Din komplette strikkekompanjong"
+• "Alt du trenger for å strikke smartere"
+• "Garnlager, prosjekter og kalkulatorer i én app"
+• "Fra garn til ferdig prosjekt"
+• "Strikk med kontroll"
+• "Mindre gjetning, mer strikking"
+
+
+SUPPORT & KONTAKT
+------------------
+For support, spørsmål eller tilbakemeldinger:
+• GitHub: https://github.com/punnerud/KnitAndCalc
+• E-post: [din e-post]
+
+Utviklet med ❤️ for strikkefellesskapet
