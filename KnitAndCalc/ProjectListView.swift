@@ -15,6 +15,7 @@ struct ProjectListView: View {
     @State private var showAddProject: Bool = false
     @State private var projectToDelete: Project?
     @State private var projectToEdit: Project?
+    @State private var projectToNavigate: Project?
 
     var categoriesForCurrentStatus: [String] {
         let projectsInStatus = projects.filter { $0.status == selectedStatus }
@@ -66,8 +67,24 @@ struct ProjectListView: View {
                 }
             }
             .sheet(isPresented: $showAddProject) {
-                AddProjectView(projects: $projects, recipes: recipes)
+                AddProjectView(projects: $projects, recipes: recipes) { newProject in
+                    projectToNavigate = newProject
+                }
             }
+            .background(
+                NavigationLink(
+                    destination: projectToNavigate.map { project in
+                        ProjectDetailView(project: project, projects: $projects, recipes: recipes)
+                    },
+                    isActive: Binding(
+                        get: { projectToNavigate != nil },
+                        set: { if !$0 { projectToNavigate = nil } }
+                    )
+                ) {
+                    EmptyView()
+                }
+                .hidden()
+            )
             .sheet(item: $projectToEdit) { project in
                 EditProjectView(projects: $projects, project: project, recipes: recipes)
             }

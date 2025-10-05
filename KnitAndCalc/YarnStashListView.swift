@@ -17,6 +17,7 @@ struct YarnStashListView: View {
     @State private var yarnToEdit: YarnStashEntry?
     @State private var listRefreshID = UUID()
     @State private var expandedGroupKey: String?
+    @State private var yarnToNavigate: YarnStashEntry?
 
     var filteredYarnEntries: [YarnStashEntry] {
         if searchText.isEmpty {
@@ -69,8 +70,32 @@ struct YarnStashListView: View {
             }
         }
         .sheet(isPresented: $showAddYarn) {
-            AddYarnStashView(yarnEntries: $yarnEntries)
+            AddYarnStashView(yarnEntries: $yarnEntries) { newYarn in
+                yarnToNavigate = newYarn
+                expandedGroupKey = "\(newYarn.brand)|\(newYarn.type)"
+            }
         }
+        .background(
+            NavigationLink(
+                destination: yarnToNavigate.map { yarn in
+                    YarnStashDetailView(
+                        yarn: yarn,
+                        yarnEntries: $yarnEntries,
+                        projects: Binding(
+                            get: { projects },
+                            set: { projects = $0; saveProjects(); listRefreshID = UUID() }
+                        )
+                    )
+                },
+                isActive: Binding(
+                    get: { yarnToNavigate != nil },
+                    set: { if !$0 { yarnToNavigate = nil } }
+                )
+            ) {
+                EmptyView()
+            }
+            .hidden()
+        )
         .sheet(item: $yarnToEdit, onDismiss: {
             loadProjects()
         }) { yarn in

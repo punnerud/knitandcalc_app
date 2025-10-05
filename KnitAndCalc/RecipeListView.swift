@@ -14,6 +14,7 @@ struct RecipeListView: View {
     @State private var showAddRecipe: Bool = false
     @State private var recipeToDelete: Recipe?
     @State private var recipeToEdit: Recipe?
+    @State private var recipeToNavigate: Recipe?
 
     var customCategories: [String] {
         let customs = recipes
@@ -54,8 +55,24 @@ struct RecipeListView: View {
             }
         }
         .sheet(isPresented: $showAddRecipe) {
-            AddRecipeView(recipes: $recipes)
+            AddRecipeView(recipes: $recipes) { newRecipe in
+                recipeToNavigate = newRecipe
+            }
         }
+        .background(
+            NavigationLink(
+                destination: recipeToNavigate.map { recipe in
+                    RecipeDetailView(recipe: recipe, recipes: $recipes)
+                },
+                isActive: Binding(
+                    get: { recipeToNavigate != nil },
+                    set: { if !$0 { recipeToNavigate = nil } }
+                )
+            ) {
+                EmptyView()
+            }
+            .hidden()
+        )
         .sheet(item: $recipeToEdit) { recipe in
             EditRecipeView(recipes: $recipes, recipe: recipe)
         }

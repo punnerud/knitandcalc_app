@@ -11,15 +11,18 @@ struct AddProjectView: View {
     @Environment(\.dismiss) var dismiss
     @Binding var projects: [Project]
     let recipes: [Recipe]
+    var onProjectCreated: ((Project) -> Void)?
 
     @State private var name: String = ""
     @State private var selectedStatus: ProjectStatus = .active
+    @FocusState private var isNameFieldFocused: Bool
 
     var body: some View {
         NavigationView {
             Form {
                 Section(header: Text("Informasjon")) {
                     TextField("Prosjektnavn", text: $name)
+                        .focused($isNameFieldFocused)
 
                     Picker("Status", selection: $selectedStatus) {
                         ForEach(ProjectStatus.allCases, id: \.self) { status in
@@ -46,6 +49,11 @@ struct AddProjectView: View {
                     .foregroundColor(name.isEmpty ? .appTertiaryText : .appIconTint)
                 }
             }
+            .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    isNameFieldFocused = true
+                }
+            }
         }
     }
 
@@ -56,6 +64,7 @@ struct AddProjectView: View {
         )
 
         projects.append(project)
+        onProjectCreated?(project)
         dismiss()
     }
 }

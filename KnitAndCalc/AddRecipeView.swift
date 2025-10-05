@@ -11,6 +11,7 @@ import PhotosUI
 struct AddRecipeView: View {
     @Environment(\.dismiss) var dismiss
     @Binding var recipes: [Recipe]
+    var onRecipeCreated: ((Recipe) -> Void)?
 
     @State private var name: String = ""
     @State private var selectedCategory: RecipeCategory = .sweaters
@@ -21,12 +22,14 @@ struct AddRecipeView: View {
     @State private var showImagePicker: Bool = false
     @State private var showDocumentPicker: Bool = false
     @State private var pdfURL: URL?
+    @FocusState private var isNameFieldFocused: Bool
 
     var body: some View {
         NavigationView {
             Form {
                 Section(header: Text("Informasjon")) {
                     TextField("Navn på oppskrift", text: $name)
+                        .focused($isNameFieldFocused)
 
                     Picker("Kategori", selection: $selectedCategory) {
                         ForEach(RecipeCategory.allCases.filter { $0 != .all }, id: \.self) { category in
@@ -132,6 +135,11 @@ struct AddRecipeView: View {
             .sheet(isPresented: $showDocumentPicker) {
                 DocumentPicker(pdfURL: $pdfURL)
             }
+            .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    isNameFieldFocused = true
+                }
+            }
         }
     }
 
@@ -195,6 +203,7 @@ struct AddRecipeView: View {
         )
 
         recipes.append(recipe)
+        onRecipeCreated?(recipe)
         dismiss()
     }
 

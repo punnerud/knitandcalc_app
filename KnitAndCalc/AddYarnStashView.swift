@@ -13,6 +13,7 @@ struct AddYarnStashView: View {
     @ObservedObject private var settings = AppSettings.shared
     var projects: Binding<[Project]>? = nil
     var linkToProjectId: UUID? = nil
+    var onYarnCreated: ((YarnStashEntry) -> Void)?
 
     private static var newBrandKey: String { String(localized: "(Nytt merke)") }
     private static var newTypeKey: String { String(localized: "(Ny type)") }
@@ -34,6 +35,7 @@ struct AddYarnStashView: View {
     @State private var linkToProject: Bool = false
     @State private var quantity: String = ""
     @State private var quantityType: YarnQuantityType = .skeins
+    @FocusState private var isCustomBrandFocused: Bool
 
     var existingBrands: [String] {
         Array(Set(yarnEntries.map { $0.brand })).sorted()
@@ -101,6 +103,7 @@ struct AddYarnStashView: View {
 
                     if showCustomBrandField {
                         TextField("Skriv inn merke", text: $customBrand)
+                            .focused($isCustomBrandFocused)
                     }
                 }
 
@@ -205,6 +208,9 @@ struct AddYarnStashView: View {
                 if linkToProjectId != nil {
                     linkToProject = true
                 }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    isCustomBrandFocused = true
+                }
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -268,6 +274,7 @@ struct AddYarnStashView: View {
             projectsBinding.wrappedValue[projectIndex].linkedYarns.append(projectYarn)
         }
 
+        onYarnCreated?(yarn)
         dismiss()
     }
 }
