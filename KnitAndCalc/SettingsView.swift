@@ -101,7 +101,7 @@ struct SettingsView: View {
                                 .font(.system(size: 15))
                             Text(NSLocalizedString("Få en påminnelse hver 3. dag", comment: ""))
                                 .font(.system(size: 13))
-                                .foregroundColor(Color(white: 0.5))
+                                .foregroundColor(.appSecondaryText)
                         }
                     }
                 }
@@ -113,7 +113,7 @@ struct SettingsView: View {
                 }) {
                     HStack {
                         Image(systemName: "square.and.arrow.up")
-                            .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                            .foregroundColor(.appIconTint)
                         Text(NSLocalizedString("Eksporter backup", comment: ""))
                             .foregroundColor(.primary)
                     }
@@ -124,7 +124,7 @@ struct SettingsView: View {
                 }) {
                     HStack {
                         Image(systemName: "square.and.arrow.down")
-                            .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                            .foregroundColor(.appIconTint)
                         Text(NSLocalizedString("Importer backup", comment: ""))
                             .foregroundColor(.primary)
                     }
@@ -136,7 +136,7 @@ struct SettingsView: View {
                     VStack(spacing: 12) {
                         Text(NSLocalizedString("Liker du KnitAndCalc?", comment: ""))
                             .font(.system(size: 15))
-                            .foregroundColor(Color(white: 0.3))
+                            .foregroundColor(.appText)
 
                         HStack(spacing: 16) {
                             ForEach(1...5, id: \.self) { rating in
@@ -145,7 +145,7 @@ struct SettingsView: View {
                                 }) {
                                     Image(systemName: "star.fill")
                                         .font(.system(size: 32))
-                                        .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                                        .foregroundColor(.appIconTint)
                                 }
                             }
                         }
@@ -159,7 +159,7 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(NSLocalizedString("Any questions or feedback?", comment: ""))
                         .font(.system(size: 15, weight: .medium))
-                        .foregroundColor(Color(white: 0.3))
+                        .foregroundColor(.appText)
 
                     Button(action: {
                         if let url = URL(string: "mailto:morten@punnerud.net") {
@@ -168,9 +168,9 @@ struct SettingsView: View {
                     }) {
                         HStack {
                             Image(systemName: "envelope.fill")
-                                .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                                .foregroundColor(.appIconTint)
                             Text("morten@punnerud.net")
-                                .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                                .foregroundColor(.appIconTint)
                         }
                     }
                 }
@@ -182,11 +182,11 @@ struct SettingsView: View {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Prising")
                             .font(.system(size: 15, weight: .semibold))
-                            .foregroundColor(Color(white: 0.3))
+                            .foregroundColor(.appText)
 
                         Text("Vi jobber for å holde denne appen rimelig og helst gratis. Skulle vi innføre betaling, vil det aldri koste mer enn 20kr/mnd.")
                             .font(.system(size: 13))
-                            .foregroundColor(Color(white: 0.5))
+                            .foregroundColor(.appSecondaryText)
                             .fixedSize(horizontal: false, vertical: true)
 
                         Divider()
@@ -194,11 +194,11 @@ struct SettingsView: View {
 
                         Text("Fremtidig funksjon: Anonymt søk")
                             .font(.system(size: 15, weight: .semibold))
-                            .foregroundColor(Color(white: 0.3))
+                            .foregroundColor(.appText)
 
                         Text("Vi vurderer en funksjon hvor du kan søke anonymt etter garn du mangler. Ditt garnlager forblir privat, men hvis noen mangler ett nøste til et stort prosjekt, kan du motta tilbud om kjøp. Dette kan være en bedre finansieringsmodell for appen.")
                             .font(.system(size: 13))
-                            .foregroundColor(Color(white: 0.5))
+                            .foregroundColor(.appSecondaryText)
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     .padding(.vertical, 8)
@@ -209,11 +209,11 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(NSLocalizedString("settings.info.title", comment: ""))
                         .font(.system(size: 13, weight: .medium))
-                        .foregroundColor(Color(white: 0.4))
+                        .foregroundColor(.appSecondaryText)
 
                     Text(NSLocalizedString("settings.info.description", comment: ""))
                         .font(.system(size: 12))
-                        .foregroundColor(Color(white: 0.5))
+                        .foregroundColor(.appSecondaryText)
                 }
             }
         }

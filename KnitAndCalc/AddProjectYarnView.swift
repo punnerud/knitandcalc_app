@@ -33,7 +33,7 @@ struct AddProjectYarnView: View {
                 Section(header: Text("Velg garn")) {
                     if yarnEntries.isEmpty {
                         Text("Ingen garn på lager")
-                            .foregroundColor(Color(white: 0.5))
+                            .foregroundColor(.appSecondaryText)
                     } else {
                         Picker("Garn", selection: $selectedYarnId) {
                             Text("Velg garn").tag(nil as UUID?)
@@ -49,7 +49,7 @@ struct AddProjectYarnView: View {
                     Button(action: { showCreateYarn = true }) {
                         HStack {
                             Image(systemName: "plus.circle")
-                                .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                                .foregroundColor(.appIconTint)
                             Text("Opprett nytt garn")
                                 .foregroundColor(.primary)
                         }
@@ -79,16 +79,16 @@ struct AddProjectYarnView: View {
 
                                 Text("Garninformasjon")
                                     .font(.system(size: 13, weight: .medium))
-                                    .foregroundColor(Color(white: 0.4))
+                                    .foregroundColor(.appSecondaryText)
 
                                 HStack {
                                     Text("På lager:")
                                         .font(.system(size: 13))
-                                        .foregroundColor(Color(white: 0.5))
+                                        .foregroundColor(.appSecondaryText)
                                     Spacer()
                                     Text("\(yarn.numberOfSkeins) \(String(localized: "nøster")) (\(UnitConverter.formatWeight(Double(yarn.numberOfSkeins) * yarn.weightPerSkein, unit: settings.currentUnitSystem)))")
                                         .font(.system(size: 13, weight: .medium))
-                                        .foregroundColor(Color(white: 0.3))
+                                        .foregroundColor(.appText)
                                 }
 
                                 Divider()
@@ -96,7 +96,7 @@ struct AddProjectYarnView: View {
 
                                 Text("Du reserverer")
                                     .font(.system(size: 13, weight: .medium))
-                                    .foregroundColor(Color(white: 0.4))
+                                    .foregroundColor(.appSecondaryText)
 
                                 let calculations = calculateConversions(quantityValue, yarn)
 
@@ -104,11 +104,11 @@ struct AddProjectYarnView: View {
                                     HStack {
                                         Text("Nøster:")
                                             .font(.system(size: 13))
-                                            .foregroundColor(Color(white: 0.5))
+                                            .foregroundColor(.appSecondaryText)
                                         Spacer()
                                         Text(formatNorwegian(calculations.skeins))
                                             .font(.system(size: 13, weight: .medium))
-                                            .foregroundColor(Color(white: 0.3))
+                                            .foregroundColor(.appText)
                                     }
                                 }
 
@@ -116,11 +116,11 @@ struct AddProjectYarnView: View {
                                     HStack {
                                         Text(settings.currentUnitSystem == .metric ? "Meter:" : "Yards:")
                                             .font(.system(size: 13))
-                                            .foregroundColor(Color(white: 0.5))
+                                            .foregroundColor(.appSecondaryText)
                                         Spacer()
                                         Text(UnitConverter.formatLength(calculations.meters, unit: settings.currentUnitSystem))
                                             .font(.system(size: 13, weight: .medium))
-                                            .foregroundColor(Color(white: 0.3))
+                                            .foregroundColor(.appText)
                                     }
                                 }
 
@@ -128,22 +128,22 @@ struct AddProjectYarnView: View {
                                     HStack {
                                         Text(settings.currentUnitSystem == .metric ? "Gram:" : "Ounces:")
                                             .font(.system(size: 13))
-                                            .foregroundColor(Color(white: 0.5))
+                                            .foregroundColor(.appSecondaryText)
                                         Spacer()
                                         Text(UnitConverter.formatWeight(calculations.grams, unit: settings.currentUnitSystem))
                                             .font(.system(size: 13, weight: .medium))
-                                            .foregroundColor(Color(white: 0.3))
+                                            .foregroundColor(.appText)
                                     }
                                 }
 
                                 HStack {
                                     Text("Prosent av lager:")
                                         .font(.system(size: 13))
-                                        .foregroundColor(Color(white: 0.5))
+                                        .foregroundColor(.appSecondaryText)
                                     Spacer()
                                     Text("\(Int(calculations.percentage))%")
                                         .font(.system(size: 13, weight: .semibold))
-                                        .foregroundColor(calculations.percentage > 100 ? .red : Color(red: 0.70, green: 0.65, blue: 0.82))
+                                        .foregroundColor(calculations.percentage > 100 ? .red : .appIconTint)
                                 }
                             }
                         }
@@ -165,7 +165,7 @@ struct AddProjectYarnView: View {
                             .font(.system(size: 17, weight: .semibold))
                     }
                     .disabled(!isFormValid)
-                    .foregroundColor(isFormValid ? Color(red: 0.70, green: 0.65, blue: 0.82) : Color(white: 0.7))
+                    .foregroundColor(isFormValid ? .appIconTint : .appTertiaryText)
                 }
             }
         }

@@ -61,7 +61,7 @@ struct ProjectListView: View {
                     Button(action: { showAddProject = true }) {
                         Image(systemName: "plus")
                             .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                            .foregroundColor(.appIconTint)
                     }
                 }
             }
@@ -101,19 +101,19 @@ struct ProjectListView: View {
                 }) {
                     Text(status.displayName)
                         .font(.system(size: 15, weight: .medium))
-                        .foregroundColor(selectedStatus == status ? .white : Color(white: 0.45))
+                        .foregroundColor(selectedStatus == status ? .appButtonText : .appButtonTextUnselected)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
                         .background(selectedStatus == status ?
-                            Color(red: 0.70, green: 0.65, blue: 0.82) :
-                            Color(red: 0.93, green: 0.92, blue: 0.95))
+                            Color.appButtonBackgroundSelected :
+                            Color.appButtonBackgroundUnselected)
                         .cornerRadius(16)
                 }
             }
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .background(Color(red: 0.98, green: 0.98, blue: 0.98))
+        .background(Color.appSecondaryBackground)
     }
 
     var categoryTabsView: some View {
@@ -126,12 +126,12 @@ struct ProjectListView: View {
                 }) {
                     Text("Alle")
                         .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(selectedCategory == nil ? .white : Color(white: 0.45))
+                        .foregroundColor(selectedCategory == nil ? .appButtonText : .appButtonTextUnselected)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)
                         .background(selectedCategory == nil ?
-                            Color(red: 0.70, green: 0.65, blue: 0.82) :
-                            Color(red: 0.93, green: 0.92, blue: 0.95))
+                            Color.appButtonBackgroundSelected :
+                            Color.appButtonBackgroundUnselected)
                         .cornerRadius(12)
                 }
 
@@ -143,12 +143,12 @@ struct ProjectListView: View {
                     }) {
                         Text(category)
                             .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(selectedCategory == category ? .white : Color(white: 0.45))
+                            .foregroundColor(selectedCategory == category ? .appButtonText : .appButtonTextUnselected)
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)
                             .background(selectedCategory == category ?
-                                Color(red: 0.70, green: 0.65, blue: 0.82) :
-                                Color(red: 0.93, green: 0.92, blue: 0.95))
+                                Color.appButtonBackgroundSelected :
+                                Color.appButtonBackgroundUnselected)
                             .cornerRadius(12)
                     }
                 }
@@ -156,7 +156,7 @@ struct ProjectListView: View {
             .padding(.horizontal)
         }
         .frame(height: 40)
-        .background(Color(red: 0.98, green: 0.98, blue: 0.98))
+        .background(Color.appSecondaryBackground)
     }
 
     var projectContentView: some View {
@@ -168,7 +168,7 @@ struct ProjectListView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(red: 0.98, green: 0.98, blue: 0.98))
+        .background(Color.appSecondaryBackground)
     }
 
     var emptyStateView: some View {
@@ -176,13 +176,13 @@ struct ProjectListView: View {
             Spacer()
             Image(systemName: "tray")
                 .font(.system(size: 60))
-                .foregroundColor(Color(white: 0.7))
+                .foregroundColor(.appTertiaryText)
             Text("Ingen prosjekter")
                 .font(.system(size: 18, weight: .medium))
-                .foregroundColor(Color(white: 0.5))
+                .foregroundColor(.appSecondaryText)
             Text("Trykk + for å legge til")
                 .font(.system(size: 14))
-                .foregroundColor(Color(white: 0.6))
+                .foregroundColor(.appSecondaryText)
             Spacer()
         }
     }
@@ -270,23 +270,23 @@ struct ProjectRowView: View {
         HStack(spacing: 12) {
             ZStack {
                 Circle()
-                    .fill(Color(red: 0.93, green: 0.92, blue: 0.95))
+                    .fill(Color.appButtonBackgroundUnselected)
                     .frame(width: 44, height: 44)
 
                 Image(systemName: project.status.iconName)
                     .font(.system(size: 20))
-                    .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                    .foregroundColor(.appIconTint)
             }
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(project.name)
                     .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(Color(white: 0.2))
+                    .foregroundColor(.appText)
 
                 if let recipe = linkedRecipe {
                     Text("\(recipe.name) • \(recipe.displayCategory)")
                         .font(.system(size: 13))
-                        .foregroundColor(Color(white: 0.5))
+                        .foregroundColor(.appSecondaryText)
                 }
             }
 
@@ -295,7 +295,7 @@ struct ProjectRowView: View {
             if let date = dateToDisplay {
                 Text(formatDate(date))
                     .font(.system(size: 12))
-                    .foregroundColor(Color(white: 0.6))
+                    .foregroundColor(.appSecondaryText)
             }
         }
         .padding(.vertical, 8)

@@ -50,7 +50,7 @@ struct RecipeListView: View {
                     Button(action: { showAddRecipe = true }) {
                         Image(systemName: "plus")
                             .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                            .foregroundColor(.appIconTint)
                     }
                 }
             }
@@ -111,7 +111,7 @@ struct RecipeListView: View {
             .padding(.horizontal)
             .padding(.vertical, 12)
         }
-        .background(Color(red: 0.98, green: 0.98, blue: 0.98))
+        .background(Color.appSecondaryBackground)
     }
 
     var recipeContentView: some View {
@@ -129,13 +129,13 @@ struct RecipeListView: View {
             Spacer()
             Image(systemName: "doc.text")
                 .font(.system(size: 60))
-                .foregroundColor(Color(white: 0.7))
+                .foregroundColor(.appTertiaryText)
             Text("Ingen oppskrifter")
                 .font(.system(size: 18, weight: .medium))
-                .foregroundColor(Color(white: 0.5))
+                .foregroundColor(.appSecondaryText)
             Text("Trykk + for å legge til")
                 .font(.system(size: 14))
-                .foregroundColor(Color(white: 0.6))
+                .foregroundColor(.appSecondaryText)
             Spacer()
         }
     }
@@ -198,12 +198,12 @@ struct CategoryTabButton: View {
                 }
             }
             .font(.system(size: 15, weight: .medium))
-            .foregroundColor(isSelected ? .white : Color(white: 0.45))
+            .foregroundColor(isSelected ? .appButtonText : .appButtonTextUnselected)
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
             .background(isSelected ?
-                Color(red: 0.70, green: 0.65, blue: 0.82) :
-                Color(red: 0.93, green: 0.92, blue: 0.95))
+                Color.appButtonBackgroundSelected :
+                Color.appButtonBackgroundUnselected)
             .cornerRadius(16)
         }
     }
@@ -238,22 +238,22 @@ struct RecipeRowView: View {
             // Icon based on type
             ZStack {
                 Circle()
-                    .fill(Color(red: 0.93, green: 0.92, blue: 0.95))
+                    .fill(Color.appButtonBackgroundUnselected)
                     .frame(width: 44, height: 44)
 
                 Image(systemName: recipe.type.iconName)
                     .font(.system(size: 20))
-                    .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                    .foregroundColor(.appIconTint)
             }
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(recipe.name)
                     .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(Color(white: 0.2))
+                    .foregroundColor(.appText)
 
                 Text(recipe.displayCategory)
                     .font(.system(size: 13))
-                    .foregroundColor(Color(white: 0.5))
+                    .foregroundColor(.appSecondaryText)
             }
 
             Spacer()

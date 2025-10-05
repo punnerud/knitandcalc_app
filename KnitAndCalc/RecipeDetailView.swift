@@ -26,7 +26,7 @@ struct RecipeDetailView: View {
                     PDFViewer(url: url)
                 } else {
                     Text("Kunne ikke laste PDF")
-                        .foregroundColor(Color(white: 0.5))
+                        .foregroundColor(.appSecondaryText)
                 }
             }
         }
@@ -76,7 +76,7 @@ struct ImageGalleryView: View {
         VStack {
             if imagePaths.isEmpty {
                 Text("Ingen bilder funnet")
-                    .foregroundColor(Color(white: 0.5))
+                    .foregroundColor(.appSecondaryText)
             } else {
                 TabView(selection: $currentIndex) {
                     ForEach(0..<imagePaths.count, id: \.self) { index in
@@ -91,7 +91,7 @@ struct ImageGalleryView: View {
 
                 Text("\(currentIndex + 1) / \(imagePaths.count)")
                     .font(.system(size: 14))
-                    .foregroundColor(Color(white: 0.5))
+                    .foregroundColor(.appSecondaryText)
                     .padding(.bottom, 8)
             }
         }

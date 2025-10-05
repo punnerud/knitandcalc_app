@@ -69,7 +69,7 @@ struct YarnStashDetailView: View {
             }
             .padding(.vertical)
         }
-        .background(Color(red: 0.98, green: 0.98, blue: 0.98))
+        .background(Color.appSecondaryBackground)
         .navigationTitle("\(yarn.brand) \(yarn.type)")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -77,7 +77,7 @@ struct YarnStashDetailView: View {
                 Button(action: { showEditYarn = true }) {
                     Text(NSLocalizedString("Rediger", comment: ""))
                         .font(.system(size: 17))
-                        .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                        .foregroundColor(.appIconTint)
                 }
             }
         }
@@ -105,7 +105,7 @@ struct YarnStashDetailView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text(NSLocalizedString("Garninformasjon", comment: ""))
                 .font(.system(size: 20, weight: .semibold))
-                .foregroundColor(Color(white: 0.2))
+                .foregroundColor(.appText)
                 .padding(.horizontal)
 
             VStack(spacing: 12) {
@@ -134,7 +134,7 @@ struct YarnStashDetailView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text(NSLocalizedString("Oversikt", comment: ""))
                 .font(.system(size: 20, weight: .semibold))
-                .foregroundColor(Color(white: 0.2))
+                .foregroundColor(.appText)
                 .padding(.horizontal)
 
             VStack(spacing: 12) {
@@ -143,7 +143,7 @@ struct YarnStashDetailView: View {
                 InfoRow(label: NSLocalizedString("Gjenværende lengde", comment: ""), value: UnitConverter.formatLength(currentYarn?.remainingLength ?? yarn.remainingLength, unit: settings.currentUnitSystem))
             }
             .padding()
-            .background(Color(red: 0.93, green: 0.92, blue: 0.95))
+            .background(Color.appButtonBackgroundUnselected)
             .cornerRadius(12)
             .padding(.horizontal)
         }
@@ -156,13 +156,13 @@ struct YarnStashDetailView: View {
                 HStack {
                     Text(NSLocalizedString("Reservert til prosjekter", comment: ""))
                         .font(.system(size: 20, weight: .semibold))
-                        .foregroundColor(Color(white: 0.2))
+                        .foregroundColor(.appText)
 
                     Spacer()
 
                     Text("\(Int(reservedPercentage))%")
                         .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(reservedPercentage > 100 ? .red : Color(red: 0.70, green: 0.65, blue: 0.82))
+                        .foregroundColor(reservedPercentage > 100 ? .red : .appIconTint)
                 }
                 .padding(.horizontal)
 
@@ -183,13 +183,13 @@ struct YarnStashDetailView: View {
                 HStack {
                     Text(NSLocalizedString("Totalt reservert:", comment: ""))
                         .font(.system(size: 15, weight: .medium))
-                        .foregroundColor(Color(white: 0.4))
+                        .foregroundColor(.appSecondaryText)
 
                     Spacer()
 
                     Text(UnitConverter.formatWeight(totalReservedGrams, unit: settings.currentUnitSystem))
                         .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(Color(white: 0.2))
+                        .foregroundColor(.appText)
                 }
                 .padding(.horizontal)
             }
@@ -203,12 +203,12 @@ struct YarnStashDetailView: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text(NSLocalizedString("Notater", comment: ""))
                     .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(Color(white: 0.2))
+                    .foregroundColor(.appText)
                     .padding(.horizontal)
 
                 Text(notes)
                     .font(.system(size: 15))
-                    .foregroundColor(Color(white: 0.3))
+                    .foregroundColor(.appText)
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(Color.white)
@@ -223,14 +223,14 @@ struct YarnStashDetailView: View {
             HStack {
                 Text(NSLocalizedString("Brukt garn", comment: ""))
                     .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(Color(white: 0.2))
+                    .foregroundColor(.appText)
 
                 Spacer()
 
                 Button(action: { showAddUsedYarn = true }) {
                     Image(systemName: "plus.circle.fill")
                         .font(.system(size: 24))
-                        .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                        .foregroundColor(.appIconTint)
                 }
             }
             .padding(.horizontal)
@@ -253,7 +253,7 @@ struct YarnStashDetailView: View {
             } else {
                 Text(NSLocalizedString("Ingen brukt garn registrert", comment: ""))
                     .font(.system(size: 15))
-                    .foregroundColor(Color(white: 0.5))
+                    .foregroundColor(.appSecondaryText)
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color.white)
@@ -302,18 +302,18 @@ struct InfoRow: View {
         HStack {
             Text(label)
                 .font(.system(size: 15))
-                .foregroundColor(Color(white: 0.5))
+                .foregroundColor(.appSecondaryText)
 
             Spacer()
 
             if let localizedValue = localizedValue {
                 Text(localizedValue)
                     .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(Color(white: 0.2))
+                    .foregroundColor(.appText)
             } else {
                 Text(value)
                     .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(Color(white: 0.2))
+                    .foregroundColor(.appText)
             }
         }
     }
@@ -334,18 +334,18 @@ struct UsedYarnRow: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(UnitConverter.formatWeight(used.grams, unit: unitSystem))
                     .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(Color(white: 0.2))
+                    .foregroundColor(.appText)
 
                 Text(String(format: NSLocalizedString("Ca. %@", comment: ""), UnitConverter.formatLength(calculatedLength, unit: unitSystem)))
                     .font(.system(size: 13))
-                    .foregroundColor(Color(white: 0.5))
+                    .foregroundColor(.appSecondaryText)
             }
 
             Spacer()
 
             Text(used.date, style: .date)
                 .font(.system(size: 13))
-                .foregroundColor(Color(white: 0.5))
+                .foregroundColor(.appSecondaryText)
 
             Button(action: onDelete) {
                 Image(systemName: "trash")
@@ -393,7 +393,7 @@ struct AddUsedYarnView: View {
 
                         HStack {
                             Text(NSLocalizedString("Ca. lengde", comment: ""))
-                                .foregroundColor(Color(white: 0.5))
+                                .foregroundColor(.appSecondaryText)
                             Spacer()
                             Text(String(format: "%@ m", formatNorwegian(calculatedLength)))
                                 .font(.system(size: 15, weight: .medium))
@@ -416,7 +416,7 @@ struct AddUsedYarnView: View {
                             .font(.system(size: 17, weight: .semibold))
                     }
                     .disabled(!isFormValid)
-                    .foregroundColor(isFormValid ? Color(red: 0.70, green: 0.65, blue: 0.82) : Color(white: 0.7))
+                    .foregroundColor(isFormValid ? .appIconTint : .appTertiaryText)
                 }
             }
         }
@@ -475,24 +475,24 @@ struct ProjectYarnRow: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(project.name)
                 .font(.system(size: 15, weight: .medium))
-                .foregroundColor(Color(white: 0.2))
+                .foregroundColor(.appText)
 
             HStack(spacing: 8) {
                 Image(systemName: project.status.iconName)
                     .font(.system(size: 12))
-                    .foregroundColor(Color(white: 0.5))
+                    .foregroundColor(.appSecondaryText)
 
                 Text(project.status.displayName)
                     .font(.system(size: 13))
-                    .foregroundColor(Color(white: 0.5))
+                    .foregroundColor(.appSecondaryText)
 
                 Text("•")
                     .font(.system(size: 13))
-                    .foregroundColor(Color(white: 0.5))
+                    .foregroundColor(.appSecondaryText)
 
                 Text(totalQuantityText)
                     .font(.system(size: 13))
-                    .foregroundColor(Color(white: 0.5))
+                    .foregroundColor(.appSecondaryText)
             }
         }
         .padding(.vertical, 4)

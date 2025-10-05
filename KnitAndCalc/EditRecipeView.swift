@@ -65,13 +65,13 @@ struct EditRecipeView: View {
                         Button(action: { showImagePicker = true }) {
                             HStack {
                                 Image(systemName: "photo.on.rectangle.angled")
-                                    .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                                    .foregroundColor(.appIconTint)
                                 Text("Velg bilder")
                                     .foregroundColor(.primary)
                                 Spacer()
                                 if !selectedImages.isEmpty {
                                     Text("\(selectedImages.count)")
-                                        .foregroundColor(Color(white: 0.5))
+                                        .foregroundColor(.appSecondaryText)
                                 }
                             }
                         }
@@ -94,14 +94,14 @@ struct EditRecipeView: View {
                         Button(action: { showDocumentPicker = true }) {
                             HStack {
                                 Image(systemName: "doc.badge.plus")
-                                    .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                                    .foregroundColor(.appIconTint)
                                 Text(pdfURL == nil ? "Velg PDF" : "PDF valgt")
                                     .foregroundColor(.primary)
                                 Spacer()
                                 if let url = pdfURL {
                                     Text(url.lastPathComponent)
                                         .lineLimit(1)
-                                        .foregroundColor(Color(white: 0.5))
+                                        .foregroundColor(.appSecondaryText)
                                         .font(.system(size: 12))
                                 }
                             }
@@ -124,7 +124,7 @@ struct EditRecipeView: View {
                             .font(.system(size: 17, weight: .semibold))
                     }
                     .disabled(!canSave)
-                    .foregroundColor(canSave ? Color(red: 0.70, green: 0.65, blue: 0.82) : Color(white: 0.7))
+                    .foregroundColor(canSave ? .appIconTint : .appTertiaryText)
                 }
             }
             .sheet(isPresented: $showImagePicker) {

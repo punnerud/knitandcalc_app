@@ -64,7 +64,7 @@ struct YarnStashListView: View {
                 Button(action: { showAddYarn = true }) {
                     Image(systemName: "plus")
                         .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                        .foregroundColor(.appIconTint)
                 }
             }
         }
@@ -98,7 +98,7 @@ struct YarnStashListView: View {
     var searchBar: some View {
         HStack {
             Image(systemName: "magnifyingglass")
-                .foregroundColor(Color(white: 0.6))
+                .foregroundColor(.appSecondaryText)
 
             TextField("Søk i garnlager", text: $searchText)
                 .textFieldStyle(PlainTextFieldStyle())
@@ -108,16 +108,16 @@ struct YarnStashListView: View {
                     searchText = ""
                 }) {
                     Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(Color(white: 0.6))
+                        .foregroundColor(.appSecondaryText)
                 }
             }
         }
         .padding(10)
-        .background(Color(red: 0.93, green: 0.92, blue: 0.95))
+        .background(Color.appButtonBackgroundUnselected)
         .cornerRadius(10)
         .padding(.horizontal)
         .padding(.vertical, 8)
-        .background(Color(red: 0.98, green: 0.98, blue: 0.98))
+        .background(Color.appSecondaryBackground)
     }
 
     var yarnContentView: some View {
@@ -129,7 +129,7 @@ struct YarnStashListView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(red: 0.98, green: 0.98, blue: 0.98))
+        .background(Color.appSecondaryBackground)
     }
 
     var emptyStateView: some View {
@@ -137,13 +137,13 @@ struct YarnStashListView: View {
             Spacer()
             Image(systemName: "tray")
                 .font(.system(size: 60))
-                .foregroundColor(Color(white: 0.7))
+                .foregroundColor(.appTertiaryText)
             Text(searchText.isEmpty ? "Ingen garn" : "Ingen treff")
                 .font(.system(size: 18, weight: .medium))
-                .foregroundColor(Color(white: 0.5))
+                .foregroundColor(.appSecondaryText)
             Text(searchText.isEmpty ? "Trykk + for å legge til" : "Prøv et annet søk")
                 .font(.system(size: 14))
-                .foregroundColor(Color(white: 0.6))
+                .foregroundColor(.appSecondaryText)
             Spacer()
         }
     }
@@ -166,7 +166,7 @@ struct YarnStashListView: View {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("\(firstYarn.brand) \(firstYarn.type)")
                                     .font(.system(size: 17, weight: .semibold))
-                                    .foregroundColor(Color(white: 0.2))
+                                    .foregroundColor(.appText)
                                     .lineLimit(2)
                                     .frame(maxWidth: 280, alignment: .leading)
 
@@ -178,15 +178,15 @@ struct YarnStashListView: View {
 
                                     Text("\(entryCount) \(entryCount == 1 ? "innslag" : "innslag")")
                                         .font(.system(size: 13))
-                                        .foregroundColor(Color(white: 0.5))
+                                        .foregroundColor(.appSecondaryText)
 
                                     Text("•")
                                         .font(.system(size: 13))
-                                        .foregroundColor(Color(white: 0.5))
+                                        .foregroundColor(.appSecondaryText)
 
                                     Text(UnitConverter.formatWeight(totalGrams, unit: settings.currentUnitSystem))
                                         .font(.system(size: 13))
-                                        .foregroundColor(Color(white: 0.5))
+                                        .foregroundColor(.appSecondaryText)
                                 }
                             }
 
@@ -194,14 +194,14 @@ struct YarnStashListView: View {
 
                             Image(systemName: expandedGroupKey == group.key ? "chevron.up" : "chevron.down")
                                 .font(.system(size: 14))
-                                .foregroundColor(Color(white: 0.5))
+                                .foregroundColor(.appSecondaryText)
                                 .padding(.top, 2)
                         }
                         .padding(.vertical, 8)
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(PlainButtonStyle())
-                    .listRowBackground(Color(red: 0.95, green: 0.95, blue: 0.97))
+                    .listRowBackground(Color.appTertiaryBackground)
 
                     if expandedGroupKey == group.key {
                         let maxColorWidth = calculateMaxColorWidth(for: group.yarns)
@@ -349,12 +349,12 @@ struct YarnColorRowView: View {
                             if !yarn.colorNumber.isEmpty {
                                 Text("\(yarn.color) (\(yarn.colorNumber))")
                                     .font(.system(size: 15, weight: .medium))
-                                    .foregroundColor(Color(white: 0.2))
+                                    .foregroundColor(.appText)
                                     .lineLimit(2)
                             } else {
                                 Text(yarn.color)
                                     .font(.system(size: 15, weight: .medium))
-                                    .foregroundColor(Color(white: 0.2))
+                                    .foregroundColor(.appText)
                                     .lineLimit(2)
                             }
                         }
@@ -362,28 +362,28 @@ struct YarnColorRowView: View {
 
                         Text("•")
                             .font(.system(size: 13))
-                            .foregroundColor(Color(white: 0.5))
+                            .foregroundColor(.appSecondaryText)
                     }
 
                     Text("\(yarn.numberOfSkeins) \(String(localized: "nøster"))")
                         .font(.system(size: 13))
-                        .foregroundColor(Color(white: 0.5))
+                        .foregroundColor(.appSecondaryText)
 
                     Text("•")
                         .font(.system(size: 13))
-                        .foregroundColor(Color(white: 0.5))
+                        .foregroundColor(.appSecondaryText)
 
                     Text(UnitConverter.formatLength(yarn.totalLength, unit: settings.currentUnitSystem))
                         .font(.system(size: 13))
-                        .foregroundColor(Color(white: 0.5))
+                        .foregroundColor(.appSecondaryText)
 
                     Text("•")
                         .font(.system(size: 13))
-                        .foregroundColor(Color(white: 0.5))
+                        .foregroundColor(.appSecondaryText)
 
                     Text(UnitConverter.formatWeight(totalGrams, unit: settings.currentUnitSystem))
                         .font(.system(size: 13))
-                        .foregroundColor(Color(white: 0.5))
+                        .foregroundColor(.appSecondaryText)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -392,11 +392,11 @@ struct YarnColorRowView: View {
                 VStack(alignment: .trailing, spacing: 1) {
                     Text("\(Int(reservedPercentage))%")
                         .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor(reservedPercentage > 100 ? .red : Color(red: 0.70, green: 0.65, blue: 0.82))
+                        .foregroundColor(reservedPercentage > 100 ? .red : .appSecondary)
 
                     Text("reservert")
                         .font(.system(size: 8))
-                        .foregroundColor(Color(white: 0.5))
+                        .foregroundColor(.appSecondaryText)
                 }
             }
         }
@@ -511,11 +511,11 @@ struct YarnStashSummaryView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Totalt på lager")
                         .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(Color(white: 0.3))
+                        .foregroundColor(.appText)
 
                     Text("For morro skyld")
                         .font(.system(size: 12))
-                        .foregroundColor(Color(white: 0.5))
+                        .foregroundColor(.appSecondaryText)
                 }
 
                 Spacer()
@@ -526,35 +526,35 @@ struct YarnStashSummaryView: View {
                 VStack(spacing: 4) {
                     Text(settings.currentUnitSystem == .metric ? "\(Int(totalWeight))" : String(format: "%.1f", UnitConverter.gramsToOunces(totalWeight)))
                         .font(.system(size: 24, weight: .bold))
-                        .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                        .foregroundColor(.appIconTint)
 
                     Text(settings.currentUnitSystem == .metric ? "gram totalt" : "oz totalt")
                         .font(.system(size: 13))
-                        .foregroundColor(Color(white: 0.5))
+                        .foregroundColor(.appSecondaryText)
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color(red: 0.93, green: 0.92, blue: 0.95))
+                .background(Color.appButtonBackgroundUnselected)
                 .cornerRadius(12)
 
                 VStack(spacing: 4) {
                     Text(settings.currentUnitSystem == .metric ? "\(Int(totalLength))" : String(format: "%.0f", UnitConverter.metersToYards(totalLength)))
                         .font(.system(size: 24, weight: .bold))
-                        .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                        .foregroundColor(.appIconTint)
 
                     Text(settings.currentUnitSystem == .metric ? "meter totalt" : "yards totalt")
                         .font(.system(size: 13))
-                        .foregroundColor(Color(white: 0.5))
+                        .foregroundColor(.appSecondaryText)
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color(red: 0.93, green: 0.92, blue: 0.95))
+                .background(Color.appButtonBackgroundUnselected)
                 .cornerRadius(12)
             }
             .padding(.horizontal)
             .padding(.bottom, 8)
         }
-        .background(Color(red: 0.98, green: 0.98, blue: 0.98))
+        .background(Color.appSecondaryBackground)
     }
 }
 

@@ -55,7 +55,7 @@ struct ProjectDetailView: View {
                                 .font(.system(size: 16, weight: .medium))
                             Text(recipe.displayCategory)
                                 .font(.system(size: 13))
-                                .foregroundColor(Color(white: 0.5))
+                                .foregroundColor(.appSecondaryText)
                         }
 
                         Spacer()
@@ -68,7 +68,7 @@ struct ProjectDetailView: View {
                     Button(action: { showRecipePicker = true }) {
                         HStack {
                             Image(systemName: "arrow.triangle.2.circlepath")
-                                .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                                .foregroundColor(.appIconTint)
                             Text("Bytt oppskrift")
                                 .foregroundColor(.primary)
                         }
@@ -77,7 +77,7 @@ struct ProjectDetailView: View {
                     Button(action: { showRecipePicker = true }) {
                         HStack {
                             Image(systemName: "plus.circle")
-                                .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                                .foregroundColor(.appIconTint)
                             Text("Legg til oppskrift")
                                 .foregroundColor(.primary)
                         }
@@ -131,7 +131,7 @@ struct ProjectDetailView: View {
                             }
                         }) {
                             Image(systemName: "xmark.circle.fill")
-                                .foregroundColor(Color(white: 0.6))
+                                .foregroundColor(.appSecondaryText)
                         }
                     }
                 } else {
@@ -142,7 +142,7 @@ struct ProjectDetailView: View {
                     }) {
                         HStack {
                             Image(systemName: "plus.circle")
-                                .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                                .foregroundColor(.appIconTint)
                             Text("Legg til startdato")
                                 .foregroundColor(.primary)
                         }
@@ -167,7 +167,7 @@ struct ProjectDetailView: View {
                             }
                         }) {
                             Image(systemName: "xmark.circle.fill")
-                                .foregroundColor(Color(white: 0.6))
+                                .foregroundColor(.appSecondaryText)
                         }
                     }
                 } else {
@@ -178,7 +178,7 @@ struct ProjectDetailView: View {
                     }) {
                         HStack {
                             Image(systemName: "plus.circle")
-                                .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                                .foregroundColor(.appIconTint)
                             Text("Legg til ferdigdato")
                                 .foregroundColor(.primary)
                         }
@@ -198,7 +198,7 @@ struct ProjectDetailView: View {
                 Button(action: { showAddYarn = true }) {
                     HStack {
                         Image(systemName: "plus.circle")
-                            .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                            .foregroundColor(.appIconTint)
                         Text("Legg til garn")
                             .foregroundColor(.primary)
                     }
@@ -239,7 +239,7 @@ struct ProjectDetailView: View {
                                 }) {
                                     Image(systemName: "minus.circle.fill")
                                         .font(.system(size: 32))
-                                        .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                                        .foregroundColor(.appIconTint)
                                 }
                                 .buttonStyle(PlainButtonStyle())
 
@@ -254,7 +254,7 @@ struct ProjectDetailView: View {
                                 }) {
                                     Image(systemName: "plus.circle.fill")
                                         .font(.system(size: 32))
-                                        .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                                        .foregroundColor(.appIconTint)
                                 }
                                 .buttonStyle(PlainButtonStyle())
 
@@ -281,7 +281,7 @@ struct ProjectDetailView: View {
                 }) {
                     HStack {
                         Image(systemName: "plus.circle")
-                            .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                            .foregroundColor(.appIconTint)
                         Text("Legg til teller")
                             .foregroundColor(.primary)
                     }
@@ -479,18 +479,18 @@ struct RecipePickerRow: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(recipe.name)
                         .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(Color(white: 0.2))
+                        .foregroundColor(.appText)
 
                     Text(recipe.displayCategory)
                         .font(.system(size: 13))
-                        .foregroundColor(Color(white: 0.5))
+                        .foregroundColor(.appSecondaryText)
                 }
 
                 Spacer()
 
                 if isSelected {
                     Image(systemName: "checkmark")
-                        .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                        .foregroundColor(.appIconTint)
                 }
             }
         }
@@ -519,11 +519,11 @@ struct ProjectYarnItemView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("\(yarn.brand) \(yarn.type)")
                     .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(Color(white: 0.2))
+                    .foregroundColor(.appText)
 
                 Text(quantityText)
                     .font(.system(size: 13))
-                    .foregroundColor(Color(white: 0.5))
+                    .foregroundColor(.appSecondaryText)
             }
 
             Spacer()

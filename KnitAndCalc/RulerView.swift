@@ -60,7 +60,7 @@ struct RulerView: View {
 
         GeometryReader { geometry in
             ZStack {
-                Color(red: 0.96, green: 0.94, blue: 0.90)
+                Color.appRulerBackground
                     .ignoresSafeArea()
 
                 // Scrollable content area with offset tracking
@@ -80,7 +80,7 @@ struct RulerView: View {
                     HStack(spacing: 0) {
                         // Corner
                         Rectangle()
-                            .fill(Color(red: 0.96, green: 0.94, blue: 0.90))
+                            .fill(Color.appRulerBackground)
                             .frame(width: 54, height: 54)
 
                         // Horizontal ruler marks
@@ -125,7 +125,7 @@ struct RulerView: View {
                                 .foregroundColor(.white)
                                 .padding(.horizontal, 20)
                                 .padding(.vertical, 10)
-                                .background(Color(red: 0.70, green: 0.65, blue: 0.82))
+                                .background(Color.appButtonBackground)
                                 .cornerRadius(20)
                                 .shadow(color: .black.opacity(0.15), radius: 4, y: 2)
                             }
@@ -137,11 +137,11 @@ struct RulerView: View {
                             Button(action: { showCalibration.toggle() }) {
                                 Image(systemName: showCalibration ? "slider.horizontal.3" : "ruler")
                                     .font(.system(size: 18, weight: .bold))
-                                    .foregroundColor(showCalibration ? .white : Color(white: 0.4))
+                                    .foregroundColor(showCalibration ? .appButtonText : .appButtonTextUnselected)
                                     .frame(width: 50, height: 50)
                                     .background(showCalibration ?
-                                        Color(red: 0.70, green: 0.65, blue: 0.82) :
-                                        Color(red: 0.93, green: 0.92, blue: 0.95))
+                                        Color.appButtonBackground :
+                                        Color.appButtonBackgroundUnselected)
                                     .cornerRadius(12)
                                     .shadow(color: .black.opacity(0.1), radius: 3, y: 2)
                             }
@@ -156,11 +156,11 @@ struct RulerView: View {
                                 }) {
                                     Text(unit.rawValue)
                                         .font(.system(size: 18, weight: .bold))
-                                        .foregroundColor(selectedUnit == unit ? .white : Color(white: 0.4))
+                                        .foregroundColor(selectedUnit == unit ? .appButtonText : .appButtonTextUnselected)
                                         .frame(width: 80, height: 50)
                                         .background(selectedUnit == unit ?
-                                            Color(red: 0.70, green: 0.65, blue: 0.82) :
-                                            Color(red: 0.93, green: 0.92, blue: 0.95))
+                                            Color.appButtonBackground :
+                                            Color.appButtonBackgroundUnselected)
                                         .cornerRadius(12)
                                         .shadow(color: .black.opacity(0.1), radius: 3, y: 2)
                                 }
@@ -174,7 +174,7 @@ struct RulerView: View {
                             VStack(spacing: 8) {
                                 Text("Kalibrering")
                                     .font(.system(size: 14, weight: .medium))
-                                    .foregroundColor(Color(white: 0.4))
+                                    .foregroundColor(.appSecondaryText)
 
                                 HStack(spacing: 12) {
                                     Button(action: { adjustCalibration(-0.01) }) {
@@ -182,19 +182,19 @@ struct RulerView: View {
                                             .font(.system(size: 16, weight: .bold))
                                             .foregroundColor(.white)
                                             .frame(width: 40, height: 40)
-                                            .background(Color(red: 0.70, green: 0.65, blue: 0.82))
+                                            .background(Color.appButtonBackground)
                                             .cornerRadius(8)
                                     }
 
                                     Slider(value: $calibrationOffset, in: -0.2...0.2, step: 0.005)
-                                        .accentColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                                        .accentColor(Color.appButtonBackground)
 
                                     Button(action: { adjustCalibration(0.01) }) {
                                         Image(systemName: "plus")
                                             .font(.system(size: 16, weight: .bold))
                                             .foregroundColor(.white)
                                             .frame(width: 40, height: 40)
-                                            .background(Color(red: 0.70, green: 0.65, blue: 0.82))
+                                            .background(Color.appButtonBackground)
                                             .cornerRadius(8)
                                     }
                                 }
@@ -206,23 +206,23 @@ struct RulerView: View {
                                             .foregroundColor(.white)
                                             .padding(.horizontal, 16)
                                             .padding(.vertical, 8)
-                                            .background(Color(red: 0.70, green: 0.65, blue: 0.82))
+                                            .background(Color.appButtonBackground)
                                             .cornerRadius(8)
                                     }
 
                                     Button(action: resetCalibration) {
                                         Text("Tilbakestill")
                                             .font(.system(size: 14, weight: .medium))
-                                            .foregroundColor(Color(white: 0.4))
+                                            .foregroundColor(.appSecondaryText)
                                             .padding(.horizontal, 16)
                                             .padding(.vertical, 8)
-                                            .background(Color(red: 0.93, green: 0.92, blue: 0.95))
+                                            .background(Color.appButtonBackgroundUnselected)
                                             .cornerRadius(8)
                                     }
                                 }
                             }
                             .padding()
-                            .background(Color(red: 0.98, green: 0.97, blue: 0.95))
+                            .background(Color.appSecondaryBackground)
                             .cornerRadius(12)
                             .padding(.horizontal)
                             .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -280,7 +280,7 @@ struct RulerContent: View {
         let totalWidth = CGFloat(unit.maxValue) * pixelsPerUnit + 1000
         let totalHeight = CGFloat(unit.maxValue) * pixelsPerUnit + 1000
 
-        Color(red: 0.96, green: 0.94, blue: 0.90)
+        Color.appRulerBackground
             .frame(width: totalWidth, height: totalHeight)
     }
 }
@@ -380,7 +380,7 @@ struct HorizontalRulerMarks: View {
             let endUnit = min(unit.maxValue, max(startUnit, Int(ceil((offset + width) / pixelsPerUnit)) + 1))
 
             ZStack(alignment: .topLeading) {
-                Color(red: 0.96, green: 0.94, blue: 0.90)
+                Color.appRulerBackground
 
                 HStack(spacing: 0) {
                     ForEach(startUnit...endUnit, id: \.self) { value in
@@ -462,7 +462,7 @@ struct VerticalRulerMarks: View {
             let endUnit = min(unit.maxValue, max(startUnit, Int(ceil((offset + height) / pixelsPerUnit)) + 1))
 
             ZStack(alignment: .topLeading) {
-                Color(red: 0.96, green: 0.94, blue: 0.90)
+                Color.appRulerBackground
 
                 VStack(spacing: 0) {
                     ForEach(startUnit...endUnit, id: \.self) { value in

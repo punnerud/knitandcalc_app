@@ -44,9 +44,9 @@ struct StitchCalculatorView: View {
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 12)
                                 .background(currentMode == mode ?
-                                    Color(red: 0.75, green: 0.70, blue: 0.85) :
-                                    Color(red: 0.93, green: 0.92, blue: 0.95))
-                                .foregroundColor(currentMode == mode ? .white : Color(white: 0.45))
+                                    Color.appButtonBackgroundSelected :
+                                    Color.appButtonBackgroundUnselected)
+                                .foregroundColor(currentMode == mode ? .appButtonText : .appButtonTextUnselected)
                                 .cornerRadius(8)
                         }
                     }
@@ -58,7 +58,7 @@ struct StitchCalculatorView: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("Antall masker på pinnen:")
                             .font(.system(size: 14))
-                            .foregroundColor(Color(white: 0.35))
+                            .foregroundColor(.appSecondaryText)
                         TextField("", text: $stitchesOnNeedle)
                             .keyboardType(.numberPad)
                             .textFieldStyle(StitchTextFieldStyle())
@@ -68,7 +68,7 @@ struct StitchCalculatorView: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(currentMode == .increase ? "Antall økninger:" : "Antall fellinger:")
                             .font(.system(size: 14))
-                            .foregroundColor(Color(white: 0.35))
+                            .foregroundColor(.appSecondaryText)
                         TextField("", text: $changes)
                             .keyboardType(.numberPad)
                             .textFieldStyle(StitchTextFieldStyle())
@@ -81,10 +81,10 @@ struct StitchCalculatorView: View {
                 Button(action: calculate) {
                     Text("Beregn")
                         .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(.white)
+                        .foregroundColor(.appButtonText)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color(red: 0.70, green: 0.65, blue: 0.82))
+                        .background(Color.appButtonBackground)
                         .cornerRadius(8)
                 }
                 .padding(.horizontal)
@@ -103,13 +103,13 @@ struct StitchCalculatorView: View {
                                         Image(systemName: checkedLines[index] ? "checkmark.square.fill" : "square")
                                             .font(.system(size: 22))
                                             .foregroundColor(checkedLines[index] ?
-                                                Color(red: 0.70, green: 0.65, blue: 0.82) :
-                                                Color(white: 0.60))
+                                                Color.appCheckmarkActive :
+                                                Color.appCheckmarkInactive)
 
                                         Text(instructionLines[index])
                                             .font(.system(size: 16))
-                                            .foregroundColor(Color(white: 0.20))
-                                            .strikethrough(checkedLines[index], color: Color(white: 0.50))
+                                            .foregroundColor(.appText)
+                                            .strikethrough(checkedLines[index], color: .appSecondaryText)
                                             .opacity(checkedLines[index] ? 0.5 : 1.0)
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                     }
@@ -121,22 +121,22 @@ struct StitchCalculatorView: View {
                             ForEach(instructionLines, id: \.self) { line in
                                 Text(line)
                                     .font(.system(size: 16))
-                                    .foregroundColor(Color(white: 0.20))
+                                    .foregroundColor(.appText)
                             }
                         }
 
                         if !totalStitches.isEmpty {
                             Text(totalStitches)
                                 .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(Color(red: 0.50, green: 0.45, blue: 0.60))
+                                .foregroundColor(.appSecondary)
                                 .frame(maxWidth: .infinity)
                                 .padding()
-                                .background(Color(red: 0.93, green: 0.92, blue: 0.95))
+                                .background(Color.appResultBackground)
                                 .cornerRadius(8)
                         }
                     }
                     .padding(20)
-                    .background(Color(red: 0.98, green: 0.98, blue: 0.98))
+                    .background(Color.appSecondaryBackground)
                     .cornerRadius(8)
                     .padding(.horizontal)
                 }
@@ -279,13 +279,13 @@ struct StitchTextFieldStyle: TextFieldStyle {
     func _body(configuration: TextField<Self._Label>) -> some View {
         configuration
             .padding(12)
-            .background(Color.white)
+            .background(Color.appTextFieldBackground)
             .cornerRadius(8)
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color(white: 0.87), lineWidth: 1)
+                    .stroke(Color.appTextFieldBorder, lineWidth: 1)
             )
-            .foregroundColor(Color(white: 0.20))
+            .foregroundColor(.appTextFieldText)
     }
 }
 

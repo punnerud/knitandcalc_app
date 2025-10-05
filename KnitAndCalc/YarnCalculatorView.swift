@@ -32,7 +32,7 @@ struct YarnCalculatorView: View {
                 // Description
                 Text("Finn ut hvor mye garn du trenger når du bytter til et annet med forskjellig løpelengde. Husk at strikkefastheten skal være lik.")
                     .font(.system(size: 14))
-                    .foregroundColor(Color(white: 0.35))
+                    .foregroundColor(.appSecondaryText)
                     .padding(.horizontal)
 
                 // Unit selector
@@ -47,11 +47,11 @@ struct YarnCalculatorView: View {
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 10)
                                 .background(selectedUnit == unit ?
-                                    Color(red: 0.75, green: 0.70, blue: 0.85) :
-                                    Color(red: 0.93, green: 0.92, blue: 0.95))
+                                    Color.appButtonBackgroundSelected :
+                                    Color.appButtonBackgroundUnselected)
                                 .foregroundColor(selectedUnit == unit ?
-                                    .white :
-                                    Color(white: 0.45))
+                                    .appButtonText :
+                                    .appButtonTextUnselected)
                                 .cornerRadius(8)
                         }
                     }
@@ -62,12 +62,12 @@ struct YarnCalculatorView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Garnet i oppskriften")
                         .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(Color(white: 0.17))
+                        .foregroundColor(.appText)
 
                     VStack(alignment: .leading, spacing: 6) {
                         Text("Løpelengde per nøste")
                             .font(.system(size: 14))
-                            .foregroundColor(Color(white: 0.35))
+                            .foregroundColor(.appSecondaryText)
                         TextField("", text: $lengthRecipe)
                             .keyboardType(.decimalPad)
                             .textFieldStyle(CustomTextFieldStyle())
@@ -77,7 +77,7 @@ struct YarnCalculatorView: View {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("Antall nøster i oppskriften")
                             .font(.system(size: 14))
-                            .foregroundColor(Color(white: 0.35))
+                            .foregroundColor(.appSecondaryText)
                         TextField("", text: $countRecipe)
                             .keyboardType(.decimalPad)
                             .textFieldStyle(CustomTextFieldStyle())
@@ -90,12 +90,12 @@ struct YarnCalculatorView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Garnet du vil bruke")
                         .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(Color(white: 0.17))
+                        .foregroundColor(.appText)
 
                     VStack(alignment: .leading, spacing: 6) {
                         Text("Løpelengde per nøste")
                             .font(.system(size: 14))
-                            .foregroundColor(Color(white: 0.35))
+                            .foregroundColor(.appSecondaryText)
                         TextField("", text: $lengthYours)
                             .keyboardType(.decimalPad)
                             .textFieldStyle(CustomTextFieldStyle())
@@ -114,10 +114,10 @@ struct YarnCalculatorView: View {
                     Button(action: { calculate(scrollProxy: proxy) }) {
                         Text("Beregn")
                             .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(.white)
+                            .foregroundColor(.appButtonText)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(Color(red: 0.70, green: 0.65, blue: 0.82))
+                            .background(Color.appButtonBackground)
                             .cornerRadius(8)
                     }
                     .id("calculateButton")
@@ -127,16 +127,16 @@ struct YarnCalculatorView: View {
                         if !tensionEnabled {
                             Text("💡 Du kan legge til strikkefasthetsberegning under tannhjulet øverst til høyre.")
                                 .font(.system(size: 13))
-                                .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                                .foregroundColor(.appHintText)
                                 .padding(.top, 8)
                         } else {
                             HStack(spacing: 6) {
                                 Image(systemName: "checkmark.circle.fill")
                                     .font(.system(size: 13))
-                                    .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                                    .foregroundColor(.appHintText)
                                 Text("Strikkefasthetsberegning er aktivert")
                                     .font(.system(size: 13, weight: .medium))
-                                    .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                                    .foregroundColor(.appHintText)
                             }
                             .padding(.top, 8)
                         }
@@ -151,12 +151,12 @@ struct YarnCalculatorView: View {
                             .font(.system(size: 48))
                         Text(resultText)
                             .font(.system(size: 16, weight: .semibold))
-                            .foregroundColor(Color(white: 0.17))
+                            .foregroundColor(.appText)
                             .multilineTextAlignment(.center)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(24)
-                    .background(Color(red: 0.93, green: 0.92, blue: 0.95))
+                    .background(Color.appResultBackground)
                     .cornerRadius(12)
                     .padding(.horizontal)
                     .id("result")
@@ -172,7 +172,7 @@ struct YarnCalculatorView: View {
                         showTensionSettings = true
                     }) {
                         Image(systemName: "gearshape")
-                            .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                            .foregroundColor(.appIconTint)
                     }
                 }
             }
@@ -241,13 +241,13 @@ struct CustomTextFieldStyle: TextFieldStyle {
     func _body(configuration: TextField<Self._Label>) -> some View {
         configuration
             .padding(12)
-            .background(Color.white)
+            .background(Color.appTextFieldBackground)
             .cornerRadius(8)
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color(red: 0.80, green: 0.75, blue: 0.88), lineWidth: 2)
+                    .stroke(Color.appTextFieldBorder, lineWidth: 2)
             )
-            .foregroundColor(Color(red: 0.50, green: 0.45, blue: 0.60))
+            .foregroundColor(.appTextFieldText)
     }
 }
 
@@ -266,9 +266,9 @@ struct TensionSettingsView: View {
                     Toggle(isOn: $tensionEnabled) {
                         Text("Aktiver strikkefasthetsberegning")
                             .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(Color(white: 0.17))
+                            .foregroundColor(.appText)
                     }
-                    .tint(Color(red: 0.70, green: 0.65, blue: 0.82))
+                    .tint(Color.appButtonBackground)
                     .padding(.horizontal)
 
                     if tensionEnabled {
@@ -277,22 +277,22 @@ struct TensionSettingsView: View {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Hvordan måle strikkefasthet:")
                                     .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(Color(white: 0.17))
+                                    .foregroundColor(.appText)
 
                                 Text("Strikk en prøvelapp på minst 12x12 cm. La den ligge flatt og tell masker på 10 cm i bredden. Oppgi antall masker med komma for halve masker (f.eks. 18,5).")
                                     .font(.system(size: 13))
-                                    .foregroundColor(Color(white: 0.35))
+                                    .foregroundColor(.appSecondaryText)
                             }
                             .padding(.horizontal)
                             .padding(.vertical, 12)
-                            .background(Color(red: 0.93, green: 0.92, blue: 0.95))
+                            .background(Color.appResultBackground)
                             .cornerRadius(8)
 
                             // From tension
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("Masker per 10cm i oppskriften")
                                     .font(.system(size: 14))
-                                    .foregroundColor(Color(white: 0.35))
+                                    .foregroundColor(.appSecondaryText)
                                 TextField("", text: $tensionFrom)
                                     .keyboardType(.decimalPad)
                                     .textFieldStyle(CustomTextFieldStyle())
@@ -303,7 +303,7 @@ struct TensionSettingsView: View {
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("Masker per 10cm med ditt garn")
                                     .font(.system(size: 14))
-                                    .foregroundColor(Color(white: 0.35))
+                                    .foregroundColor(.appSecondaryText)
                                 TextField("", text: $tensionTo)
                                     .keyboardType(.decimalPad)
                                     .textFieldStyle(CustomTextFieldStyle())
@@ -324,7 +324,7 @@ struct TensionSettingsView: View {
                     Button("Ferdig") {
                         dismiss()
                     }
-                    .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                    .foregroundColor(.appIconTint)
                 }
             }
         }

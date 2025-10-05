@@ -195,11 +195,11 @@ struct EditYarnStashView: View {
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text(item.project.name)
                                             .font(.system(size: 16, weight: .medium))
-                                            .foregroundColor(Color(white: 0.2))
+                                            .foregroundColor(.appText)
 
                                         Text(formatProjectYarnQuantity(projectYarn))
                                             .font(.system(size: 13))
-                                            .foregroundColor(Color(white: 0.5))
+                                            .foregroundColor(.appSecondaryText)
                                     }
 
                                     Spacer()
@@ -212,7 +212,7 @@ struct EditYarnStashView: View {
                                         }) {
                                             Image(systemName: "pencil")
                                                 .font(.system(size: 18))
-                                                .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                                                .foregroundColor(.appIconTint)
                                         }
                                         .buttonStyle(PlainButtonStyle())
 
@@ -247,7 +247,7 @@ struct EditYarnStashView: View {
                             .font(.system(size: 17, weight: .semibold))
                     }
                     .disabled(!isFormValid)
-                    .foregroundColor(isFormValid ? Color(red: 0.70, green: 0.65, blue: 0.82) : Color(white: 0.7))
+                    .foregroundColor(isFormValid ? .appIconTint : .appTertiaryText)
                 }
             }
             .onAppear {
@@ -412,7 +412,7 @@ struct EditProjectYarnQuantityView: View {
                 Section(header: Text("Prosjekt")) {
                     HStack {
                         Text("Navn")
-                            .foregroundColor(Color(white: 0.5))
+                            .foregroundColor(.appSecondaryText)
                         Spacer()
                         Text(project.name)
                             .font(.system(size: 16, weight: .medium))
@@ -437,16 +437,16 @@ struct EditProjectYarnQuantityView: View {
 
                             Text("Garninformasjon")
                                 .font(.system(size: 13, weight: .medium))
-                                .foregroundColor(Color(white: 0.4))
+                                .foregroundColor(.appSecondaryText)
 
                             HStack {
                                 Text("På lager:")
                                     .font(.system(size: 13))
-                                    .foregroundColor(Color(white: 0.5))
+                                    .foregroundColor(.appSecondaryText)
                                 Spacer()
                                 Text("\(yarn.numberOfSkeins) nøster (\(UnitConverter.formatWeight(Double(yarn.numberOfSkeins) * yarn.weightPerSkein, unit: settings.currentUnitSystem)))")
                                     .font(.system(size: 13, weight: .medium))
-                                    .foregroundColor(Color(white: 0.3))
+                                    .foregroundColor(.appText)
                             }
 
                             Divider()
@@ -454,7 +454,7 @@ struct EditProjectYarnQuantityView: View {
 
                             Text("Du reserverer")
                                 .font(.system(size: 13, weight: .medium))
-                                .foregroundColor(Color(white: 0.4))
+                                .foregroundColor(.appSecondaryText)
 
                             let calculations = calculateConversions(quantityValue)
 
@@ -462,11 +462,11 @@ struct EditProjectYarnQuantityView: View {
                                 HStack {
                                     Text("Nøster:")
                                         .font(.system(size: 13))
-                                        .foregroundColor(Color(white: 0.5))
+                                        .foregroundColor(.appSecondaryText)
                                     Spacer()
                                     Text(formatNorwegian(calculations.skeins))
                                         .font(.system(size: 13, weight: .medium))
-                                        .foregroundColor(Color(white: 0.3))
+                                        .foregroundColor(.appText)
                                 }
                             }
 
@@ -474,11 +474,11 @@ struct EditProjectYarnQuantityView: View {
                                 HStack {
                                     Text(settings.currentUnitSystem == .metric ? "Meter:" : "Yards:")
                                         .font(.system(size: 13))
-                                        .foregroundColor(Color(white: 0.5))
+                                        .foregroundColor(.appSecondaryText)
                                     Spacer()
                                     Text(UnitConverter.formatLength(calculations.meters, unit: settings.currentUnitSystem))
                                         .font(.system(size: 13, weight: .medium))
-                                        .foregroundColor(Color(white: 0.3))
+                                        .foregroundColor(.appText)
                                 }
                             }
 
@@ -486,22 +486,22 @@ struct EditProjectYarnQuantityView: View {
                                 HStack {
                                     Text(settings.currentUnitSystem == .metric ? "Gram:" : "Ounces:")
                                         .font(.system(size: 13))
-                                        .foregroundColor(Color(white: 0.5))
+                                        .foregroundColor(.appSecondaryText)
                                     Spacer()
                                     Text(UnitConverter.formatWeight(calculations.grams, unit: settings.currentUnitSystem))
                                         .font(.system(size: 13, weight: .medium))
-                                        .foregroundColor(Color(white: 0.3))
+                                        .foregroundColor(.appText)
                                 }
                             }
 
                             HStack {
                                 Text("Prosent av lager:")
                                     .font(.system(size: 13))
-                                    .foregroundColor(Color(white: 0.5))
+                                    .foregroundColor(.appSecondaryText)
                                 Spacer()
                                 Text("\(Int(calculations.percentage))%")
                                     .font(.system(size: 13, weight: .semibold))
-                                    .foregroundColor(calculations.percentage > 100 ? .red : Color(red: 0.70, green: 0.65, blue: 0.82))
+                                    .foregroundColor(calculations.percentage > 100 ? .red : .appIconTint)
                             }
                         }
                     }
@@ -522,7 +522,7 @@ struct EditProjectYarnQuantityView: View {
                             .font(.system(size: 17, weight: .semibold))
                     }
                     .disabled(!isFormValid)
-                    .foregroundColor(isFormValid ? Color(red: 0.70, green: 0.65, blue: 0.82) : Color(white: 0.7))
+                    .foregroundColor(isFormValid ? .appIconTint : .appTertiaryText)
                 }
             }
             .onAppear {

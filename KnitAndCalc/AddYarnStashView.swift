@@ -219,7 +219,7 @@ struct AddYarnStashView: View {
                             .font(.system(size: 17, weight: .semibold))
                     }
                     .disabled(!isFormValid)
-                    .foregroundColor(isFormValid ? Color(red: 0.70, green: 0.65, blue: 0.82) : Color(white: 0.7))
+                    .foregroundColor(isFormValid ? .appIconTint : .appTertiaryText)
                 }
             }
         }

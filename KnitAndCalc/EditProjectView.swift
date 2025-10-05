@@ -44,7 +44,7 @@ struct EditProjectView: View {
                             .font(.system(size: 17, weight: .semibold))
                     }
                     .disabled(name.isEmpty)
-                    .foregroundColor(name.isEmpty ? Color(white: 0.7) : Color(red: 0.70, green: 0.65, blue: 0.82))
+                    .foregroundColor(name.isEmpty ? .appTertiaryText : .appIconTint)
                 }
             }
             .onAppear {
