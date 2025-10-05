@@ -36,6 +36,7 @@ struct EditYarnStashView: View {
     @State private var showEditQuantity: Bool = false
     @State private var editingProject: Project?
     @State private var editingProjectYarn: ProjectYarn?
+    @State private var showDeleteAlert: Bool = false
 
     var existingBrands: [String] {
         Array(Set(yarnEntries.map { $0.brand })).sorted()
@@ -187,6 +188,20 @@ struct EditYarnStashView: View {
                         .frame(minHeight: 100)
                 }
 
+                Section {
+                    Button(action: {
+                        showDeleteAlert = true
+                    }) {
+                        HStack {
+                            Spacer()
+                            Text("Slett garn")
+                                .font(.system(size: 17, weight: .semibold))
+                                .foregroundColor(.red)
+                            Spacer()
+                        }
+                    }
+                }
+
                 if !linkedProjects.isEmpty {
                     Section(header: Text("Koblet til prosjekter")) {
                         ForEach(linkedProjects, id: \.project.id) { item in
@@ -265,6 +280,20 @@ struct EditYarnStashView: View {
                 }
             } message: { item in
                 Text("Er du sikker på at du vil koble fra dette garnet fra \"\(item.project.name)\"? Prosjektet vil også miste garnet i sin oversikt.")
+            }
+            .alert("Slett garn", isPresented: $showDeleteAlert) {
+                Button("Avbryt", role: .cancel) {
+                    showDeleteAlert = false
+                }
+                Button("Slett", role: .destructive) {
+                    deleteYarn()
+                }
+            } message: {
+                if !linkedProjects.isEmpty {
+                    Text("Er du sikker på at du vil slette dette garnet? Det er koblet til \(linkedProjects.count) prosjekt\(linkedProjects.count == 1 ? "" : "er") og vil bli fjernet derfra også.")
+                } else {
+                    Text("Er du sikker på at du vil slette dette garnet?")
+                }
             }
             .sheet(isPresented: $showEditQuantity, onDismiss: {
                 if projects == nil {
@@ -388,6 +417,22 @@ struct EditYarnStashView: View {
             }
         }
         projectYarnToUnlink = nil
+    }
+
+    func deleteYarn() {
+        // Remove yarn from all linked projects first
+        for (project, projectYarns) in linkedProjects {
+            for projectYarn in projectYarns {
+                unlinkProjectYarn(project: project, projectYarn: projectYarn)
+            }
+        }
+
+        // Remove the yarn entry itself
+        if let index = yarnEntries.firstIndex(where: { $0.id == yarn.id }) {
+            yarnEntries.remove(at: index)
+        }
+
+        dismiss()
     }
 }
 

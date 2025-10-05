@@ -2237,6 +2237,19 @@
         }
       }
     },
+    "Er du sikker på at du vil slette dette garnet?" : {
+
+    },
+    "Er du sikker på at du vil slette dette garnet? Det er koblet til %lld prosjekt%@ og vil bli fjernet derfra også." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Er du sikker på at du vil slette dette garnet? Det er koblet til %1$lld prosjekt%2$@ og vil bli fjernet derfra også."
+          }
+        }
+      }
+    },
     "Få en påminnelse hver 3. dag" : {
       "localizations" : {
         "da" : {
