@@ -36,7 +36,7 @@ enum NeedleSize: String, CaseIterable {
 }
 
 struct ProjectDetailView: View {
-    let project: Project
+    let projectId: UUID
     @Binding var projects: [Project]
     let recipes: [Recipe]
 
@@ -51,7 +51,16 @@ struct ProjectDetailView: View {
     @State private var isCustomNeedleSize: Bool = false
     @FocusState private var isCustomNeedleSizeFocused: Bool
     @State private var showDeleteConfirmation: Bool = false
+    @State private var showImagePicker: Bool = false
+    @State private var selectedImages: [UIImage] = []
+    @State private var imageToDelete: String?
+    @State private var showImageGallery: Bool = false
+    @State private var selectedImageIndex: Int = 0
     @Environment(\.dismiss) var dismiss
+
+    var project: Project {
+        projects.first { $0.id == projectId } ?? Project(name: "")
+    }
 
     var linkedRecipe: Recipe? {
         if let recipeId = project.recipeId {
@@ -61,18 +70,105 @@ struct ProjectDetailView: View {
     }
 
     var projectIndex: Int? {
-        projects.firstIndex { $0.id == project.id }
+        projects.firstIndex { $0.id == projectId }
     }
 
     var body: some View {
-        ZStack {
-            Color.clear
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    hideKeyboard()
+        mainForm
+            .navigationTitle(project.name)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Lagre") {
+                        dismiss()
+                    }
+                    .foregroundColor(.appIconTint)
                 }
 
-            Form {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Ferdig") {
+                        hideKeyboard()
+                    }
+                }
+            }
+            .sheet(isPresented: $showRecipePicker) {
+                RecipePickerView(selectedRecipeId: Binding(
+                    get: { project.recipeId },
+                    set: { newValue in
+                        if let index = projectIndex {
+                            projects[index].recipeId = newValue
+                        }
+                    }
+                ), recipes: recipes)
+            }
+            .alert("Slett teller", isPresented: .constant(counterToDelete != nil), presenting: counterToDelete) { counter in
+                Button("Avbryt", role: .cancel) {
+                    counterToDelete = nil
+                }
+                Button("Slett", role: .destructive) {
+                    if let index = projectIndex,
+                       let counterIndex = projects[index].rowCounters.firstIndex(where: { $0.id == counter.id }) {
+                        projects[index].rowCounters.remove(at: counterIndex)
+                    }
+                    counterToDelete = nil
+                }
+            } message: { counter in
+                Text("Er du sikker på at du vil slette \"\(counter.name)\"?")
+            }
+            .alert("Slett garn", isPresented: .constant(yarnToDelete != nil), presenting: yarnToDelete) { yarn in
+                Button("Avbryt", role: .cancel) {
+                    yarnToDelete = nil
+                }
+                Button("Slett", role: .destructive) {
+                    if let index = projectIndex,
+                       let yarnIndex = projects[index].linkedYarns.firstIndex(where: { $0.id == yarn.id }) {
+                        projects[index].linkedYarns.remove(at: yarnIndex)
+                    }
+                    yarnToDelete = nil
+                }
+            } message: { yarn in
+                if let yarnEntry = yarnEntries.first(where: { $0.id == yarn.yarnStashId }) {
+                    Text("Er du sikker på at du vil fjerne \"\(yarnEntry.brand) \(yarnEntry.type)\"?")
+                } else {
+                    Text("Er du sikker på at du vil fjerne dette garnet?")
+                }
+            }
+            .sheet(isPresented: $showAddYarn) {
+                AddProjectYarnView(projects: $projects, projectId: projectId)
+            }
+            .sheet(isPresented: $showImagePicker, onDismiss: {
+                handleNewImages(selectedImages)
+            }) {
+                ImagePicker(images: $selectedImages)
+            }
+            .alert("Slett bilde", isPresented: .constant(imageToDelete != nil), presenting: imageToDelete) { imagePath in
+                Button("Avbryt", role: .cancel) {
+                    imageToDelete = nil
+                }
+                Button("Slett", role: .destructive) {
+                    deleteImage(imagePath)
+                }
+            } message: { _ in
+                Text("Er du sikker på at du vil slette dette bildet?")
+            }
+            .alert("Slett prosjekt", isPresented: $showDeleteConfirmation) {
+                Button("Avbryt", role: .cancel) {}
+                Button("Slett", role: .destructive) {
+                    deleteProject()
+                }
+            } message: {
+                Text("Er du sikker på at du vil slette \"\(project.name)\"?\n\nTips: Du kan også trekke til venstre på oversikten for å redigere eller slette. Det er raskere enn å bruke denne knappen.")
+            }
+            .onAppear {
+                loadYarnEntries()
+                initializeNeedleSize()
+            }
+    }
+
+    var mainForm: some View {
+        Form {
+            Group {
             Section(header: Text("Status")) {
                 Picker("Status", selection: Binding(
                     get: { project.status },
@@ -283,6 +379,17 @@ struct ProjectDetailView: View {
                 .frame(minHeight: 100)
             }
 
+            ProjectImagesSection(
+                projectId: projectId,
+                projects: $projects,
+                showImagePicker: $showImagePicker,
+                imageToDelete: $imageToDelete,
+                showGallery: $showImageGallery,
+                selectedImageIndex: $selectedImageIndex
+            )
+            }
+
+            Group {
             Section(header: Text("Omgangsteller")) {
                 ForEach(project.rowCounters) { counter in
                     if let counterIndex = project.rowCounters.firstIndex(where: { $0.id == counter.id }) {
@@ -369,73 +476,6 @@ struct ProjectDetailView: View {
             }
             }
         }
-        .navigationTitle(project.name)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItemGroup(placement: .keyboard) {
-                Spacer()
-                Button("Ferdig") {
-                    hideKeyboard()
-                }
-            }
-        }
-        .sheet(isPresented: $showRecipePicker) {
-            RecipePickerView(selectedRecipeId: Binding(
-                get: { project.recipeId },
-                set: { newValue in
-                    if let index = projectIndex {
-                        projects[index].recipeId = newValue
-                    }
-                }
-            ), recipes: recipes)
-        }
-        .alert("Slett teller", isPresented: .constant(counterToDelete != nil), presenting: counterToDelete) { counter in
-            Button("Avbryt", role: .cancel) {
-                counterToDelete = nil
-            }
-            Button("Slett", role: .destructive) {
-                if let index = projectIndex,
-                   let counterIndex = projects[index].rowCounters.firstIndex(where: { $0.id == counter.id }) {
-                    projects[index].rowCounters.remove(at: counterIndex)
-                }
-                counterToDelete = nil
-            }
-        } message: { counter in
-            Text("Er du sikker på at du vil slette \"\(counter.name)\"?")
-        }
-        .alert("Slett garn", isPresented: .constant(yarnToDelete != nil), presenting: yarnToDelete) { yarn in
-            Button("Avbryt", role: .cancel) {
-                yarnToDelete = nil
-            }
-            Button("Slett", role: .destructive) {
-                if let index = projectIndex,
-                   let yarnIndex = projects[index].linkedYarns.firstIndex(where: { $0.id == yarn.id }) {
-                    projects[index].linkedYarns.remove(at: yarnIndex)
-                }
-                yarnToDelete = nil
-            }
-        } message: { yarn in
-            if let yarnEntry = yarnEntries.first(where: { $0.id == yarn.yarnStashId }) {
-                Text("Er du sikker på at du vil fjerne \"\(yarnEntry.brand) \(yarnEntry.type)\"?")
-            } else {
-                Text("Er du sikker på at du vil fjerne dette garnet?")
-            }
-        }
-        .sheet(isPresented: $showAddYarn) {
-            AddProjectYarnView(projects: $projects, projectId: project.id)
-        }
-        .alert("Slett prosjekt", isPresented: $showDeleteConfirmation) {
-            Button("Avbryt", role: .cancel) {}
-            Button("Slett", role: .destructive) {
-                deleteProject()
-            }
-        } message: {
-            Text("Er du sikker på at du vil slette \"\(project.name)\"?\n\nTips: Du kan også trekke til venstre på oversikten for å redigere eller slette. Det er raskere enn å bruke denne knappen.")
-        }
-        .onAppear {
-            loadYarnEntries()
-            initializeNeedleSize()
-        }
     }
 
     func deleteProject() {
@@ -466,6 +506,52 @@ struct ProjectDetailView: View {
 
     func hideKeyboard() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+
+    func handleNewImages(_ images: [UIImage]) {
+        guard !images.isEmpty, let idx = projectIndex else { return }
+        for img in images {
+            if let path = saveImageToFile(img) {
+                projects[idx].images.append(path)
+                if projects[idx].primaryImageIndex == nil {
+                    projects[idx].primaryImageIndex = 0
+                }
+            }
+        }
+        selectedImages = []
+    }
+
+    func saveImageToFile(_ img: UIImage) -> String? {
+        guard let data = img.jpegData(compressionQuality: 0.8) else { return nil }
+        let name = UUID().uuidString + ".jpg"
+        let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent(name)
+        try? data.write(to: url)
+        return name
+    }
+
+    func deleteImage(_ imagePath: String) {
+        guard let idx = projectIndex else { return }
+
+        if let imageIndex = projects[idx].images.firstIndex(of: imagePath) {
+            // Delete file
+            let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+                .appendingPathComponent(imagePath)
+            try? FileManager.default.removeItem(at: url)
+
+            // Remove from array
+            projects[idx].images.remove(at: imageIndex)
+
+            // Update primary index if needed
+            if let primaryIdx = projects[idx].primaryImageIndex {
+                if primaryIdx == imageIndex {
+                    projects[idx].primaryImageIndex = projects[idx].images.isEmpty ? nil : 0
+                } else if primaryIdx > imageIndex {
+                    projects[idx].primaryImageIndex = primaryIdx - 1
+                }
+            }
+        }
+        imageToDelete = nil
     }
 }
 
@@ -661,10 +747,11 @@ struct ProjectYarnItemView: View {
 }
 
 #Preview {
-    NavigationView {
+    let testProject = Project(name: "Test Prosjekt")
+    return NavigationView {
         ProjectDetailView(
-            project: Project(name: "Test Prosjekt"),
-            projects: .constant([]),
+            projectId: testProject.id,
+            projects: .constant([testProject]),
             recipes: []
         )
     }

@@ -74,7 +74,7 @@ struct ProjectListView: View {
             .background(
                 NavigationLink(
                     destination: projectToNavigate.map { project in
-                        ProjectDetailView(project: project, projects: $projects, recipes: recipes)
+                        ProjectDetailView(projectId: project.id, projects: $projects, recipes: recipes)
                     },
                     isActive: Binding(
                         get: { projectToNavigate != nil },
@@ -207,8 +207,8 @@ struct ProjectListView: View {
     var projectListView: some View {
         List {
             ForEach(filteredProjects) { project in
-                NavigationLink(destination: ProjectDetailView(project: project, projects: $projects, recipes: recipes)) {
-                    ProjectRowView(project: project, recipes: recipes)
+                NavigationLink(destination: ProjectDetailView(projectId: project.id, projects: $projects, recipes: recipes)) {
+                    ProjectRowView(project: project, recipes: recipes, projects: $projects)
                 }
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                     Button(role: .destructive) {
@@ -259,6 +259,8 @@ struct ProjectListView: View {
 struct ProjectRowView: View {
     let project: Project
     let recipes: [Recipe]
+    @Binding var projects: [Project]
+    @State private var showImageGallery = false
 
     var linkedRecipe: Recipe? {
         if let recipeId = project.recipeId {
@@ -283,16 +285,47 @@ struct ProjectRowView: View {
         return formatter.string(from: date)
     }
 
+    func loadImage(_ filename: String) -> UIImage? {
+        let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let fileURL = documentsPath.appendingPathComponent(filename)
+
+        if let data = try? Data(contentsOf: fileURL) {
+            return UIImage(data: data)
+        }
+        return nil
+    }
+
+    var primaryImage: UIImage? {
+        if let primaryIdx = project.primaryImageIndex,
+           primaryIdx < project.images.count {
+            return loadImage(project.images[primaryIdx])
+        }
+        return nil
+    }
+
     var body: some View {
         HStack(spacing: 12) {
-            ZStack {
-                Circle()
-                    .fill(Color.appButtonBackgroundUnselected)
+            if let image = primaryImage {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
                     .frame(width: 44, height: 44)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .onTapGesture {
+                        if !project.images.isEmpty {
+                            showImageGallery = true
+                        }
+                    }
+            } else {
+                ZStack {
+                    Circle()
+                        .fill(Color.appButtonBackgroundUnselected)
+                        .frame(width: 44, height: 44)
 
-                Image(systemName: project.status.iconName)
-                    .font(.system(size: 20))
-                    .foregroundColor(.appIconTint)
+                    Image(systemName: project.status.iconName)
+                        .font(.system(size: 20))
+                        .foregroundColor(.appIconTint)
+                }
             }
 
             VStack(alignment: .leading, spacing: 4) {
@@ -316,6 +349,14 @@ struct ProjectRowView: View {
             }
         }
         .padding(.vertical, 8)
+        .fullScreenCover(isPresented: $showImageGallery) {
+            ProjectImageGalleryView(
+                projectId: project.id,
+                projects: $projects,
+                initialIndex: project.primaryImageIndex ?? 0,
+                onDismiss: { showImageGallery = false }
+            )
+        }
     }
 }
 
@@ -396,9 +437,11 @@ struct Project: Identifiable, Codable, Equatable {
     var notes: String
     var rowCounters: [RowCounter]
     var linkedYarns: [ProjectYarn]
+    var images: [String]
+    var primaryImageIndex: Int?
     var dateCreated: Date
 
-    init(id: UUID = UUID(), name: String, status: ProjectStatus = .planned, recipeId: UUID? = nil, size: String = "", gauge: String = "", needleSize: String = "", startDate: Date? = nil, completedDate: Date? = nil, notes: String = "", rowCounters: [RowCounter] = [], linkedYarns: [ProjectYarn] = [], dateCreated: Date = Date()) {
+    init(id: UUID = UUID(), name: String, status: ProjectStatus = .planned, recipeId: UUID? = nil, size: String = "", gauge: String = "", needleSize: String = "", startDate: Date? = nil, completedDate: Date? = nil, notes: String = "", rowCounters: [RowCounter] = [], linkedYarns: [ProjectYarn] = [], images: [String] = [], primaryImageIndex: Int? = nil, dateCreated: Date = Date()) {
         self.id = id
         self.name = name
         self.status = status
@@ -411,7 +454,35 @@ struct Project: Identifiable, Codable, Equatable {
         self.notes = notes
         self.rowCounters = rowCounters
         self.linkedYarns = linkedYarns
+        self.images = images
+        self.primaryImageIndex = primaryImageIndex
         self.dateCreated = dateCreated
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        status = try container.decode(ProjectStatus.self, forKey: .status)
+        recipeId = try container.decodeIfPresent(UUID.self, forKey: .recipeId)
+        size = try container.decode(String.self, forKey: .size)
+        gauge = try container.decode(String.self, forKey: .gauge)
+        needleSize = try container.decode(String.self, forKey: .needleSize)
+        startDate = try container.decodeIfPresent(Date.self, forKey: .startDate)
+        completedDate = try container.decodeIfPresent(Date.self, forKey: .completedDate)
+        notes = try container.decode(String.self, forKey: .notes)
+        rowCounters = try container.decode([RowCounter].self, forKey: .rowCounters)
+        linkedYarns = try container.decode([ProjectYarn].self, forKey: .linkedYarns)
+        // New fields with defaults for backward compatibility
+        images = try container.decodeIfPresent([String].self, forKey: .images) ?? []
+        primaryImageIndex = try container.decodeIfPresent(Int.self, forKey: .primaryImageIndex)
+        dateCreated = try container.decode(Date.self, forKey: .dateCreated)
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, status, recipeId, size, gauge, needleSize
+        case startDate, completedDate, notes, rowCounters, linkedYarns
+        case images, primaryImageIndex, dateCreated
     }
 }
 

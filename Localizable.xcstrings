@@ -1457,6 +1457,9 @@
         }
       }
     },
+    "Bilder" : {
+
+    },
     "Brukt garn" : {
       "localizations" : {
         "da" : {
@@ -2250,6 +2253,9 @@
         }
       }
     },
+    "Er du sikker på at du vil slette dette bildet?" : {
+
+    },
     "Er du sikker på at du vil slette dette garnet?" : {
 
     },
@@ -2388,6 +2394,9 @@
           }
         }
       }
+    },
+    "Feil" : {
+
     },
     "fell" : {
       "localizations" : {
@@ -3319,6 +3328,9 @@
           }
         }
       }
+    },
+    "Hovedbilde" : {
+
     },
     "https://eksempel.no/oppskrift" : {
       "localizations" : {
@@ -4395,7 +4407,13 @@
         }
       }
     },
+    "Lagre bilde" : {
+
+    },
     "Laster PDF..." : {
+
+    },
+    "Legg til bilder" : {
 
     },
     "Legg til brukt garn" : {
@@ -7781,6 +7799,9 @@
         }
       }
     },
+    "Slett bilde" : {
+
+    },
     "Slett brukt garn" : {
       "localizations" : {
         "da" : {
@@ -9057,6 +9078,9 @@
           }
         }
       }
+    },
+    "Vil du lagre dette bildet til fotoalbum?" : {
+
     },
     "Votter" : {
       "localizations" : {
