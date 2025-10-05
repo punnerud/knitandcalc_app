@@ -176,7 +176,7 @@ struct YarnStashListView: View {
                                         sum + (Double(yarn.numberOfSkeins) * yarn.weightPerSkein)
                                     }
 
-                                    Text("\(entryCount) \(entryCount == 1 ? "innslag" : "innslag")")
+                                    Text("\(entryCount) \(entryCount == 1 ? "farge" : "farger")")
                                         .font(.system(size: 13))
                                         .foregroundColor(.appSecondaryText)
 
