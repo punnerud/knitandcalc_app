@@ -169,7 +169,20 @@ struct AddRecipeView: View {
 
         case .pdf:
             if let url = pdfURL {
-                content = url.absoluteString
+                // Create security-scoped bookmark
+                let startedAccessing = url.startAccessingSecurityScopedResource()
+                defer {
+                    if startedAccessing {
+                        url.stopAccessingSecurityScopedResource()
+                    }
+                }
+
+                if let bookmarkData = try? url.bookmarkData(options: .minimalBookmark, includingResourceValuesForKeys: nil, relativeTo: nil) {
+                    content = bookmarkData.base64EncodedString()
+                } else {
+                    // Fallback to URL string
+                    content = url.absoluteString
+                }
             }
         }
 

@@ -4326,6 +4326,9 @@
         }
       }
     },
+    "Kunne ikke laste PDF - ugyldig URL" : {
+
+    },
     "Lagre" : {
       "localizations" : {
         "da" : {
@@ -4365,6 +4368,9 @@
           }
         }
       }
+    },
+    "Laster PDF..." : {
+
     },
     "Legg til brukt garn" : {
       "localizations" : {
@@ -7008,6 +7014,9 @@
         }
       }
     },
+    "Roter (%lld°)" : {
+
+    },
     "Se detaljer" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -7609,6 +7618,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enhetssystem"
+          }
+        }
+      }
+    },
+    "Side %lld av %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Side %1$lld av %2$lld"
           }
         }
       }

@@ -38,41 +38,39 @@ struct RecipeListView: View {
     }
 
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                categoryTabsView
-                recipeContentView
-            }
-            .navigationTitle("Oppskrifter")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { showAddRecipe = true }) {
-                        Image(systemName: "plus")
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(.appIconTint)
-                    }
+        VStack(spacing: 0) {
+            categoryTabsView
+            recipeContentView
+        }
+        .navigationTitle("Oppskrifter")
+        .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: { showAddRecipe = true }) {
+                    Image(systemName: "plus")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundColor(.appIconTint)
                 }
             }
-            .sheet(isPresented: $showAddRecipe) {
-                AddRecipeView(recipes: $recipes)
+        }
+        .sheet(isPresented: $showAddRecipe) {
+            AddRecipeView(recipes: $recipes)
+        }
+        .sheet(item: $recipeToEdit) { recipe in
+            EditRecipeView(recipes: $recipes, recipe: recipe)
+        }
+        .alert("Slett oppskrift", isPresented: .constant(recipeToDelete != nil), presenting: recipeToDelete) { recipe in
+            Button("Avbryt", role: .cancel) {
+                recipeToDelete = nil
             }
-            .sheet(item: $recipeToEdit) { recipe in
-                EditRecipeView(recipes: $recipes, recipe: recipe)
+            Button("Slett", role: .destructive) {
+                deleteRecipe(recipe)
             }
-            .alert("Slett oppskrift", isPresented: .constant(recipeToDelete != nil), presenting: recipeToDelete) { recipe in
-                Button("Avbryt", role: .cancel) {
-                    recipeToDelete = nil
-                }
-                Button("Slett", role: .destructive) {
-                    deleteRecipe(recipe)
-                }
-            } message: { recipe in
-                Text("Er du sikker på at du vil slette \"\(recipe.name)\"?")
-            }
-            .onChange(of: recipes) { _ in
-                saveRecipes()
-            }
+        } message: { recipe in
+            Text("Er du sikker på at du vil slette \"\(recipe.name)\"?")
+        }
+        .onChange(of: recipes) { _ in
+            saveRecipes()
         }
         .onAppear {
             loadRecipes()
@@ -143,7 +141,7 @@ struct RecipeListView: View {
     var recipeListView: some View {
         List {
             ForEach(filteredRecipes) { recipe in
-                NavigationLink(destination: RecipeDetailView(recipe: recipe)) {
+                NavigationLink(destination: RecipeDetailView(recipe: recipe, recipes: $recipes)) {
                     RecipeRowView(recipe: recipe)
                 }
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
