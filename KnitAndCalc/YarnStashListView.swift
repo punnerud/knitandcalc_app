@@ -18,6 +18,13 @@ struct YarnStashListView: View {
     @State private var listRefreshID = UUID()
     @State private var expandedGroupKey: String?
     @State private var yarnToNavigate: YarnStashEntry?
+    @State private var quickAddInfo: QuickAddInfo?
+
+    struct QuickAddInfo: Identifiable {
+        let id = UUID()
+        let brand: String
+        let type: String
+    }
 
     var filteredYarnEntries: [YarnStashEntry] {
         if searchText.isEmpty {
@@ -100,6 +107,15 @@ struct YarnStashListView: View {
             loadProjects()
         }) { yarn in
             EditYarnStashView(yarnEntries: $yarnEntries, yarn: yarn)
+        }
+        .sheet(item: $quickAddInfo) { info in
+            QuickAddYarnView(
+                yarnEntries: $yarnEntries,
+                brand: info.brand,
+                type: info.type
+            ) { newYarn in
+                expandedGroupKey = "\(newYarn.brand)|\(newYarn.type)"
+            }
         }
         .alert("Slett garn", isPresented: .constant(yarnToDelete != nil), presenting: yarnToDelete) { yarn in
             Button("Avbryt", role: .cancel) {
@@ -217,10 +233,24 @@ struct YarnStashListView: View {
 
                             Spacer(minLength: 8)
 
-                            Image(systemName: expandedGroupKey == group.key ? "chevron.up" : "chevron.down")
-                                .font(.system(size: 14))
-                                .foregroundColor(.appSecondaryText)
-                                .padding(.top, 2)
+                            HStack(spacing: 20) {
+                                if expandedGroupKey == group.key {
+                                    Button(action: {
+                                        let firstYarn = group.yarns.first!
+                                        quickAddInfo = QuickAddInfo(brand: firstYarn.brand, type: firstYarn.type)
+                                    }) {
+                                        Image(systemName: "plus.circle.fill")
+                                            .font(.system(size: 20))
+                                            .foregroundColor(.appIconTint)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                }
+
+                                Image(systemName: expandedGroupKey == group.key ? "chevron.up" : "chevron.down")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.appSecondaryText)
+                                    .padding(.top, 2)
+                            }
                         }
                         .padding(.vertical, 8)
                         .contentShape(Rectangle())
@@ -361,6 +391,14 @@ struct YarnColorRowView: View {
     let maxColorWidth: CGFloat
     @ObservedObject private var settings = AppSettings.shared
 
+    func formatSkeins(_ count: Double) -> String {
+        if count.truncatingRemainder(dividingBy: 1) == 0 {
+            return String(format: "%.0f", count)
+        } else {
+            return String(format: "%.1f", count).replacingOccurrences(of: ".", with: ",")
+        }
+    }
+
     var totalGrams: Double {
         Double(yarn.numberOfSkeins) * yarn.weightPerSkein
     }
@@ -390,7 +428,7 @@ struct YarnColorRowView: View {
                             .foregroundColor(.appSecondaryText)
                     }
 
-                    Text("\(yarn.numberOfSkeins) \(String(localized: "nøster"))")
+                    Text("\(formatSkeins(yarn.numberOfSkeins)) \(String(localized: "nøster"))")
                         .font(.system(size: 13))
                         .foregroundColor(.appSecondaryText)
 
@@ -429,6 +467,200 @@ struct YarnColorRowView: View {
     }
 }
 
+// MARK: - Quick Add View
+
+struct QuickAddYarnView: View {
+    @Environment(\.dismiss) var dismiss
+    @Binding var yarnEntries: [YarnStashEntry]
+    let brand: String
+    let type: String
+    var onYarnCreated: ((YarnStashEntry) -> Void)?
+    @ObservedObject private var settings = AppSettings.shared
+
+    @State private var colorName: String = ""
+    @State private var colorNumber: String = ""
+    @State private var lotNumber: String = ""
+    @State private var totalWeight: String = ""
+    @State private var referenceYarn: YarnStashEntry?
+    @FocusState private var focusedField: QuickAddField?
+
+    enum QuickAddField {
+        case colorName, colorNumber, lotNumber, totalWeight
+    }
+
+    // Get reference yarn from same brand/type (use most recently added, or first if dates are equal)
+    func loadReferenceYarn() {
+        let filtered = yarnEntries.filter { $0.brand == brand && $0.type == type }
+
+        // Try to sort by dateCreated (most recent first)
+        let sorted = filtered.sorted { $0.dateCreated > $1.dateCreated }
+
+        // Return first from sorted list (will be most recent, or first if all dates are equal)
+        referenceYarn = sorted.first
+    }
+
+    var calculatedSkeins: String {
+        guard let ref = referenceYarn,
+              let weight = Double(totalWeight),
+              weight > 0 else {
+            return "-"
+        }
+        let count = weight / ref.weightPerSkein
+        if count.truncatingRemainder(dividingBy: 1) == 0 {
+            return String(format: "%.0f", count)
+        } else {
+            return String(format: "%.1f", count).replacingOccurrences(of: ".", with: ",")
+        }
+    }
+
+    var isFormValid: Bool {
+        !colorName.isEmpty &&
+        Double(totalWeight) != nil &&
+        Double(totalWeight)! > 0 &&
+        referenceYarn != nil
+    }
+
+    var body: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("Garn")) {
+                    HStack {
+                        Text("Merke/Type")
+                            .foregroundColor(.appSecondaryText)
+                        Spacer()
+                        Text("\(brand) \(type)")
+                            .font(.system(size: 16, weight: .medium))
+                    }
+
+                    if let ref = referenceYarn {
+                        HStack {
+                            Text("Vekt per nøste")
+                                .foregroundColor(.appSecondaryText)
+                            Spacer()
+                            Text(UnitConverter.formatWeight(ref.weightPerSkein, unit: settings.currentUnitSystem))
+                                .font(.system(size: 16, weight: .medium))
+                        }
+
+                        HStack {
+                            Text("Lengde per nøste")
+                                .foregroundColor(.appSecondaryText)
+                            Spacer()
+                            Text(UnitConverter.formatLength(ref.lengthPerSkein, unit: settings.currentUnitSystem))
+                                .font(.system(size: 16, weight: .medium))
+                        }
+                    }
+                }
+
+                Section(header: Text("Detaljer")) {
+                    HStack {
+                        Text("Navn/Farge")
+                            .frame(width: 120, alignment: .leading)
+                        TextField("", text: $colorName)
+                            .multilineTextAlignment(.trailing)
+                            .focused($focusedField, equals: .colorName)
+                    }
+
+                    HStack {
+                        Text("Fargenummer")
+                            .frame(width: 120, alignment: .leading)
+                        TextField("", text: $colorNumber)
+                            .multilineTextAlignment(.trailing)
+                            .focused($focusedField, equals: .colorNumber)
+                    }
+
+                    HStack {
+                        Text("Partinummer")
+                            .frame(width: 120, alignment: .leading)
+                        TextField("", text: $lotNumber)
+                            .multilineTextAlignment(.trailing)
+                            .focused($focusedField, equals: .lotNumber)
+                    }
+
+                    HStack {
+                        Text(settings.currentUnitSystem == .metric ? "Vekt i gram" : "Vekt i oz")
+                            .frame(width: 120, alignment: .leading)
+                        TextField("", text: $totalWeight)
+                            .keyboardType(.numberPad)
+                            .multilineTextAlignment(.trailing)
+                            .focused($focusedField, equals: .totalWeight)
+                    }
+
+                    HStack {
+                        Text("Antall nøster")
+                            .frame(width: 120, alignment: .leading)
+                            .foregroundColor(.appSecondaryText)
+                        Spacer()
+                        Text(calculatedSkeins)
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.appSecondaryText)
+                    }
+                }
+            }
+            .navigationTitle("Legg til farge")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Avbryt") {
+                        dismiss()
+                    }
+                }
+
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: { saveYarn() }) {
+                        Text("Lagre")
+                            .font(.system(size: 17, weight: .semibold))
+                    }
+                    .disabled(!isFormValid)
+                    .foregroundColor(isFormValid ? .appIconTint : .appTertiaryText)
+                }
+            }
+            .onAppear {
+                loadReferenceYarn()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    focusedField = .colorName
+                }
+            }
+            .onChange(of: brand) { _ in
+                loadReferenceYarn()
+            }
+            .onChange(of: type) { _ in
+                loadReferenceYarn()
+            }
+            .onChange(of: yarnEntries) { _ in
+                loadReferenceYarn()
+            }
+        }
+    }
+
+    func saveYarn() {
+        guard let ref = referenceYarn,
+              let weight = Double(totalWeight),
+              weight > 0 else {
+            return
+        }
+
+        let weightInGrams = settings.currentUnitSystem == .imperial ? UnitConverter.ouncesToGrams(weight) : weight
+        let count = weightInGrams / ref.weightPerSkein
+
+        let yarn = YarnStashEntry(
+            brand: brand,
+            type: type,
+            weightPerSkein: ref.weightPerSkein,
+            lengthPerSkein: ref.lengthPerSkein,
+            numberOfSkeins: count,
+            color: colorName,
+            colorNumber: colorNumber,
+            lotNumber: lotNumber,
+            notes: "",
+            gauge: ref.gauge
+        )
+
+        yarnEntries.append(yarn)
+        onYarnCreated?(yarn)
+        dismiss()
+    }
+}
+
 // MARK: - Models
 
 struct YarnStashEntry: Identifiable, Codable, Equatable {
@@ -437,16 +669,15 @@ struct YarnStashEntry: Identifiable, Codable, Equatable {
     var type: String
     var weightPerSkein: Double
     var lengthPerSkein: Double
-    var numberOfSkeins: Int
+    var numberOfSkeins: Double
     var color: String
     var colorNumber: String
     var lotNumber: String
     var notes: String
     var gauge: GaugeOption
-    var usedSkeins: [UsedSkein]
     var dateCreated: Date
 
-    init(id: UUID = UUID(), brand: String, type: String, weightPerSkein: Double, lengthPerSkein: Double, numberOfSkeins: Int, color: String = "", colorNumber: String = "", lotNumber: String, notes: String = "", gauge: GaugeOption = .none, usedSkeins: [UsedSkein] = [], dateCreated: Date = Date()) {
+    init(id: UUID = UUID(), brand: String, type: String, weightPerSkein: Double, lengthPerSkein: Double, numberOfSkeins: Double, color: String = "", colorNumber: String = "", lotNumber: String, notes: String = "", gauge: GaugeOption = .none, dateCreated: Date = Date()) {
         self.id = id
         self.brand = brand
         self.type = type
@@ -458,37 +689,15 @@ struct YarnStashEntry: Identifiable, Codable, Equatable {
         self.lotNumber = lotNumber
         self.notes = notes
         self.gauge = gauge
-        self.usedSkeins = usedSkeins
         self.dateCreated = dateCreated
     }
 
     var totalLength: Double {
-        Double(numberOfSkeins) * lengthPerSkein
+        numberOfSkeins * lengthPerSkein
     }
 
-    var remainingSkeins: Int {
-        let usedWeight = usedSkeins.reduce(0.0) { $0 + $1.grams }
-        let usedInSkeins = usedWeight / weightPerSkein
-        return max(0, numberOfSkeins - Int(ceil(usedInSkeins)))
-    }
-
-    var remainingLength: Double {
-        let usedWeight = usedSkeins.reduce(0.0) { $0 + $1.grams }
-        let lengthPerGram = lengthPerSkein / weightPerSkein
-        let usedLength = usedWeight * lengthPerGram
-        return max(0, totalLength - usedLength)
-    }
-}
-
-struct UsedSkein: Identifiable, Codable, Equatable {
-    var id: UUID
-    var grams: Double
-    var date: Date
-
-    init(id: UUID = UUID(), grams: Double, date: Date = Date()) {
-        self.id = id
-        self.grams = grams
-        self.date = date
+    var totalWeight: Double {
+        numberOfSkeins * weightPerSkein
     }
 }
 

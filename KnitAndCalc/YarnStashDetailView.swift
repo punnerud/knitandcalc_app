@@ -13,16 +13,24 @@ struct YarnStashDetailView: View {
     @Binding var projects: [Project]
     @ObservedObject private var settings = AppSettings.shared
 
-    @State private var showAddUsedYarn: Bool = false
     @State private var showEditYarn: Bool = false
-    @State private var usedGrams: String = ""
-    @State private var usedSkeinToDelete: UsedSkein?
     @State private var refreshID = UUID()
     @State private var showDeleteConfirmation: Bool = false
+    @State private var hasModifiedSkeins: Bool = false
+    @State private var showRoundButton: Bool = false
+    @State private var showRoundConfirmation: Bool = false
     @Environment(\.dismiss) var dismiss
 
     var currentYarn: YarnStashEntry? {
         yarnEntries.first { $0.id == yarn.id }
+    }
+
+    func formatSkeins(_ count: Double) -> String {
+        if count.truncatingRemainder(dividingBy: 1) == 0 {
+            return String(format: "%.0f", count)
+        } else {
+            return String(format: "%.1f", count).replacingOccurrences(of: ".", with: ",")
+        }
     }
 
     var linkedProjects: [(project: Project, yarns: [ProjectYarn])] {
@@ -67,7 +75,6 @@ struct YarnStashDetailView: View {
                 summarySection
                 reservedSection
                 notesSection
-                usedYarnSection
                 deleteSection
             }
             .padding(.vertical)
@@ -84,23 +91,10 @@ struct YarnStashDetailView: View {
                 }
             }
         }
-        .sheet(isPresented: $showAddUsedYarn) {
-            AddUsedYarnView(yarnEntries: $yarnEntries, yarnId: yarn.id)
-        }
         .sheet(isPresented: $showEditYarn, onDismiss: {
             refreshID = UUID()
         }) {
             EditYarnStashView(yarnEntries: $yarnEntries, yarn: yarn, projects: $projects)
-        }
-        .alert("Slett brukt garn", isPresented: .constant(usedSkeinToDelete != nil), presenting: usedSkeinToDelete) { used in
-            Button("Avbryt", role: .cancel) {
-                usedSkeinToDelete = nil
-            }
-            Button("Slett", role: .destructive) {
-                deleteUsedSkein(used)
-            }
-        } message: { used in
-            Text(String(format: NSLocalizedString("Er du sikker på at du vil slette denne brukt garn-registreringen (%@ g)?", comment: ""), formatNorwegian(used.grams)))
         }
         .alert("Slett garn", isPresented: $showDeleteConfirmation) {
             Button("Avbryt", role: .cancel) {}
@@ -109,6 +103,16 @@ struct YarnStashDetailView: View {
             }
         } message: {
             Text("Er du sikker på at du vil slette \"\(yarn.brand) \(yarn.type)\"?\n\nTips: Du kan også trekke til venstre på oversikten for å redigere eller slette. Det er raskere enn å bruke denne knappen.")
+        }
+        .alert("Avrund antall nøster", isPresented: $showRoundConfirmation) {
+            Button("Avbryt", role: .cancel) {}
+            Button("Avrund", role: .destructive) {
+                roundToWhole()
+            }
+        } message: {
+            let currentValue = currentYarn?.numberOfSkeins ?? yarn.numberOfSkeins
+            let roundedValue = round(currentValue)
+            Text("Vil du avrunde fra \(formatSkeins(currentValue)) til \(formatSkeins(roundedValue)) nøster?\n\nDu kan alltid endre dette igjen under \"Rediger\".")
         }
     }
 
@@ -137,6 +141,77 @@ struct YarnStashDetailView: View {
         dismiss()
     }
 
+    var skeinAdjusterRow: some View {
+        HStack {
+            Text(NSLocalizedString("Antall nøster", comment: ""))
+                .font(.system(size: 15))
+                .foregroundColor(.appSecondaryText)
+
+            Spacer()
+
+            HStack(spacing: 12) {
+                Button(action: {
+                    adjustSkeins(by: -1)
+                }) {
+                    Image(systemName: "minus.circle.fill")
+                        .font(.system(size: 24))
+                        .foregroundColor(.appIconTint)
+                }
+                .buttonStyle(PlainButtonStyle())
+
+                VStack(spacing: 4) {
+                    Text(formatSkeins(currentYarn?.numberOfSkeins ?? yarn.numberOfSkeins))
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(.appText)
+
+                    if showRoundButton {
+                        Button(action: {
+                            showRoundConfirmation = true
+                        }) {
+                            let currentValue = currentYarn?.numberOfSkeins ?? yarn.numberOfSkeins
+                            let roundedValue = round(currentValue)
+                            Text("\(formatSkeins(currentValue)) => \(formatSkeins(roundedValue))")
+                                .font(.system(size: 11))
+                                .foregroundColor(.appIconTint)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                }
+                .frame(minWidth: 50)
+
+                Button(action: {
+                    adjustSkeins(by: 1)
+                }) {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.system(size: 24))
+                        .foregroundColor(.appIconTint)
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+        }
+    }
+
+    func adjustSkeins(by amount: Int) {
+        guard let index = yarnEntries.firstIndex(where: { $0.id == yarn.id }) else { return }
+        let newValue = max(0, yarnEntries[index].numberOfSkeins + Double(amount))
+        yarnEntries[index].numberOfSkeins = newValue
+        hasModifiedSkeins = true
+
+        // Show round button if there's a decimal part after modification
+        let hasDecimal = newValue.truncatingRemainder(dividingBy: 1) != 0
+        withAnimation {
+            showRoundButton = hasDecimal && hasModifiedSkeins
+        }
+    }
+
+    func roundToWhole() {
+        guard let index = yarnEntries.firstIndex(where: { $0.id == yarn.id }) else { return }
+        yarnEntries[index].numberOfSkeins = round(yarnEntries[index].numberOfSkeins)
+        withAnimation {
+            showRoundButton = false
+        }
+    }
+
     var basicInfoSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(NSLocalizedString("Garninformasjon", comment: ""))
@@ -153,7 +228,9 @@ struct YarnStashDetailView: View {
                 }
                 InfoRow(label: NSLocalizedString("Vekt per nøste", comment: ""), value: UnitConverter.formatWeight(currentYarn?.weightPerSkein ?? yarn.weightPerSkein, unit: settings.currentUnitSystem))
                 InfoRow(label: NSLocalizedString("Lengde per nøste", comment: ""), value: UnitConverter.formatLength(currentYarn?.lengthPerSkein ?? yarn.lengthPerSkein, unit: settings.currentUnitSystem))
-                InfoRow(label: NSLocalizedString("Antall nøster", comment: ""), value: "\(currentYarn?.numberOfSkeins ?? yarn.numberOfSkeins)")
+
+                skeinAdjusterRow
+
                 if !(currentYarn?.lotNumber ?? yarn.lotNumber).isEmpty {
                     InfoRow(label: NSLocalizedString("Innfarging/Partinummer", comment: ""), value: currentYarn?.lotNumber ?? yarn.lotNumber)
                 }
@@ -174,9 +251,8 @@ struct YarnStashDetailView: View {
                 .padding(.horizontal)
 
             VStack(spacing: 12) {
+                InfoRow(label: NSLocalizedString("Total vekt", comment: ""), value: UnitConverter.formatWeight(currentYarn?.totalWeight ?? yarn.totalWeight, unit: settings.currentUnitSystem))
                 InfoRow(label: NSLocalizedString("Total lengde", comment: ""), value: UnitConverter.formatLength(currentYarn?.totalLength ?? yarn.totalLength, unit: settings.currentUnitSystem))
-                InfoRow(label: NSLocalizedString("Gjenværende nøster", comment: ""), value: "\(currentYarn?.remainingSkeins ?? yarn.remainingSkeins)")
-                InfoRow(label: NSLocalizedString("Gjenværende lengde", comment: ""), value: UnitConverter.formatLength(currentYarn?.remainingLength ?? yarn.remainingLength, unit: settings.currentUnitSystem))
             }
             .padding()
             .background(Color.appButtonBackgroundUnselected)
@@ -254,57 +330,6 @@ struct YarnStashDetailView: View {
         }
     }
 
-    var usedYarnSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text(NSLocalizedString("Brukt garn", comment: ""))
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(.appText)
-
-                Spacer()
-
-                Button(action: { showAddUsedYarn = true }) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 24))
-                        .foregroundColor(.appIconTint)
-                }
-            }
-            .padding(.horizontal)
-
-            if let usedSkeins = currentYarn?.usedSkeins, !usedSkeins.isEmpty {
-                VStack(spacing: 8) {
-                    ForEach(usedSkeins) { used in
-                        UsedYarnRow(
-                            used: used,
-                            lengthPerGram: (currentYarn?.lengthPerSkein ?? yarn.lengthPerSkein) / (currentYarn?.weightPerSkein ?? yarn.weightPerSkein),
-                            onDelete: { usedSkeinToDelete = used },
-                            unitSystem: settings.currentUnitSystem
-                        )
-                    }
-                }
-                .padding()
-                .background(Color.white)
-                .cornerRadius(12)
-                .padding(.horizontal)
-            } else {
-                Text(NSLocalizedString("Ingen brukt garn registrert", comment: ""))
-                    .font(.system(size: 15))
-                    .foregroundColor(.appSecondaryText)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(12)
-                    .padding(.horizontal)
-            }
-        }
-    }
-
-    func deleteUsedSkein(_ used: UsedSkein) {
-        if let index = yarnEntries.firstIndex(where: { $0.id == yarn.id }) {
-            yarnEntries[index].usedSkeins.removeAll { $0.id == used.id }
-        }
-        usedSkeinToDelete = nil
-    }
 
     func formatNorwegian(_ value: Double) -> String {
         let formatter = NumberFormatter()
@@ -352,133 +377,6 @@ struct InfoRow: View {
                     .foregroundColor(.appText)
             }
         }
-    }
-}
-
-struct UsedYarnRow: View {
-    let used: UsedSkein
-    let lengthPerGram: Double
-    let onDelete: () -> Void
-    let unitSystem: UnitSystem
-
-    var calculatedLength: Double {
-        used.grams * lengthPerGram
-    }
-
-    var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(UnitConverter.formatWeight(used.grams, unit: unitSystem))
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(.appText)
-
-                Text(String(format: NSLocalizedString("Ca. %@", comment: ""), UnitConverter.formatLength(calculatedLength, unit: unitSystem)))
-                    .font(.system(size: 13))
-                    .foregroundColor(.appSecondaryText)
-            }
-
-            Spacer()
-
-            Text(used.date, style: .date)
-                .font(.system(size: 13))
-                .foregroundColor(.appSecondaryText)
-
-            Button(action: onDelete) {
-                Image(systemName: "trash")
-                    .font(.system(size: 16))
-                    .foregroundColor(.red)
-            }
-        }
-        .padding(.vertical, 4)
-    }
-
-    func formatNorwegian(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.minimumFractionDigits = 1
-        formatter.maximumFractionDigits = 1
-        formatter.decimalSeparator = ","
-        formatter.groupingSeparator = " "
-        return formatter.string(from: NSNumber(value: value)) ?? String(format: "%.1f", value)
-    }
-}
-
-struct AddUsedYarnView: View {
-    @Environment(\.dismiss) var dismiss
-    @Binding var yarnEntries: [YarnStashEntry]
-    let yarnId: UUID
-
-    @State private var grams: String = ""
-
-    var isFormValid: Bool {
-        Double(grams) != nil && Double(grams)! > 0
-    }
-
-    var body: some View {
-        NavigationView {
-            Form {
-                Section(header: Text("Brukt garn")) {
-                    TextField("Gram", text: $grams)
-                        .keyboardType(.decimalPad)
-
-                    if let gramsValue = Double(grams),
-                       gramsValue > 0,
-                       let yarn = yarnEntries.first(where: { $0.id == yarnId }) {
-                        let lengthPerGram = yarn.lengthPerSkein / yarn.weightPerSkein
-                        let calculatedLength = gramsValue * lengthPerGram
-
-                        HStack {
-                            Text(NSLocalizedString("Ca. lengde", comment: ""))
-                                .foregroundColor(.appSecondaryText)
-                            Spacer()
-                            Text(String(format: "%@ m", formatNorwegian(calculatedLength)))
-                                .font(.system(size: 15, weight: .medium))
-                        }
-                    }
-                }
-            }
-            .navigationTitle("Legg til brukt garn")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Avbryt") {
-                        dismiss()
-                    }
-                }
-
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { addUsedYarn() }) {
-                        Text(NSLocalizedString("Lagre", comment: ""))
-                            .font(.system(size: 17, weight: .semibold))
-                    }
-                    .disabled(!isFormValid)
-                    .foregroundColor(isFormValid ? .appIconTint : .appTertiaryText)
-                }
-            }
-        }
-    }
-
-    func addUsedYarn() {
-        guard let gramsValue = Double(grams), gramsValue > 0 else {
-            return
-        }
-
-        if let index = yarnEntries.firstIndex(where: { $0.id == yarnId }) {
-            let usedSkein = UsedSkein(grams: gramsValue)
-            yarnEntries[index].usedSkeins.append(usedSkein)
-        }
-
-        dismiss()
-    }
-
-    func formatNorwegian(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.minimumFractionDigits = 1
-        formatter.maximumFractionDigits = 1
-        formatter.decimalSeparator = ","
-        formatter.groupingSeparator = " "
-        return formatter.string(from: NSNumber(value: value)) ?? String(format: "%.1f", value)
     }
 }
 
@@ -542,7 +440,7 @@ struct ProjectYarnRow: View {
             type: "Alpakka",
             weightPerSkein: 50,
             lengthPerSkein: 120,
-            numberOfSkeins: 5,
+            numberOfSkeins: 5.0,
             color: "1234",
             lotNumber: "123",
             notes: "Nydelig garn til jakker"

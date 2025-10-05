@@ -27,6 +27,7 @@ struct AddYarnStashView: View {
     @State private var weightPerSkein: String = ""
     @State private var lengthPerSkein: String = ""
     @State private var numberOfSkeins: String = ""
+    @State private var totalWeight: String = ""
     @State private var color: String = ""
     @State private var colorNumber: String = ""
     @State private var lotNumber: String = ""
@@ -36,6 +37,13 @@ struct AddYarnStashView: View {
     @State private var quantity: String = ""
     @State private var quantityType: YarnQuantityType = .skeins
     @FocusState private var isCustomBrandFocused: Bool
+    @FocusState private var focusedField: FormField?
+    @State private var isUpdatingWeight: Bool = false
+    @State private var isUpdatingSkeins: Bool = false
+
+    enum FormField {
+        case customBrand, weightPerSkein, lengthPerSkein, numberOfSkeins, totalWeight, color, colorNumber, lotNumber, notes, quantity
+    }
 
     var existingBrands: [String] {
         Array(Set(yarnEntries.map { $0.brand })).sorted()
@@ -70,7 +78,7 @@ struct AddYarnStashView: View {
         !finalType.isEmpty &&
         Double(weightPerSkein) != nil &&
         Double(lengthPerSkein) != nil &&
-        Int(numberOfSkeins) != nil
+        Double(numberOfSkeins) != nil
 
         if linkToProjectId != nil && linkToProject {
             return basicValid && Double(quantity) != nil && Double(quantity)! > 0
@@ -103,7 +111,7 @@ struct AddYarnStashView: View {
 
                     if showCustomBrandField {
                         TextField("Skriv inn merke", text: $customBrand)
-                            .focused($isCustomBrandFocused)
+                            .focused($focusedField, equals: .customBrand)
                     }
                 }
 
@@ -131,6 +139,10 @@ struct AddYarnStashView: View {
                         TextField("", text: $weightPerSkein)
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
+                            .focused($focusedField, equals: .weightPerSkein)
+                            .onChange(of: weightPerSkein) { _ in
+                                updateTotalWeight()
+                            }
                     }
 
                     HStack {
@@ -139,14 +151,35 @@ struct AddYarnStashView: View {
                         TextField("", text: $lengthPerSkein)
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
+                            .focused($focusedField, equals: .lengthPerSkein)
                     }
 
                     HStack {
                         Text("Antall nøster")
                             .frame(width: 160, alignment: .leading)
                         TextField("", text: $numberOfSkeins)
+                            .keyboardType(.decimalPad)
+                            .multilineTextAlignment(.trailing)
+                            .focused($focusedField, equals: .numberOfSkeins)
+                            .onChange(of: numberOfSkeins) { _ in
+                                if !isUpdatingSkeins {
+                                    updateTotalWeight()
+                                }
+                            }
+                    }
+
+                    HStack {
+                        Text(settings.currentUnitSystem == .metric ? "Vekt i gram" : "Vekt i oz")
+                            .frame(width: 160, alignment: .leading)
+                        TextField("", text: $totalWeight)
                             .keyboardType(.numberPad)
                             .multilineTextAlignment(.trailing)
+                            .focused($focusedField, equals: .totalWeight)
+                            .onChange(of: focusedField) { newFocus in
+                                if newFocus != .totalWeight && !isUpdatingWeight && !totalWeight.isEmpty {
+                                    updateNumberOfSkeinsFromWeight()
+                                }
+                            }
                     }
 
                     HStack {
@@ -154,6 +187,7 @@ struct AddYarnStashView: View {
                             .frame(width: 160, alignment: .leading)
                         TextField("", text: $color)
                             .multilineTextAlignment(.trailing)
+                            .focused($focusedField, equals: .color)
                     }
 
                     HStack {
@@ -161,6 +195,7 @@ struct AddYarnStashView: View {
                             .frame(width: 160, alignment: .leading)
                         TextField("", text: $colorNumber)
                             .multilineTextAlignment(.trailing)
+                            .focused($focusedField, equals: .colorNumber)
                     }
 
                     HStack {
@@ -168,6 +203,7 @@ struct AddYarnStashView: View {
                             .frame(width: 160, alignment: .leading)
                         TextField("", text: $lotNumber)
                             .multilineTextAlignment(.trailing)
+                            .focused($focusedField, equals: .lotNumber)
                     }
                 }
 
@@ -182,6 +218,7 @@ struct AddYarnStashView: View {
                 Section(header: Text("Notater")) {
                     TextEditor(text: $notes)
                         .frame(minHeight: 100)
+                        .focused($focusedField, equals: .notes)
                 }
 
                 if linkToProjectId != nil, projects != nil {
@@ -198,6 +235,7 @@ struct AddYarnStashView: View {
 
                             TextField("Mengde", text: $quantity)
                                 .keyboardType(.decimalPad)
+                                .focused($focusedField, equals: .quantity)
                         }
                     }
                 }
@@ -209,7 +247,7 @@ struct AddYarnStashView: View {
                     linkToProject = true
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    isCustomBrandFocused = true
+                    focusedField = .customBrand
                 }
             }
             .toolbar {
@@ -231,10 +269,33 @@ struct AddYarnStashView: View {
         }
     }
 
+    func updateTotalWeight() {
+        guard let weight = Double(weightPerSkein.replacingOccurrences(of: ",", with: ".")),
+              let count = Double(numberOfSkeins.replacingOccurrences(of: ",", with: ".")) else {
+            return
+        }
+        let total = weight * count
+        isUpdatingWeight = true
+        totalWeight = String(format: "%.0f", total)
+        isUpdatingWeight = false
+    }
+
+    func updateNumberOfSkeinsFromWeight() {
+        guard let weight = Double(weightPerSkein.replacingOccurrences(of: ",", with: ".")),
+              let total = Double(totalWeight),
+              weight > 0 else {
+            return
+        }
+        let count = total / weight
+        isUpdatingSkeins = true
+        numberOfSkeins = String(format: "%.1f", count).replacingOccurrences(of: ".", with: ",")
+        isUpdatingSkeins = false
+    }
+
     func saveYarn() {
-        guard let weight = Double(weightPerSkein),
-              let length = Double(lengthPerSkein),
-              let count = Int(numberOfSkeins) else {
+        guard let weight = Double(weightPerSkein.replacingOccurrences(of: ",", with: ".")),
+              let length = Double(lengthPerSkein.replacingOccurrences(of: ",", with: ".")),
+              let count = Double(numberOfSkeins.replacingOccurrences(of: ",", with: ".")) else {
             return
         }
 

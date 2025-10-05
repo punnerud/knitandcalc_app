@@ -393,6 +393,26 @@
         }
       }
     },
+    "%lf %@ (%@)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lf %2$@ (%3$@)"
+          }
+        }
+      }
+    },
+    "%lf nøster (%@)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lf nøster (%2$@)"
+          }
+        }
+      }
+    },
     "%lld" : {
       "localizations" : {
         "da" : {
@@ -509,16 +529,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld %2$@"
-          }
-        }
-      }
-    },
-    "%lld %@ (%@)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$lld %2$@ (%3$@)"
           }
         }
       }
@@ -683,16 +693,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld nystan (%2$@ g)"
-          }
-        }
-      }
-    },
-    "%lld nøster (%@)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$lld nøster (%2$@)"
           }
         }
       }
@@ -1461,6 +1461,7 @@
 
     },
     "Brukt garn" : {
+      "extractionState" : "stale",
       "localizations" : {
         "da" : {
           "stringUnit" : {
@@ -1581,6 +1582,7 @@
       }
     },
     "Ca. %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "da" : {
           "stringUnit" : {
@@ -1662,6 +1664,7 @@
       }
     },
     "Ca. lengde" : {
+      "extractionState" : "stale",
       "localizations" : {
         "da" : {
           "stringUnit" : {
@@ -2214,6 +2217,7 @@
 
     },
     "Er du sikker på at du vil slette denne brukt garn-registreringen (%@ g)?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "da" : {
           "stringUnit" : {
@@ -3090,6 +3094,7 @@
       }
     },
     "Gjenværende lengde" : {
+      "extractionState" : "stale",
       "localizations" : {
         "da" : {
           "stringUnit" : {
@@ -3130,6 +3135,7 @@
       }
     },
     "Gjenværende nøster" : {
+      "extractionState" : "stale",
       "localizations" : {
         "da" : {
           "stringUnit" : {
@@ -3210,6 +3216,7 @@
       }
     },
     "Gram" : {
+      "extractionState" : "stale",
       "localizations" : {
         "da" : {
           "stringUnit" : {
@@ -3600,6 +3607,7 @@
       }
     },
     "Ingen brukt garn registrert" : {
+      "extractionState" : "stale",
       "localizations" : {
         "da" : {
           "stringUnit" : {
@@ -4417,6 +4425,7 @@
 
     },
     "Legg til brukt garn" : {
+      "extractionState" : "stale",
       "localizations" : {
         "da" : {
           "stringUnit" : {
@@ -4455,6 +4464,9 @@
           }
         }
       }
+    },
+    "Legg til farge" : {
+
     },
     "Legg til ferdigdato" : {
       "localizations" : {
@@ -5436,6 +5448,9 @@
         }
       }
     },
+    "Merke/Type" : {
+
+    },
     "meter" : {
       "localizations" : {
         "da" : {
@@ -5678,6 +5693,9 @@
           }
         }
       }
+    },
+    "Navn/Farge" : {
+
     },
     "nøster" : {
       "localizations" : {
@@ -6375,7 +6393,6 @@
       }
     },
     "Partinummer" : {
-      "extractionState" : "stale",
       "localizations" : {
         "da" : {
           "stringUnit" : {
@@ -7803,6 +7820,7 @@
 
     },
     "Slett brukt garn" : {
+      "extractionState" : "stale",
       "localizations" : {
         "da" : {
           "stringUnit" : {
@@ -8491,6 +8509,9 @@
         }
       }
     },
+    "Total vekt" : {
+
+    },
     "Totalt på lager" : {
       "localizations" : {
         "da" : {
@@ -8789,6 +8810,12 @@
           }
         }
       }
+    },
+    "Vekt i gram" : {
+
+    },
+    "Vekt i oz" : {
+
     },
     "Vekt per nøste" : {
       "localizations" : {

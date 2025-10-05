@@ -26,6 +26,7 @@ struct EditYarnStashView: View {
     @State private var weightPerSkein: String = ""
     @State private var lengthPerSkein: String = ""
     @State private var numberOfSkeins: String = ""
+    @State private var totalWeight: String = ""
     @State private var color: String = ""
     @State private var colorNumber: String = ""
     @State private var lotNumber: String = ""
@@ -37,6 +38,13 @@ struct EditYarnStashView: View {
     @State private var editingProject: Project?
     @State private var editingProjectYarn: ProjectYarn?
     @State private var showDeleteAlert: Bool = false
+    @FocusState private var focusedField: FormField?
+    @State private var isUpdatingWeight: Bool = false
+    @State private var isUpdatingSkeins: Bool = false
+
+    enum FormField {
+        case customBrand, customType, weightPerSkein, lengthPerSkein, numberOfSkeins, totalWeight, color, colorNumber, lotNumber, notes
+    }
 
     var existingBrands: [String] {
         Array(Set(yarnEntries.map { $0.brand })).sorted()
@@ -73,9 +81,9 @@ struct EditYarnStashView: View {
     var isFormValid: Bool {
         !finalBrand.isEmpty &&
         !finalType.isEmpty &&
-        Double(weightPerSkein) != nil &&
-        Double(lengthPerSkein) != nil &&
-        Int(numberOfSkeins) != nil
+        Double(weightPerSkein.replacingOccurrences(of: ",", with: ".")) != nil &&
+        Double(lengthPerSkein.replacingOccurrences(of: ",", with: ".")) != nil &&
+        Double(numberOfSkeins.replacingOccurrences(of: ",", with: ".")) != nil
     }
 
     var linkedProjects: [(project: Project, yarns: [ProjectYarn])] {
@@ -110,6 +118,7 @@ struct EditYarnStashView: View {
 
                     if showCustomBrandField {
                         TextField("Skriv inn merke", text: $customBrand)
+                            .focused($focusedField, equals: .customBrand)
                     }
                 }
 
@@ -125,6 +134,7 @@ struct EditYarnStashView: View {
 
                     if showCustomTypeField {
                         TextField("Skriv inn type", text: $customType)
+                            .focused($focusedField, equals: .customType)
                     }
                 }
 
@@ -135,6 +145,10 @@ struct EditYarnStashView: View {
                         TextField("", text: $weightPerSkein)
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
+                            .focused($focusedField, equals: .weightPerSkein)
+                            .onChange(of: weightPerSkein) { _ in
+                                updateTotalWeight()
+                            }
                     }
 
                     HStack {
@@ -143,14 +157,35 @@ struct EditYarnStashView: View {
                         TextField("", text: $lengthPerSkein)
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
+                            .focused($focusedField, equals: .lengthPerSkein)
                     }
 
                     HStack {
                         Text("Antall nøster")
                             .frame(width: 160, alignment: .leading)
                         TextField("", text: $numberOfSkeins)
+                            .keyboardType(.decimalPad)
+                            .multilineTextAlignment(.trailing)
+                            .focused($focusedField, equals: .numberOfSkeins)
+                            .onChange(of: numberOfSkeins) { _ in
+                                if !isUpdatingSkeins {
+                                    updateTotalWeight()
+                                }
+                            }
+                    }
+
+                    HStack {
+                        Text(settings.currentUnitSystem == .metric ? "Vekt i gram" : "Vekt i oz")
+                            .frame(width: 160, alignment: .leading)
+                        TextField("", text: $totalWeight)
                             .keyboardType(.numberPad)
                             .multilineTextAlignment(.trailing)
+                            .focused($focusedField, equals: .totalWeight)
+                            .onChange(of: focusedField) { newFocus in
+                                if newFocus != .totalWeight && !isUpdatingWeight && !totalWeight.isEmpty {
+                                    updateNumberOfSkeinsFromWeight()
+                                }
+                            }
                     }
 
                     HStack {
@@ -158,6 +193,7 @@ struct EditYarnStashView: View {
                             .frame(width: 160, alignment: .leading)
                         TextField("", text: $color)
                             .multilineTextAlignment(.trailing)
+                            .focused($focusedField, equals: .color)
                     }
 
                     HStack {
@@ -165,6 +201,7 @@ struct EditYarnStashView: View {
                             .frame(width: 160, alignment: .leading)
                         TextField("", text: $colorNumber)
                             .multilineTextAlignment(.trailing)
+                            .focused($focusedField, equals: .colorNumber)
                     }
 
                     HStack {
@@ -172,6 +209,7 @@ struct EditYarnStashView: View {
                             .frame(width: 160, alignment: .leading)
                         TextField("", text: $lotNumber)
                             .multilineTextAlignment(.trailing)
+                            .focused($focusedField, equals: .lotNumber)
                     }
                 }
 
@@ -186,6 +224,7 @@ struct EditYarnStashView: View {
                 Section(header: Text("Notater")) {
                     TextEditor(text: $notes)
                         .frame(minHeight: 100)
+                        .focused($focusedField, equals: .notes)
                 }
 
                 Section {
@@ -314,6 +353,29 @@ struct EditYarnStashView: View {
         }
     }
 
+    func updateTotalWeight() {
+        guard let weight = Double(weightPerSkein.replacingOccurrences(of: ",", with: ".")),
+              let count = Double(numberOfSkeins.replacingOccurrences(of: ",", with: ".")) else {
+            return
+        }
+        let total = weight * count
+        isUpdatingWeight = true
+        totalWeight = String(format: "%.0f", total)
+        isUpdatingWeight = false
+    }
+
+    func updateNumberOfSkeinsFromWeight() {
+        guard let weight = Double(weightPerSkein.replacingOccurrences(of: ",", with: ".")),
+              let total = Double(totalWeight),
+              weight > 0 else {
+            return
+        }
+        let count = total / weight
+        isUpdatingSkeins = true
+        numberOfSkeins = String(format: "%.1f", count).replacingOccurrences(of: ".", with: ",")
+        isUpdatingSkeins = false
+    }
+
     func loadYarnData() {
         // Check if current brand exists in the list
         if existingBrands.contains(yarn.brand) {
@@ -336,13 +398,26 @@ struct EditYarnStashView: View {
             showCustomTypeField = true
         }
 
-        weightPerSkein = settings.currentUnitSystem == .imperial ?
-            String(format: "%.1f", UnitConverter.gramsToOunces(yarn.weightPerSkein)) :
-            String(format: "%.0f", yarn.weightPerSkein)
-        lengthPerSkein = settings.currentUnitSystem == .imperial ?
-            String(format: "%.0f", UnitConverter.metersToYards(yarn.lengthPerSkein)) :
-            String(format: "%.0f", yarn.lengthPerSkein)
-        numberOfSkeins = String(yarn.numberOfSkeins)
+        let displayWeight = settings.currentUnitSystem == .imperial ?
+            UnitConverter.gramsToOunces(yarn.weightPerSkein) :
+            yarn.weightPerSkein
+        let displayLength = settings.currentUnitSystem == .imperial ?
+            UnitConverter.metersToYards(yarn.lengthPerSkein) :
+            yarn.lengthPerSkein
+
+        weightPerSkein = String(format: "%.1f", displayWeight).replacingOccurrences(of: ".", with: ",")
+        lengthPerSkein = String(format: "%.0f", displayLength).replacingOccurrences(of: ".", with: ",")
+
+        // Format numberOfSkeins: show whole number if no decimals, otherwise show 1 decimal with comma
+        if yarn.numberOfSkeins.truncatingRemainder(dividingBy: 1) == 0 {
+            numberOfSkeins = String(format: "%.0f", yarn.numberOfSkeins)
+        } else {
+            numberOfSkeins = String(format: "%.1f", yarn.numberOfSkeins).replacingOccurrences(of: ".", with: ",")
+        }
+
+        let displayTotalWeight = displayWeight * yarn.numberOfSkeins
+        totalWeight = String(format: "%.0f", displayTotalWeight)
+
         color = yarn.color
         colorNumber = yarn.colorNumber
         lotNumber = yarn.lotNumber
@@ -351,9 +426,9 @@ struct EditYarnStashView: View {
     }
 
     func updateYarn() {
-        guard let weight = Double(weightPerSkein),
-              let length = Double(lengthPerSkein),
-              let count = Int(numberOfSkeins) else {
+        guard let weight = Double(weightPerSkein.replacingOccurrences(of: ",", with: ".")),
+              let length = Double(lengthPerSkein.replacingOccurrences(of: ",", with: ".")),
+              let count = Double(numberOfSkeins.replacingOccurrences(of: ",", with: ".")) else {
             return
         }
 
