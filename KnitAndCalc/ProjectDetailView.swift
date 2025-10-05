@@ -7,6 +7,34 @@
 
 import SwiftUI
 
+enum NeedleSize: String, CaseIterable {
+    case none = ""
+    case size1 = "1"
+    case size1_5 = "1,5"
+    case size2 = "2"
+    case size2_5 = "2,5"
+    case size3 = "3"
+    case size3_5 = "3,5"
+    case size4 = "4"
+    case size4_5 = "4,5"
+    case size5 = "5"
+    case size5_5 = "5,5"
+    case size6 = "6"
+    case size6_5 = "6,5"
+    case size7 = "7"
+    case size7_5 = "7,5"
+    case size8 = "8"
+    case size8_5 = "8,5"
+    case size9 = "9"
+    case size9_5 = "9,5"
+    case size10 = "10"
+    case other = "Annet"
+
+    var displayName: String {
+        return self.rawValue
+    }
+}
+
 struct ProjectDetailView: View {
     let project: Project
     @Binding var projects: [Project]
@@ -18,6 +46,12 @@ struct ProjectDetailView: View {
     @State private var showAddYarn: Bool = false
     @State private var counterToDelete: RowCounter?
     @State private var yarnToDelete: ProjectYarn?
+    @State private var selectedNeedleSize: NeedleSize = .none
+    @State private var customNeedleSize: String = ""
+    @State private var isCustomNeedleSize: Bool = false
+    @FocusState private var isCustomNeedleSizeFocused: Bool
+    @State private var showDeleteConfirmation: Bool = false
+    @Environment(\.dismiss) var dismiss
 
     var linkedRecipe: Recipe? {
         if let recipeId = project.recipeId {
@@ -31,7 +65,14 @@ struct ProjectDetailView: View {
     }
 
     var body: some View {
-        Form {
+        ZStack {
+            Color.clear
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    hideKeyboard()
+                }
+
+            Form {
             Section(header: Text("Status")) {
                 Picker("Status", selection: Binding(
                     get: { project.status },
@@ -104,14 +145,39 @@ struct ProjectDetailView: View {
                     }
                 ))
 
-                TextField("Pinnestørrelse", text: Binding(
-                    get: { project.needleSize },
-                    set: { newValue in
+                Picker("Pinnestørrelse", selection: $selectedNeedleSize) {
+                    ForEach(NeedleSize.allCases, id: \.self) { size in
+                        Text(size.displayName).tag(size)
+                    }
+                }
+                .onChange(of: selectedNeedleSize) { newValue in
+                    if newValue == .other {
+                        isCustomNeedleSize = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            isCustomNeedleSizeFocused = true
+                        }
+                    } else {
+                        isCustomNeedleSize = false
                         if let index = projectIndex {
-                            projects[index].needleSize = newValue
+                            projects[index].needleSize = newValue.rawValue
+                        }
+                        // Clear custom field when switching away from "Annet"
+                        if newValue != .other {
+                            customNeedleSize = ""
                         }
                     }
-                ))
+                }
+
+                if isCustomNeedleSize {
+                    TextField("Skriv inn pinnestørrelse", text: $customNeedleSize)
+                        .keyboardType(.decimalPad)
+                        .focused($isCustomNeedleSizeFocused)
+                        .onChange(of: customNeedleSize) { newValue in
+                            if let index = projectIndex {
+                                projects[index].needleSize = newValue
+                            }
+                        }
+                }
 
                 // Start date
                 if let startDate = project.startDate {
@@ -287,9 +353,32 @@ struct ProjectDetailView: View {
                     }
                 }
             }
+
+            Section {
+                Button(action: {
+                    showDeleteConfirmation = true
+                }) {
+                    HStack {
+                        Spacer()
+                        Text("Slett prosjekt")
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundColor(.red)
+                        Spacer()
+                    }
+                }
+            }
+            }
         }
         .navigationTitle(project.name)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button("Ferdig") {
+                    hideKeyboard()
+                }
+            }
+        }
         .sheet(isPresented: $showRecipePicker) {
             RecipePickerView(selectedRecipeId: Binding(
                 get: { project.recipeId },
@@ -335,8 +424,36 @@ struct ProjectDetailView: View {
         .sheet(isPresented: $showAddYarn) {
             AddProjectYarnView(projects: $projects, projectId: project.id)
         }
+        .alert("Slett prosjekt", isPresented: $showDeleteConfirmation) {
+            Button("Avbryt", role: .cancel) {}
+            Button("Slett", role: .destructive) {
+                deleteProject()
+            }
+        } message: {
+            Text("Er du sikker på at du vil slette \"\(project.name)\"?\n\nTips: Du kan også trekke til venstre på oversikten for å redigere eller slette. Det er raskere enn å bruke denne knappen.")
+        }
         .onAppear {
             loadYarnEntries()
+            initializeNeedleSize()
+        }
+    }
+
+    func deleteProject() {
+        if let index = projectIndex {
+            projects.remove(at: index)
+        }
+        dismiss()
+    }
+
+    func initializeNeedleSize() {
+        let currentSize = project.needleSize
+        if let matchedSize = NeedleSize.allCases.first(where: { $0.rawValue == currentSize }) {
+            selectedNeedleSize = matchedSize
+            isCustomNeedleSize = false
+        } else if !currentSize.isEmpty {
+            selectedNeedleSize = .other
+            customNeedleSize = currentSize
+            isCustomNeedleSize = true
         }
     }
 
@@ -345,6 +462,10 @@ struct ProjectDetailView: View {
            let decoded = try? JSONDecoder().decode([YarnStashEntry].self, from: data) {
             yarnEntries = decoded
         }
+    }
+
+    func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
 

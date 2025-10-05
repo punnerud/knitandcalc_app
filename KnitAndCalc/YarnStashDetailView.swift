@@ -18,6 +18,8 @@ struct YarnStashDetailView: View {
     @State private var usedGrams: String = ""
     @State private var usedSkeinToDelete: UsedSkein?
     @State private var refreshID = UUID()
+    @State private var showDeleteConfirmation: Bool = false
+    @Environment(\.dismiss) var dismiss
 
     var currentYarn: YarnStashEntry? {
         yarnEntries.first { $0.id == yarn.id }
@@ -66,6 +68,7 @@ struct YarnStashDetailView: View {
                 reservedSection
                 notesSection
                 usedYarnSection
+                deleteSection
             }
             .padding(.vertical)
         }
@@ -99,6 +102,39 @@ struct YarnStashDetailView: View {
         } message: { used in
             Text(String(format: NSLocalizedString("Er du sikker på at du vil slette denne brukt garn-registreringen (%@ g)?", comment: ""), formatNorwegian(used.grams)))
         }
+        .alert("Slett garn", isPresented: $showDeleteConfirmation) {
+            Button("Avbryt", role: .cancel) {}
+            Button("Slett", role: .destructive) {
+                deleteYarn()
+            }
+        } message: {
+            Text("Er du sikker på at du vil slette \"\(yarn.brand) \(yarn.type)\"?\n\nTips: Du kan også trekke til venstre på oversikten for å redigere eller slette. Det er raskere enn å bruke denne knappen.")
+        }
+    }
+
+    var deleteSection: some View {
+        VStack {
+            Button(action: {
+                showDeleteConfirmation = true
+            }) {
+                HStack {
+                    Spacer()
+                    Text("Slett garn")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundColor(.red)
+                    Spacer()
+                }
+            }
+            .padding()
+            .background(Color.appBackground)
+            .cornerRadius(12)
+        }
+        .padding(.horizontal)
+    }
+
+    func deleteYarn() {
+        yarnEntries.removeAll { $0.id == yarn.id }
+        dismiss()
     }
 
     var basicInfoSection: some View {

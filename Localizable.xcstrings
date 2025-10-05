@@ -2163,6 +2163,16 @@
         }
       }
     },
+    "Er du sikker på at du vil slette \"%@ %@\"?\n\nTips: Du kan også trekke til venstre på oversikten for å redigere eller slette. Det er raskere enn å bruke denne knappen." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Er du sikker på at du vil slette \"%1$@ %2$@\"?\n\nTips: Du kan også trekke til venstre på oversikten for å redigere eller slette. Det er raskere enn å bruke denne knappen."
+          }
+        }
+      }
+    },
     "Er du sikker på at du vil slette \"%@\"?" : {
       "localizations" : {
         "da" : {
@@ -2196,6 +2206,9 @@
           }
         }
       }
+    },
+    "Er du sikker på at du vil slette \"%@\"?\n\nTips: Du kan også trekke til venstre på oversikten for å redigere eller slette. Det er raskere enn å bruke denne knappen." : {
+
     },
     "Er du sikker på at du vil slette denne brukt garn-registreringen (%@ g)?" : {
       "localizations" : {
@@ -7684,6 +7697,9 @@
           }
         }
       }
+    },
+    "Skriv inn pinnestørrelse" : {
+
     },
     "Skriv inn type" : {
       "localizations" : {

@@ -22,6 +22,7 @@ struct EditRecipeView: View {
     @State private var showImagePicker: Bool = false
     @State private var showDocumentPicker: Bool = false
     @State private var pdfURL: URL?
+    @State private var showDeleteConfirmation: Bool = false
 
     var body: some View {
         NavigationView {
@@ -108,6 +109,20 @@ struct EditRecipeView: View {
                         }
                     }
                 }
+
+                Section {
+                    Button(action: {
+                        showDeleteConfirmation = true
+                    }) {
+                        HStack {
+                            Spacer()
+                            Text("Slett oppskrift")
+                                .font(.system(size: 17, weight: .semibold))
+                                .foregroundColor(.red)
+                            Spacer()
+                        }
+                    }
+                }
             }
             .navigationTitle("Rediger oppskrift")
             .navigationBarTitleDisplayMode(.inline)
@@ -133,10 +148,23 @@ struct EditRecipeView: View {
             .sheet(isPresented: $showDocumentPicker) {
                 DocumentPicker(pdfURL: $pdfURL)
             }
+            .alert("Slett oppskrift", isPresented: $showDeleteConfirmation) {
+                Button("Avbryt", role: .cancel) {}
+                Button("Slett", role: .destructive) {
+                    deleteRecipe()
+                }
+            } message: {
+                Text("Er du sikker på at du vil slette \"\(recipe.name)\"?\n\nTips: Du kan også trekke til venstre på oversikten for å redigere eller slette. Det er raskere enn å bruke denne knappen.")
+            }
             .onAppear {
                 loadRecipeData()
             }
         }
+    }
+
+    func deleteRecipe() {
+        recipes.removeAll { $0.id == recipe.id }
+        dismiss()
     }
 
     var canSave: Bool {

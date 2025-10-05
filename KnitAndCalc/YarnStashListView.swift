@@ -493,6 +493,7 @@ struct UsedSkein: Identifiable, Codable, Equatable {
 }
 
 enum GaugeOption: String, Codable, CaseIterable {
+    case other = "annet"
     case none = "ingen"
     case gauge8 = "8/10"
     case gauge10 = "10/10"
@@ -511,7 +512,6 @@ enum GaugeOption: String, Codable, CaseIterable {
     case gauge36 = "36/10"
     case gauge38 = "38/10"
     case gauge40 = "40/10"
-    case other = "annet"
 
     var displayName: LocalizedStringKey {
         switch self {
