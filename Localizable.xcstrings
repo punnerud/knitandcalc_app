@@ -777,6 +777,9 @@
         }
       }
     },
+    "💡 Du kan legge til strikkefasthetsberegning under tannhjulet øverst til høyre." : {
+
+    },
     "🧶🧶🧶" : {
       "localizations" : {
         "da" : {
@@ -856,6 +859,9 @@
           }
         }
       }
+    },
+    "Aktiver strikkefasthetsberegning" : {
+
     },
     "Alle" : {
       "localizations" : {
@@ -1870,6 +1876,7 @@
       }
     },
     "Du trenger %@ nøster med løpelengde %@%@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "da" : {
           "stringUnit" : {
@@ -3327,6 +3334,9 @@
         }
       }
     },
+    "Hvordan måle strikkefasthet:" : {
+
+    },
     "Importer backup" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3870,6 +3880,9 @@
           }
         }
       }
+    },
+    "Innstillinger" : {
+
     },
     "Kalibrering" : {
       "localizations" : {
@@ -4957,6 +4970,12 @@
           }
         }
       }
+    },
+    "Masker per 10cm i oppskriften" : {
+
+    },
+    "Masker per 10cm med ditt garn" : {
+
     },
     "Med filer" : {
       "extractionState" : "manual",
@@ -8237,6 +8256,9 @@
         }
       }
     },
+    "Strikk en prøvelapp på minst 12x12 cm. La den ligge flatt og tell masker på 10 cm i bredden. Oppgi antall masker med komma for halve masker (f.eks. 18,5)." : {
+
+    },
     "Strikkefasthet" : {
       "localizations" : {
         "da" : {
@@ -8276,6 +8298,9 @@
           }
         }
       }
+    },
+    "Strikkefasthetsberegning er aktivert" : {
+
     },
     "Strikkekalkulator" : {
       "localizations" : {

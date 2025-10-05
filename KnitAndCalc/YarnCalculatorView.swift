@@ -8,6 +8,10 @@ struct YarnCalculatorView: View {
     @State private var resultText: String = ""
     @State private var showResult: Bool = false
     @FocusState private var isFocused: Bool
+    @State private var showTensionSettings: Bool = false
+    @State private var tensionEnabled: Bool = false
+    @State private var tensionFrom: String = ""
+    @State private var tensionTo: String = ""
 
     enum YarnUnit: String, CaseIterable {
         case meter = "Meter"
@@ -117,6 +121,26 @@ struct YarnCalculatorView: View {
                             .cornerRadius(8)
                     }
                     .id("calculateButton")
+
+                    // Tension hint - only show before calculation
+                    if !showResult {
+                        if !tensionEnabled {
+                            Text("💡 Du kan legge til strikkefasthetsberegning under tannhjulet øverst til høyre.")
+                                .font(.system(size: 13))
+                                .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                                .padding(.top, 8)
+                        } else {
+                            HStack(spacing: 6) {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.system(size: 13))
+                                    .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                                Text("Strikkefasthetsberegning er aktivert")
+                                    .font(.system(size: 13, weight: .medium))
+                                    .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                            }
+                            .padding(.top, 8)
+                        }
+                    }
                 }
                 .padding(.horizontal)
 
@@ -142,6 +166,23 @@ struct YarnCalculatorView: View {
             }
             .navigationTitle("Garnkalkulator")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        showTensionSettings = true
+                    }) {
+                        Image(systemName: "gearshape")
+                            .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                    }
+                }
+            }
+            .sheet(isPresented: $showTensionSettings) {
+                TensionSettingsView(
+                    tensionEnabled: $tensionEnabled,
+                    tensionFrom: $tensionFrom,
+                    tensionTo: $tensionTo
+                )
+            }
         }
     }
 
@@ -158,10 +199,33 @@ struct YarnCalculatorView: View {
             return
         }
 
-        let totalYarn = lengthRec * countRec
+        var totalYarn = lengthRec * countRec
+        var tensionPercentage: Double? = nil
+
+        // Apply tension adjustment if enabled
+        if tensionEnabled,
+           let tensionFromVal = Double(tensionFrom.replacingOccurrences(of: ",", with: ".")),
+           let tensionToVal = Double(tensionTo.replacingOccurrences(of: ",", with: ".")),
+           tensionFromVal > 0, tensionToVal > 0 {
+            // Adjust yarn amount based on tension difference
+            // More stitches per 10cm = tighter tension = needs more yarn
+            let tensionRatio = tensionToVal / tensionFromVal
+            totalYarn = totalYarn * tensionRatio
+
+            // Calculate percentage difference
+            tensionPercentage = (tensionRatio - 1.0) * 100
+        }
+
         let skeinsNeeded = totalYarn / lengthYour
 
-        resultText = String(localized: "Du trenger \(String(format: "%.1f", skeinsNeeded)) nøster med løpelengde \(String(format: "%.0f", lengthYour))\(selectedUnit.abbreviation)")
+        var result = "Du trenger \(String(format: "%.1f", skeinsNeeded)) nøster med løpelengde \(String(format: "%.0f", lengthYour))\(selectedUnit.abbreviation)"
+
+        if let percentage = tensionPercentage {
+            let sign = percentage >= 0 ? "+" : ""
+            result += " (\(sign)\(String(format: "%.0f", percentage))% pga. strikkefasthet)"
+        }
+
+        resultText = result
         showResult = true
 
         // Scroll to result after a short delay to let the view update
@@ -184,6 +248,86 @@ struct CustomTextFieldStyle: TextFieldStyle {
                     .stroke(Color(red: 0.80, green: 0.75, blue: 0.88), lineWidth: 2)
             )
             .foregroundColor(Color(red: 0.50, green: 0.45, blue: 0.60))
+    }
+}
+
+struct TensionSettingsView: View {
+    @Binding var tensionEnabled: Bool
+    @Binding var tensionFrom: String
+    @Binding var tensionTo: String
+    @Environment(\.dismiss) var dismiss
+    @FocusState private var isFocused: Bool
+
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    // Toggle
+                    Toggle(isOn: $tensionEnabled) {
+                        Text("Aktiver strikkefasthetsberegning")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(Color(white: 0.17))
+                    }
+                    .tint(Color(red: 0.70, green: 0.65, blue: 0.82))
+                    .padding(.horizontal)
+
+                    if tensionEnabled {
+                        VStack(alignment: .leading, spacing: 20) {
+                            // Info text
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Hvordan måle strikkefasthet:")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(Color(white: 0.17))
+
+                                Text("Strikk en prøvelapp på minst 12x12 cm. La den ligge flatt og tell masker på 10 cm i bredden. Oppgi antall masker med komma for halve masker (f.eks. 18,5).")
+                                    .font(.system(size: 13))
+                                    .foregroundColor(Color(white: 0.35))
+                            }
+                            .padding(.horizontal)
+                            .padding(.vertical, 12)
+                            .background(Color(red: 0.93, green: 0.92, blue: 0.95))
+                            .cornerRadius(8)
+
+                            // From tension
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("Masker per 10cm i oppskriften")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(Color(white: 0.35))
+                                TextField("", text: $tensionFrom)
+                                    .keyboardType(.decimalPad)
+                                    .textFieldStyle(CustomTextFieldStyle())
+                                    .focused($isFocused)
+                            }
+
+                            // To tension
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("Masker per 10cm med ditt garn")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(Color(white: 0.35))
+                                TextField("", text: $tensionTo)
+                                    .keyboardType(.decimalPad)
+                                    .textFieldStyle(CustomTextFieldStyle())
+                                    .focused($isFocused)
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+
+                    Spacer()
+                }
+                .padding(.vertical)
+            }
+            .navigationTitle("Innstillinger")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Ferdig") {
+                        dismiss()
+                    }
+                    .foregroundColor(Color(red: 0.70, green: 0.65, blue: 0.82))
+                }
+            }
+        }
     }
 }
 
