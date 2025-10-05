@@ -2,16 +2,16 @@ import SwiftUI
 
 extension Color {
     // MARK: - App Color Palette
-    // Based on: #330000, #73605B, #D09683
+    // Based on: #f4ecff, #6b52a3
 
-    // Primary brand color - deep burgundy
-    static let appPrimary = Color(hex: "330000")
+    // Primary brand color - light lavender
+    static let appPrimary = Color(hex: "f4ecff")
 
-    // Secondary brand color - warm taupe
-    static let appSecondary = Color(hex: "73605B")
+    // Secondary brand color - purple
+    static let appSecondary = Color(hex: "6b52a3")
 
-    // Accent color - soft peach
-    static let appAccent = Color(hex: "D09683")
+    // Accent color - purple (same as secondary for consistency)
+    static let appAccent = Color(hex: "6b52a3")
 
     // MARK: - Semantic Colors (Dark Mode Compatible)
 
