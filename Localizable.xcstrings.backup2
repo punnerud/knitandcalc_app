@@ -276,16 +276,6 @@
         }
       }
     },
-    "%@ => %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ => %2$@"
-          }
-        }
-      }
-    },
     "%@ 1 maske" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1238,12 +1228,6 @@
           }
         }
       }
-    },
-    "Avrund" : {
-
-    },
-    "Avrund antall nøster" : {
-
     },
     "Backup" : {
       "extractionState" : "manual",
@@ -9081,16 +9065,6 @@
     },
     "Vi vurderer en funksjon hvor du kan søke anonymt etter garn du mangler. Ditt garnlager forblir privat, men hvis noen mangler ett nøste til et stort prosjekt, kan du motta tilbud om kjøp. Dette kan være en bedre finansieringsmodell for appen." : {
 
-    },
-    "Vil du avrunde fra %@ til %@ nøster?\n\nDu kan alltid endre dette igjen under \"Rediger\"." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Vil du avrunde fra %1$@ til %2$@ nøster?\n\nDu kan alltid endre dette igjen under \"Rediger\"."
-          }
-        }
-      }
     },
     "Vil du inkludere bilder og PDF-filer i backupen? Med filer tar det lengre tid, men sikrer fullstendig backup." : {
       "localizations" : {
