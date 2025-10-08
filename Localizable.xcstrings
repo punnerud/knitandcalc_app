@@ -962,6 +962,9 @@
         }
       }
     },
+    "Antall entries:" : {
+
+    },
     "Antall fellinger:" : {
       "localizations" : {
         "da" : {
@@ -2313,6 +2316,9 @@
         }
       }
     },
+    "Er tom:" : {
+
+    },
     "Få en påminnelse hver 3. dag" : {
       "localizations" : {
         "da" : {
@@ -2440,6 +2446,9 @@
       }
     },
     "Feil" : {
+
+    },
+    "Feilmelding:" : {
 
     },
     "fell" : {
@@ -3096,6 +3105,9 @@
         }
       }
     },
+    "Garnlager Data" : {
+
+    },
     "Gensere" : {
       "localizations" : {
         "da" : {
@@ -3379,6 +3391,9 @@
         }
       }
     },
+    "Har data:" : {
+
+    },
     "Hovedbilde" : {
 
     },
@@ -3423,6 +3438,9 @@
       }
     },
     "Hvordan måle strikkefasthet:" : {
+
+    },
+    "Idempotency Key:" : {
 
     },
     "Importer backup" : {
@@ -3973,6 +3991,9 @@
     "Innstillinger" : {
 
     },
+    "Ja" : {
+
+    },
     "Kalibrering" : {
       "localizations" : {
         "da" : {
@@ -4012,6 +4033,9 @@
           }
         }
       }
+    },
+    "Kan dekodes:" : {
+
     },
     "Kan ikke felle. Kan ikke felle med mer enn %lld når du har %lld masker på pinnen" : {
       "extractionState" : "stale",
@@ -4462,6 +4486,9 @@
 
     },
     "Laster PDF..." : {
+
+    },
+    "Laster..." : {
 
     },
     "Legg til" : {
@@ -5749,6 +5776,9 @@
     "Navn/Farge" : {
 
     },
+    "Nei" : {
+
+    },
     "nøster" : {
       "localizations" : {
         "da" : {
@@ -6850,6 +6880,9 @@
         }
       }
     },
+    "Receive Count:" : {
+
+    },
     "Rediger" : {
       "localizations" : {
         "da" : {
@@ -7751,6 +7784,9 @@
     "Sist synkronisert:" : {
 
     },
+    "Siste respons:" : {
+
+    },
     "Skriv inn merke" : {
       "localizations" : {
         "da" : {
@@ -8491,6 +8527,9 @@
 
     },
     "Synkronisering" : {
+
+    },
+    "Test idempotency key" : {
 
     },
     "Tilbakestill" : {

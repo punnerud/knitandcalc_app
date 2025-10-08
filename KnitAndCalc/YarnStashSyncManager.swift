@@ -155,9 +155,20 @@ class YarnStashSyncManager {
         }
 
         // Calculate idempotency key (hash of yarnStash array only)
+        // Use deterministic serialization with sorted keys and sorted array
         var idempotencyKey = ""
-        if let yarnStash = payload["yarnStash"] {
-            if let yarnStashData = try? JSONSerialization.data(withJSONObject: yarnStash) {
+        if let yarnStash = payload["yarnStash"] as? [[String: Any]] {
+            // Sort array by ID for deterministic ordering
+            let sortedYarnStash = yarnStash.sorted { dict1, dict2 in
+                let id1 = dict1["id"] as? String ?? ""
+                let id2 = dict2["id"] as? String ?? ""
+                return id1 < id2
+            }
+
+            if let yarnStashData = try? JSONSerialization.data(
+                withJSONObject: sortedYarnStash,
+                options: [.sortedKeys, .fragmentsAllowed]
+            ) {
                 idempotencyKey = sha256Hash(of: yarnStashData)
             }
         }
