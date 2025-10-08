@@ -431,7 +431,7 @@ struct Project: Identifiable, Codable, Equatable {
     var recipeId: UUID?
     var size: String
     var gauge: String
-    var needleSize: String
+    var needleSizes: [String]
     var startDate: Date?
     var completedDate: Date?
     var notes: String
@@ -441,14 +441,14 @@ struct Project: Identifiable, Codable, Equatable {
     var primaryImageIndex: Int?
     var dateCreated: Date
 
-    init(id: UUID = UUID(), name: String, status: ProjectStatus = .planned, recipeId: UUID? = nil, size: String = "", gauge: String = "", needleSize: String = "", startDate: Date? = nil, completedDate: Date? = nil, notes: String = "", rowCounters: [RowCounter] = [], linkedYarns: [ProjectYarn] = [], images: [String] = [], primaryImageIndex: Int? = nil, dateCreated: Date = Date()) {
+    init(id: UUID = UUID(), name: String, status: ProjectStatus = .planned, recipeId: UUID? = nil, size: String = "", gauge: String = "", needleSizes: [String] = [], startDate: Date? = nil, completedDate: Date? = nil, notes: String = "", rowCounters: [RowCounter] = [], linkedYarns: [ProjectYarn] = [], images: [String] = [], primaryImageIndex: Int? = nil, dateCreated: Date = Date()) {
         self.id = id
         self.name = name
         self.status = status
         self.recipeId = recipeId
         self.size = size
         self.gauge = gauge
-        self.needleSize = needleSize
+        self.needleSizes = needleSizes
         self.startDate = startDate
         self.completedDate = completedDate
         self.notes = notes
@@ -467,7 +467,17 @@ struct Project: Identifiable, Codable, Equatable {
         recipeId = try container.decodeIfPresent(UUID.self, forKey: .recipeId)
         size = try container.decode(String.self, forKey: .size)
         gauge = try container.decode(String.self, forKey: .gauge)
-        needleSize = try container.decode(String.self, forKey: .needleSize)
+
+        // Backward compatibility: handle both old needleSize (String) and new needleSizes (Array)
+        if let needleSizesArray = try? container.decode([String].self, forKey: .needleSizes) {
+            needleSizes = needleSizesArray
+        } else if let needleSize = try? container.decode(String.self, forKey: .needleSize) {
+            // Convert old single needleSize to array
+            needleSizes = needleSize.isEmpty ? [] : [needleSize]
+        } else {
+            needleSizes = []
+        }
+
         startDate = try container.decodeIfPresent(Date.self, forKey: .startDate)
         completedDate = try container.decodeIfPresent(Date.self, forKey: .completedDate)
         notes = try container.decode(String.self, forKey: .notes)
@@ -479,8 +489,27 @@ struct Project: Identifiable, Codable, Equatable {
         dateCreated = try container.decode(Date.self, forKey: .dateCreated)
     }
 
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encode(status, forKey: .status)
+        try container.encodeIfPresent(recipeId, forKey: .recipeId)
+        try container.encode(size, forKey: .size)
+        try container.encode(gauge, forKey: .gauge)
+        try container.encode(needleSizes, forKey: .needleSizes)
+        try container.encodeIfPresent(startDate, forKey: .startDate)
+        try container.encodeIfPresent(completedDate, forKey: .completedDate)
+        try container.encode(notes, forKey: .notes)
+        try container.encode(rowCounters, forKey: .rowCounters)
+        try container.encode(linkedYarns, forKey: .linkedYarns)
+        try container.encode(images, forKey: .images)
+        try container.encodeIfPresent(primaryImageIndex, forKey: .primaryImageIndex)
+        try container.encode(dateCreated, forKey: .dateCreated)
+    }
+
     enum CodingKeys: String, CodingKey {
-        case id, name, status, recipeId, size, gauge, needleSize
+        case id, name, status, recipeId, size, gauge, needleSize, needleSizes
         case startDate, completedDate, notes, rowCounters, linkedYarns
         case images, primaryImageIndex, dateCreated
     }

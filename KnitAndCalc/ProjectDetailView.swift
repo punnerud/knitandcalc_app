@@ -48,7 +48,7 @@ struct ProjectDetailView: View {
     @State private var yarnToDelete: ProjectYarn?
     @State private var selectedNeedleSize: NeedleSize = .none
     @State private var customNeedleSize: String = ""
-    @State private var isCustomNeedleSize: Bool = false
+    @State private var showCustomNeedleInput: Bool = false
     @FocusState private var isCustomNeedleSizeFocused: Bool
     @State private var showDeleteConfirmation: Bool = false
     @State private var showImagePicker: Bool = false
@@ -162,7 +162,6 @@ struct ProjectDetailView: View {
             }
             .onAppear {
                 loadYarnEntries()
-                initializeNeedleSize()
             }
     }
 
@@ -240,42 +239,79 @@ struct ProjectDetailView: View {
                         }
                     }
                 ))
+            }
 
-                Picker("Pinnestørrelse", selection: $selectedNeedleSize) {
-                    ForEach(NeedleSize.allCases, id: \.self) { size in
-                        Text(size.displayName).tag(size)
-                    }
-                }
-                .onChange(of: selectedNeedleSize) { newValue in
-                    if newValue == .other {
-                        isCustomNeedleSize = true
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            isCustomNeedleSizeFocused = true
-                        }
-                    } else {
-                        isCustomNeedleSize = false
-                        if let index = projectIndex {
-                            projects[index].needleSize = newValue.rawValue
-                        }
-                        // Clear custom field when switching away from "Annet"
-                        if newValue != .other {
-                            customNeedleSize = ""
+            Section(header: Text("Pinnestørrelse")) {
+                // Dropdown to add needle sizes
+                HStack {
+                    Picker("Legg til pinnestørrelse", selection: $selectedNeedleSize) {
+                        ForEach(NeedleSize.allCases, id: \.self) { size in
+                            Text(size.displayName).tag(size)
                         }
                     }
-                }
-
-                if isCustomNeedleSize {
-                    TextField("Skriv inn pinnestørrelse", text: $customNeedleSize)
-                        .keyboardType(.decimalPad)
-                        .focused($isCustomNeedleSizeFocused)
-                        .onChange(of: customNeedleSize) { newValue in
-                            if let index = projectIndex {
-                                projects[index].needleSize = newValue
+                    .onChange(of: selectedNeedleSize) { newValue in
+                        if newValue != .none {
+                            if newValue == .other {
+                                showCustomNeedleInput = true
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    isCustomNeedleSizeFocused = true
+                                }
+                            } else {
+                                addNeedleSize(newValue.rawValue)
+                                selectedNeedleSize = .none
                             }
                         }
+                    }
                 }
 
-                // Start date
+                // Custom needle size input when "Annet" is selected
+                if showCustomNeedleInput {
+                    HStack {
+                        TextField("Skriv inn pinnestørrelse", text: $customNeedleSize)
+                            .keyboardType(.decimalPad)
+                            .focused($isCustomNeedleSizeFocused)
+
+                        Button("Legg til") {
+                            if !customNeedleSize.isEmpty {
+                                addNeedleSize(customNeedleSize)
+                                customNeedleSize = ""
+                                showCustomNeedleInput = false
+                                selectedNeedleSize = .none
+                            }
+                        }
+                        .foregroundColor(.appIconTint)
+
+                        Button("Avbryt") {
+                            customNeedleSize = ""
+                            showCustomNeedleInput = false
+                            selectedNeedleSize = .none
+                        }
+                        .foregroundColor(.red)
+                    }
+                }
+
+                // List of selected needle sizes
+                if !project.needleSizes.isEmpty {
+                    ForEach(Array(project.needleSizes.enumerated()), id: \.offset) { index, size in
+                        HStack {
+                            Text(size)
+                                .font(.system(size: 16))
+
+                            Spacer()
+
+                            Button(action: {
+                                removeNeedleSize(at: index)
+                            }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(.appSecondaryText)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                    }
+                }
+            }
+
+            Section(header: Text("Datoer")) {
                 if let startDate = project.startDate {
                     HStack {
                         DatePicker("Startet", selection: Binding(
@@ -485,16 +521,14 @@ struct ProjectDetailView: View {
         dismiss()
     }
 
-    func initializeNeedleSize() {
-        let currentSize = project.needleSize
-        if let matchedSize = NeedleSize.allCases.first(where: { $0.rawValue == currentSize }) {
-            selectedNeedleSize = matchedSize
-            isCustomNeedleSize = false
-        } else if !currentSize.isEmpty {
-            selectedNeedleSize = .other
-            customNeedleSize = currentSize
-            isCustomNeedleSize = true
-        }
+    func addNeedleSize(_ size: String) {
+        guard let index = projectIndex else { return }
+        projects[index].needleSizes.append(size)
+    }
+
+    func removeNeedleSize(at index: Int) {
+        guard let projectIdx = projectIndex else { return }
+        projects[projectIdx].needleSizes.remove(at: index)
     }
 
     func loadYarnEntries() {

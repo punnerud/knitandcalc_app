@@ -1767,6 +1767,9 @@
         }
       }
     },
+    "Datoer" : {
+
+    },
     "Detaljer" : {
       "localizations" : {
         "da" : {
@@ -4437,6 +4440,9 @@
     "Laster PDF..." : {
 
     },
+    "Legg til" : {
+
+    },
     "Legg til bilder" : {
 
     },
@@ -4643,6 +4649,9 @@
           }
         }
       }
+    },
+    "Legg til pinnestørrelse" : {
+
     },
     "Legg til startdato" : {
       "localizations" : {
