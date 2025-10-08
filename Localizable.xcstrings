@@ -747,6 +747,9 @@
         }
       }
     },
+    "%llds" : {
+
+    },
     "•" : {
       "localizations" : {
         "da" : {
@@ -830,6 +833,9 @@
         }
       }
     },
+    "Actions" : {
+
+    },
     "Aktive" : {
       "localizations" : {
         "da" : {
@@ -871,6 +877,9 @@
       }
     },
     "Aktiver strikkefasthetsberegning" : {
+
+    },
+    "Aldri synkronisert" : {
 
     },
     "Alle" : {
@@ -1476,6 +1485,9 @@
     "Bilder" : {
 
     },
+    "Bruker-ID:" : {
+
+    },
     "Brukt garn" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1770,6 +1782,12 @@
     "Datoer" : {
 
     },
+    "Debug Menu" : {
+
+    },
+    "Debug-funksjoner for testing av garnlager-synkronisering" : {
+
+    },
     "Detaljer" : {
       "localizations" : {
         "da" : {
@@ -1809,6 +1827,9 @@
           }
         }
       }
+    },
+    "Dette vil nullstille all synkroniseringsstatistikk og la deg teste synkronisering på nytt." : {
+
     },
     "Du har nå %lld masker på pinnen" : {
       "localizations" : {
@@ -2660,6 +2681,9 @@
           }
         }
       }
+    },
+    "Forsøk i dag:" : {
+
     },
     "Fremtidig funksjon: Anonymt søk" : {
 
@@ -4976,6 +5000,9 @@
         }
       }
     },
+    "Lukk" : {
+
+    },
     "maske" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -5881,6 +5908,9 @@
           }
         }
       }
+    },
+    "Nullstill statistikk" : {
+
     },
     "Ny oppskrift" : {
       "localizations" : {
@@ -7718,6 +7748,9 @@
         }
       }
     },
+    "Sist synkronisert:" : {
+
+    },
     "Skriv inn merke" : {
       "localizations" : {
         "da" : {
@@ -8454,6 +8487,12 @@
         }
       }
     },
+    "Sync Status" : {
+
+    },
+    "Synkronisering" : {
+
+    },
     "Tilbakestill" : {
       "localizations" : {
         "da" : {
@@ -8616,6 +8655,9 @@
           }
         }
       }
+    },
+    "Trigger synkronisering" : {
+
     },
     "Trykk + for å legge til" : {
       "localizations" : {
@@ -9188,6 +9230,9 @@
 
     },
     "Yards:" : {
+
+    },
+    "Yarn Stash Sync Debug" : {
 
     }
   },

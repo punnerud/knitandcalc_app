@@ -28,6 +28,8 @@ struct KnitAndCalcApp: App {
             case .background:
                 // App went to background - schedule notification for 3 days from now
                 NotificationManager.shared.scheduleNotificationIfNeeded()
+                // Sync yarn stash data to API
+                YarnStashSyncManager.shared.syncYarnStashIfNeeded()
             case .inactive:
                 break
             @unknown default:

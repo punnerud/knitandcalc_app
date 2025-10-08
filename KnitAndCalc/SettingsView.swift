@@ -50,6 +50,11 @@ struct SettingsView: View {
     @AppStorage("notificationsEnabled") private var notificationsEnabled = false
     @State private var showNotificationAlert = false
 
+    // Debug menu sequence tracking
+    @State private var debugSequence: [String] = []
+    @State private var debugSequenceStartTime: Date?
+    @State private var showDebugMenu = false
+
     var body: some View {
         Form {
             Section(header: Text(NSLocalizedString("settings.language.header", comment: ""))) {
@@ -75,6 +80,9 @@ struct SettingsView: View {
                     }
                 }
                 .pickerStyle(SegmentedPickerStyle())
+                .onChange(of: settings.unitSystem) { newValue in
+                    trackDebugSequence("unit:\(newValue)")
+                }
             }
 
             if settings.currentLanguage == .norwegian {
@@ -87,12 +95,14 @@ struct SettingsView: View {
                                 NotificationManager.shared.requestAuthorization { granted in
                                     if granted {
                                         notificationsEnabled = true
+                                        trackDebugSequence("notif:on")
                                     } else {
                                         showNotificationAlert = true
                                     }
                                 }
                             } else {
                                 notificationsEnabled = false
+                                trackDebugSequence("notif:off")
                             }
                         }
                     )) {
@@ -274,6 +284,9 @@ struct SettingsView: View {
         } message: {
             Text("Vil du inkludere bilder og PDF-filer i backupen? Med filer tar det lengre tid, men sikrer fullstendig backup.")
         }
+        .sheet(isPresented: $showDebugMenu) {
+            DebugMenuView()
+        }
     }
 
     func handleRating(_ rating: Int) {
@@ -426,6 +439,57 @@ struct SettingsView: View {
 
             // Write file
             try? data.write(to: fileURL)
+        }
+    }
+
+    // MARK: - Debug Sequence Tracking
+
+    func trackDebugSequence(_ action: String) {
+        let now = Date()
+
+        // Reset if more than 10 seconds since start
+        if let startTime = debugSequenceStartTime {
+            if now.timeIntervalSince(startTime) > 10 {
+                debugSequence = []
+                debugSequenceStartTime = nil
+            }
+        }
+
+        // Start or continue sequence
+        if debugSequenceStartTime == nil {
+            debugSequenceStartTime = now
+        }
+
+        debugSequence.append(action)
+
+        // Check if sequence matches
+        // Metrisk->Imperial, Imperial->Metrisk, Metrisk->Imperial, Imperial->Metrisk,
+        // Påminnelser av, Påminnelser på, Metrisk->Imperial, Imperial->Metrisk
+        let expectedSequence = [
+            "unit:imperial",
+            "unit:metric",
+            "unit:imperial",
+            "unit:metric",
+            "notif:off",
+            "notif:on",
+            "unit:imperial",
+            "unit:metric"
+        ]
+
+        // Check if we have the correct sequence
+        if debugSequence.count >= expectedSequence.count {
+            let lastActions = Array(debugSequence.suffix(expectedSequence.count))
+            if lastActions == expectedSequence {
+                print("Debug menu sequence detected!")
+                showDebugMenu = true
+                debugSequence = []
+                debugSequenceStartTime = nil
+            }
+        }
+
+        // Cleanup old entries
+        if debugSequence.count > 20 {
+            debugSequence.removeFirst()
         }
     }
 }
