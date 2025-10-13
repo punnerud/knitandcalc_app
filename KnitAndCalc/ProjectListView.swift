@@ -10,12 +10,14 @@ import SwiftUI
 struct ProjectListView: View {
     @State private var projects: [Project] = []
     @State private var recipes: [Recipe] = []
+    @State private var yarnEntries: [YarnStashEntry] = []
     @State private var selectedStatus: ProjectStatus = .active
     @State private var selectedCategory: String? = nil
     @State private var showAddProject: Bool = false
     @State private var projectToDelete: Project?
     @State private var projectToEdit: Project?
     @State private var projectToNavigate: Project?
+    @ObservedObject private var settings = AppSettings.shared
 
     var categoriesForCurrentStatus: [String] {
         let projectsInStatus = projects.filter { $0.status == selectedStatus }
@@ -45,6 +47,50 @@ struct ProjectListView: View {
             }
             return false
         }
+    }
+
+    var completedProjects: [Project] {
+        projects.filter { $0.status == .completed }
+    }
+
+    var totalCompletedGrams: Double {
+        var total: Double = 0.0
+        for project in completedProjects {
+            for linkedYarn in project.linkedYarns {
+                if let yarn = yarnEntries.first(where: { $0.id == linkedYarn.yarnStashId }) {
+                    switch linkedYarn.quantityType {
+                    case .grams:
+                        total += linkedYarn.quantity
+                    case .skeins:
+                        total += linkedYarn.quantity * yarn.weightPerSkein
+                    case .meters:
+                        let gramsPerMeter = yarn.weightPerSkein / yarn.lengthPerSkein
+                        total += linkedYarn.quantity * gramsPerMeter
+                    }
+                }
+            }
+        }
+        return total
+    }
+
+    var totalCompletedMeters: Double {
+        var total: Double = 0.0
+        for project in completedProjects {
+            for linkedYarn in project.linkedYarns {
+                if let yarn = yarnEntries.first(where: { $0.id == linkedYarn.yarnStashId }) {
+                    switch linkedYarn.quantityType {
+                    case .meters:
+                        total += linkedYarn.quantity
+                    case .skeins:
+                        total += linkedYarn.quantity * yarn.lengthPerSkein
+                    case .grams:
+                        let metersPerGram = yarn.lengthPerSkein / yarn.weightPerSkein
+                        total += linkedYarn.quantity * metersPerGram
+                    }
+                }
+            }
+        }
+        return total
     }
 
     var body: some View {
@@ -104,6 +150,7 @@ struct ProjectListView: View {
             .onAppear {
                 loadProjects()
                 loadRecipes()
+                loadYarnEntries()
             }
     }
 
@@ -225,6 +272,14 @@ struct ProjectListView: View {
                     .tint(Color(red: 0.70, green: 0.65, blue: 0.82))
                 }
             }
+
+            if selectedStatus == .completed && !completedProjects.isEmpty && (totalCompletedGrams > 0 || totalCompletedMeters > 0) {
+                Section {
+                    CompletedProjectsSummaryView(totalWeight: totalCompletedGrams, totalLength: totalCompletedMeters)
+                }
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
+            }
         }
         .listStyle(PlainListStyle())
     }
@@ -253,6 +308,74 @@ struct ProjectListView: View {
         if let encoded = try? JSONEncoder().encode(projects) {
             UserDefaults.standard.set(encoded, forKey: "savedProjects")
         }
+    }
+
+    func loadYarnEntries() {
+        if let data = UserDefaults.standard.data(forKey: "savedYarnStash"),
+           let decoded = try? JSONDecoder().decode([YarnStashEntry].self, from: data) {
+            yarnEntries = decoded
+        }
+    }
+}
+
+struct CompletedProjectsSummaryView: View {
+    let totalWeight: Double
+    let totalLength: Double
+    @ObservedObject private var settings = AppSettings.shared
+
+    var body: some View {
+        VStack(spacing: 12) {
+            Divider()
+                .padding(.vertical, 8)
+
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Totalt brukt i fullførte prosjekter")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.appText)
+
+                    Text("For morro skyld")
+                        .font(.system(size: 12))
+                        .foregroundColor(.appSecondaryText)
+                }
+
+                Spacer()
+            }
+            .padding(.horizontal)
+
+            HStack(spacing: 20) {
+                VStack(spacing: 4) {
+                    Text(settings.currentUnitSystem == .metric ? "\(Int(totalWeight))" : String(format: "%.1f", UnitConverter.gramsToOunces(totalWeight)))
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundColor(.appIconTint)
+
+                    Text(settings.currentUnitSystem == .metric ? "gram totalt" : "oz totalt")
+                        .font(.system(size: 13))
+                        .foregroundColor(.appSecondaryText)
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.appButtonBackgroundUnselected)
+                .cornerRadius(12)
+
+                VStack(spacing: 4) {
+                    Text(settings.currentUnitSystem == .metric ? "\(Int(totalLength))" : String(format: "%.0f", UnitConverter.metersToYards(totalLength)))
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundColor(.appIconTint)
+
+                    Text(settings.currentUnitSystem == .metric ? "meter totalt" : "yards totalt")
+                        .font(.system(size: 13))
+                        .foregroundColor(.appSecondaryText)
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.appButtonBackgroundUnselected)
+                .cornerRadius(12)
+            }
+            .padding(.horizontal)
+            .padding(.bottom, 8)
+        }
+        .background(Color.appSecondaryBackground)
     }
 }
 
