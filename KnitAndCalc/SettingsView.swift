@@ -85,6 +85,38 @@ struct SettingsView: View {
                 }
             }
 
+            Section(header: Text("Facebook-gruppe")) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Bli med i KnitAndCalc-gruppen på Facebook")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(.appText)
+
+                    Text("Del tips, få hjelp og gi tilbakemeldinger til fellesskapet!")
+                        .font(.system(size: 13))
+                        .foregroundColor(.appSecondaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Button(action: {
+                        if let url = URL(string: "https://www.facebook.com/groups/knitandcalc/") {
+                            UIApplication.shared.open(url)
+                        }
+                    }) {
+                        HStack {
+                            Image(systemName: "person.3.fill")
+                                .foregroundColor(.appIconTint)
+                            Text("Gå til Facebook-gruppen")
+                                .foregroundColor(.appIconTint)
+                        }
+                    }
+
+                    Text("Skriv \"CalcAndKnit\" for å bli medlem")
+                        .font(.system(size: 12))
+                        .foregroundColor(.appSecondaryText)
+                        .padding(.top, 4)
+                }
+                .padding(.vertical, 4)
+            }
+
             if settings.currentLanguage == .norwegian {
                 Section(header: Text(NSLocalizedString("Varsler", comment: ""))) {
                     Toggle(isOn: Binding(
@@ -107,9 +139,9 @@ struct SettingsView: View {
                         }
                     )) {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(NSLocalizedString("Påminnelser om strikking", comment: ""))
+                            Text(NSLocalizedString("Påminnelser om strikking (bare for gøy)", comment: ""))
                                 .font(.system(size: 15))
-                            Text(NSLocalizedString("Få en påminnelse hver 3. dag", comment: ""))
+                            Text(NSLocalizedString("Får kun varsel hvis appen ikke er brukt på 3 dager", comment: ""))
                                 .font(.system(size: 13))
                                 .foregroundColor(.appSecondaryText)
                         }

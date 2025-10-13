@@ -1488,6 +1488,9 @@
     "Bilder" : {
 
     },
+    "Bli med i KnitAndCalc-gruppen på Facebook" : {
+
+    },
     "Bruker-ID:" : {
 
     },
@@ -1789,6 +1792,9 @@
 
     },
     "Debug-funksjoner for testing av garnlager-synkronisering" : {
+
+    },
+    "Del tips, få hjelp og gi tilbakemeldinger til fellesskapet!" : {
 
     },
     "Detaljer" : {
@@ -2320,6 +2326,7 @@
 
     },
     "Få en påminnelse hver 3. dag" : {
+      "extractionState" : "stale",
       "localizations" : {
         "da" : {
           "stringUnit" : {
@@ -2364,6 +2371,12 @@
           }
         }
       }
+    },
+    "Facebook-gruppe" : {
+
+    },
+    "Får kun varsel hvis appen ikke er brukt på 3 dager" : {
+
     },
     "Farge" : {
       "localizations" : {
@@ -2736,6 +2749,9 @@
           }
         }
       }
+    },
+    "Gå til Facebook-gruppen" : {
+
     },
     "Gå til Innstillinger > KnitAndCalc > Varsler for å aktivere varsler" : {
       "localizations" : {
@@ -7785,6 +7801,9 @@
 
     },
     "Siste respons:" : {
+
+    },
+    "Skriv \"CalcAndKnit\" for å bli medlem" : {
 
     },
     "Skriv inn merke" : {
