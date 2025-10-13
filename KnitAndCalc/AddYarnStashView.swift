@@ -76,12 +76,14 @@ struct AddYarnStashView: View {
     var isFormValid: Bool {
         let basicValid = !finalBrand.isEmpty &&
         !finalType.isEmpty &&
-        Double(weightPerSkein) != nil &&
-        Double(lengthPerSkein) != nil &&
-        Double(numberOfSkeins) != nil
+        Double(weightPerSkein.replacingOccurrences(of: ",", with: ".")) != nil &&
+        Double(lengthPerSkein.replacingOccurrences(of: ",", with: ".")) != nil &&
+        Double(numberOfSkeins.replacingOccurrences(of: ",", with: ".")) != nil
 
         if linkToProjectId != nil && linkToProject {
-            return basicValid && Double(quantity) != nil && Double(quantity)! > 0
+            let quantityValid = Double(quantity.replacingOccurrences(of: ",", with: ".")) != nil &&
+                               Double(quantity.replacingOccurrences(of: ",", with: "."))! > 0
+            return basicValid && quantityValid
         }
         return basicValid
     }
