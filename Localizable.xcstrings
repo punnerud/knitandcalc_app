@@ -6448,6 +6448,7 @@
       }
     },
     "Påminnelser om strikking" : {
+      "extractionState" : "stale",
       "localizations" : {
         "da" : {
           "stringUnit" : {
@@ -6492,6 +6493,9 @@
           }
         }
       }
+    },
+    "Påminnelser om strikking (bare for gøy)" : {
+
     },
     "Partinummer" : {
       "localizations" : {

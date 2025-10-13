@@ -237,7 +237,7 @@ struct YarnStashDetailView: View {
                 InfoRow(label: NSLocalizedString("Strikkefasthet", comment: ""), value: (currentYarn?.gauge ?? yarn.gauge).displayName)
             }
             .padding()
-            .background(Color.white)
+            .background(Color.appBackground)
             .cornerRadius(12)
             .padding(.horizontal)
         }
@@ -288,7 +288,7 @@ struct YarnStashDetailView: View {
                     }
                 }
                 .padding()
-                .background(Color.white)
+                .background(Color.appBackground)
                 .cornerRadius(12)
                 .padding(.horizontal)
 
@@ -323,7 +323,7 @@ struct YarnStashDetailView: View {
                     .foregroundColor(.appText)
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.white)
+                    .background(Color.appBackground)
                     .cornerRadius(12)
                     .padding(.horizontal)
             }
