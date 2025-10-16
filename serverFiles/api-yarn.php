@@ -6,6 +6,32 @@
 
 header('Content-Type: application/json');
 
+// Helper function to log request
+function logRequest($db, $ipAddress, $deviceInfo, $appVersion, $httpMethod, $rawBody, $errorMessage, $statusCode, $userId = null, $yarnCount = null, $hasPayloadHash = 0, $hasSaltedHash = 0, $hasIdempotencyKey = 0) {
+    try {
+        $stmt = $db->prepare('INSERT INTO request_log
+            (timestamp, ip_address, device_info, app_version, http_method, raw_body, error_message, status_code, user_id, yarn_count, has_payload_hash, has_salted_hash, has_idempotency_key)
+            VALUES (:timestamp, :ip_address, :device_info, :app_version, :http_method, :raw_body, :error_message, :status_code, :user_id, :yarn_count, :has_payload_hash, :has_salted_hash, :has_idempotency_key)');
+        $stmt->execute([
+            ':timestamp' => date('c'),
+            ':ip_address' => $ipAddress,
+            ':device_info' => $deviceInfo,
+            ':app_version' => $appVersion,
+            ':http_method' => $httpMethod,
+            ':raw_body' => substr($rawBody, 0, 10000), // Limit to 10KB
+            ':error_message' => $errorMessage,
+            ':status_code' => $statusCode,
+            ':user_id' => $userId,
+            ':yarn_count' => $yarnCount,
+            ':has_payload_hash' => $hasPayloadHash,
+            ':has_salted_hash' => $hasSaltedHash,
+            ':has_idempotency_key' => $hasIdempotencyKey
+        ]);
+    } catch (PDOException $e) {
+        error_log('Failed to log request: ' . $e->getMessage());
+    }
+}
+
 // Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -13,9 +39,60 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// Get headers early for logging
+$payloadHash = $_SERVER['HTTP_X_PAYLOAD_HASH'] ?? null;
+$payloadHashSalted = $_SERVER['HTTP_X_PAYLOAD_HASH_SALTED'] ?? null;
+$idempotencyKey = $_SERVER['HTTP_X_IDEMPOTENCY_KEY'] ?? null;
+$deviceInfo = $_SERVER['HTTP_X_DEVICE_INFO'] ?? $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
+$appVersion = $_SERVER['HTTP_X_APP_VERSION'] ?? 'Unknown';
+
+// Get client IP address early for logging
+$ipAddress = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? 'Unknown';
+if (strpos($ipAddress, ',') !== false) {
+    $ipAddress = trim(explode(',', $ipAddress)[0]);
+}
+
 // Read raw POST data
 $rawInput = file_get_contents('php://input');
+
+// Open database early so we can log all requests
+$dbPath = __DIR__ . '/yarn.db';
+try {
+    $db = new PDO('sqlite:' . $dbPath);
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    // Create request log table for ALL requests (including failed ones)
+    $db->exec('CREATE TABLE IF NOT EXISTS request_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        timestamp TEXT NOT NULL,
+        ip_address TEXT,
+        device_info TEXT,
+        app_version TEXT,
+        http_method TEXT,
+        raw_body TEXT,
+        error_message TEXT,
+        status_code INTEGER,
+        user_id TEXT,
+        yarn_count INTEGER,
+        has_payload_hash INTEGER DEFAULT 0,
+        has_salted_hash INTEGER DEFAULT 0,
+        has_idempotency_key INTEGER DEFAULT 0,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )');
+
+    // Create index on request_log timestamp
+    $db->exec('CREATE INDEX IF NOT EXISTS idx_request_log_timestamp ON request_log(timestamp DESC)');
+
+} catch (PDOException $e) {
+    error_log('Database connection error: ' . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(['error' => 'Database error']);
+    exit;
+}
+
+// Validate empty request body
 if (empty($rawInput)) {
+    logRequest($db, $ipAddress, $deviceInfo, $appVersion, $_SERVER['REQUEST_METHOD'], '', 'Empty request body', 400);
     http_response_code(400);
     echo json_encode(['error' => 'Empty request body']);
     exit;
@@ -24,6 +101,7 @@ if (empty($rawInput)) {
 // Parse JSON
 $payload = json_decode($rawInput, true);
 if (json_last_error() !== JSON_ERROR_NONE) {
+    logRequest($db, $ipAddress, $deviceInfo, $appVersion, $_SERVER['REQUEST_METHOD'], $rawInput, 'Invalid JSON: ' . json_last_error_msg(), 400);
     http_response_code(400);
     echo json_encode(['error' => 'Invalid JSON: ' . json_last_error_msg()]);
     exit;
@@ -31,17 +109,30 @@ if (json_last_error() !== JSON_ERROR_NONE) {
 
 // Validate required fields
 if (!isset($payload['userId']) || !isset($payload['timestamp']) || !isset($payload['yarnStash'])) {
+    $missingFields = [];
+    if (!isset($payload['userId'])) $missingFields[] = 'userId';
+    if (!isset($payload['timestamp'])) $missingFields[] = 'timestamp';
+    if (!isset($payload['yarnStash'])) $missingFields[] = 'yarnStash';
+
+    logRequest(
+        $db,
+        $ipAddress,
+        $deviceInfo,
+        $appVersion,
+        $_SERVER['REQUEST_METHOD'],
+        $rawInput,
+        'Missing required fields: ' . implode(', ', $missingFields),
+        400,
+        $payload['userId'] ?? null,
+        isset($payload['yarnStash']) && is_array($payload['yarnStash']) ? count($payload['yarnStash']) : null,
+        $payloadHash ? 1 : 0,
+        $payloadHashSalted ? 1 : 0,
+        $idempotencyKey ? 1 : 0
+    );
     http_response_code(400);
     echo json_encode(['error' => 'Missing required fields (userId, timestamp, yarnStash)']);
     exit;
 }
-
-// Get headers
-$payloadHash = $_SERVER['HTTP_X_PAYLOAD_HASH'] ?? null;
-$payloadHashSalted = $_SERVER['HTTP_X_PAYLOAD_HASH_SALTED'] ?? null;
-$idempotencyKey = $_SERVER['HTTP_X_IDEMPOTENCY_KEY'] ?? null;
-$deviceInfo = $_SERVER['HTTP_X_DEVICE_INFO'] ?? $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
-$appVersion = $_SERVER['HTTP_X_APP_VERSION'] ?? 'Unknown';
 
 // Calculate idempotency key if not provided (hash of yarnStash array)
 if (!$idempotencyKey && isset($payload['yarnStash'])) {
@@ -61,6 +152,21 @@ if ($payloadHash && $payloadHashSalted) {
 
     // Reject if hashes don't match
     if (!$hashValid) {
+        logRequest(
+            $db,
+            $ipAddress,
+            $deviceInfo,
+            $appVersion,
+            $_SERVER['REQUEST_METHOD'],
+            $rawInput,
+            'Invalid payload hash',
+            400,
+            $payload['userId'],
+            is_array($payload['yarnStash']) ? count($payload['yarnStash']) : 0,
+            1,
+            $payloadHashSalted ? 1 : 0,
+            $idempotencyKey ? 1 : 0
+        );
         http_response_code(400);
         echo json_encode([
             'error' => 'Invalid payload hash',
@@ -71,6 +177,21 @@ if ($payloadHash && $payloadHashSalted) {
     }
 
     if (!$saltedHashValid) {
+        logRequest(
+            $db,
+            $ipAddress,
+            $deviceInfo,
+            $appVersion,
+            $_SERVER['REQUEST_METHOD'],
+            $rawInput,
+            'Invalid salted payload hash',
+            400,
+            $payload['userId'],
+            is_array($payload['yarnStash']) ? count($payload['yarnStash']) : 0,
+            1,
+            1,
+            $idempotencyKey ? 1 : 0
+        );
         http_response_code(400);
         echo json_encode([
             'error' => 'Invalid salted payload hash',
@@ -81,20 +202,8 @@ if ($payloadHash && $payloadHashSalted) {
     }
 }
 
-// Get client IP address
-$ipAddress = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? 'Unknown';
-// Clean up IP if it's a comma-separated list (from proxy)
-if (strpos($ipAddress, ',') !== false) {
-    $ipAddress = trim(explode(',', $ipAddress)[0]);
-}
-
-// Open/create SQLite database
-$dbPath = __DIR__ . '/yarn.db';
+// Create main submissions table if it doesn't exist
 try {
-    $db = new PDO('sqlite:' . $dbPath);
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-    // Create table if it doesn't exist
     $db->exec('CREATE TABLE IF NOT EXISTS yarn_stash_submissions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id TEXT NOT NULL,
@@ -180,6 +289,23 @@ try {
         ]);
     }
 
+    // Log successful request
+    logRequest(
+        $db,
+        $ipAddress,
+        $deviceInfo,
+        $appVersion,
+        $_SERVER['REQUEST_METHOD'],
+        $rawInput,
+        null, // No error
+        200,
+        $payload['userId'],
+        is_array($payload['yarnStash']) ? count($payload['yarnStash']) : 0,
+        $payloadHash ? 1 : 0,
+        $payloadHashSalted ? 1 : 0,
+        $idempotencyKey ? 1 : 0
+    );
+
     // Success response
     http_response_code(200);
     echo json_encode([
@@ -194,6 +320,28 @@ try {
 
 } catch (PDOException $e) {
     error_log('Database error: ' . $e->getMessage());
+
+    // Try to log the database error (might fail if it's a DB connection issue)
+    try {
+        logRequest(
+            $db,
+            $ipAddress,
+            $deviceInfo,
+            $appVersion,
+            $_SERVER['REQUEST_METHOD'],
+            $rawInput,
+            'Database error: ' . $e->getMessage(),
+            500,
+            $payload['userId'] ?? null,
+            isset($payload['yarnStash']) && is_array($payload['yarnStash']) ? count($payload['yarnStash']) : null,
+            $payloadHash ? 1 : 0,
+            $payloadHashSalted ? 1 : 0,
+            $idempotencyKey ? 1 : 0
+        );
+    } catch (Exception $logError) {
+        // Ignore logging errors
+    }
+
     http_response_code(500);
     echo json_encode(['error' => 'Database error']);
     exit;

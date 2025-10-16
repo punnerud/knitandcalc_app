@@ -1,0 +1,2070 @@
+# KnitAndCalc - Complete App Documentation for Android Development
+
+Version: 1.1.4
+Platform: iOS (SwiftUI) → Android conversion target
+Language: Norwegian (with multi-language support)
+Last Updated: 2025-10-14
+
+===============================================================================
+TABLE OF CONTENTS
+===============================================================================
+1. App Overview & Architecture
+2. Color Palette & Theme System
+3. Typography & Text Styles
+4. Navigation Structure
+5. Main Screen (ContentView)
+6. Calculator Features
+   6.1. Yarn Calculator
+   6.2. Stitch Calculator
+   6.3. Ruler
+7. Project Management
+8. Yarn Stash Management
+9. Recipe Management
+10. Settings & Preferences
+11. Data Models
+12. Visual Design Specifications
+13. Animations & Transitions
+14. Notifications System
+15. Backup/Export System
+
+===============================================================================
+1. APP OVERVIEW & ARCHITECTURE
+===============================================================================
+
+KnitAndCalc is a comprehensive knitting companion app available in Norwegian
+(with support for English, Danish, Finnish, French, German, and Swedish).
+
+CORE FEATURES:
+- Three Calculators: Yarn, Stitch, and Ruler
+- Project Management: Track knitting projects with status, dates, notes, images
+- Yarn Stash: Manage yarn inventory with colors, quantities, reservations
+- Recipe Library: Store knitting patterns (PDFs, images, web links)
+- Multi-language & Multi-unit system (Metric/Imperial)
+
+TECHNICAL ARCHITECTURE:
+- SwiftUI-based UI with NavigationView hierarchy
+- UserDefaults for data persistence (JSON encoding)
+- FileManager for image/PDF storage
+- Local notifications for engagement reminders
+- No backend/server required - fully offline app
+
+DATA STORAGE:
+- Projects: "savedProjects" key in UserDefaults
+- Yarn Stash: "savedYarnStash" key in UserDefaults
+- Recipes: "savedRecipes" key in UserDefaults
+- Settings: AppStorage with individual keys
+- Files: Documents directory (images as .jpg, recipes as .pdf)
+
+===============================================================================
+2. COLOR PALETTE & THEME SYSTEM
+===============================================================================
+
+PRIMARY COLORS:
+- App Primary: #f4ecff (light lavender) - Used for backgrounds
+- App Secondary/Accent: #6b52a3 (purple) - Used for buttons, icons, highlights
+
+SEMANTIC COLORS (Dark Mode Compatible):
+- Background: UIColor.systemBackground
+- Secondary Background: UIColor.secondarySystemBackground
+- Tertiary Background: UIColor.tertiarySystemBackground
+
+TEXT COLORS:
+- Primary Text: UIColor.label
+- Secondary Text: UIColor.secondaryLabel
+- Tertiary Text: UIColor.tertiaryLabel
+
+COMPONENT-SPECIFIC COLORS:
+Buttons:
+- Selected Background: #6b52a3 (appSecondary)
+- Unselected Background: UIColor.systemGray5
+- Selected Text: White
+- Unselected Text: UIColor.secondaryLabel
+
+Text Fields:
+- Background: UIColor.systemBackground
+- Border: #6b52a3 with 50% opacity
+- Text: UIColor.label
+
+Result Boxes:
+- Background: UIColor.secondarySystemBackground
+
+Interactive Elements:
+- Checkmark Active: #6b52a3
+- Checkmark Inactive: UIColor.systemGray3
+- Icon Tint: #6b52a3
+
+Ruler:
+- Background: UIColor.systemBackground
+- Marks: Color(white: 0.3) for main marks
+- Marks: Color(white: 0.5) for small divisions
+
+DARK MODE:
+All colors use UIColor semantic colors which automatically adapt to dark mode.
+The purple accent color (#6b52a3) remains consistent in both light and dark modes.
+
+===============================================================================
+3. TYPOGRAPHY & TEXT STYLES
+===============================================================================
+
+FONT FAMILY:
+- System Font (San Francisco on iOS, Roboto on Android)
+- Design: .rounded for ruler numbers only
+
+TEXT STYLES:
+
+Navigation Titles:
+- Font: System, size: default (34pt large), weight: default
+- Color: Primary text
+
+List Item Titles:
+- Font: System, size: 16pt-18pt, weight: medium/semibold
+- Color: Primary text
+
+Calculator Headings:
+- Font: System, size: 18pt, weight: semibold
+- Color: Primary text
+
+Body Text / Labels:
+- Font: System, size: 14-15pt, weight: regular
+- Color: Secondary text
+
+Field Labels:
+- Font: System, size: 14pt, weight: regular
+- Color: Secondary text
+
+Button Text:
+- Font: System, size: 15-18pt, weight: medium/bold
+- Color: White (selected) or Secondary text (unselected)
+
+Result Text:
+- Font: System, size: 16pt, weight: semibold
+- Color: Primary text
+
+Hint Text:
+- Font: System, size: 13pt, weight: regular/medium
+- Color: Purple (#6b52a3)
+
+Small Text (metadata):
+- Font: System, size: 12-13pt, weight: regular
+- Color: Secondary text
+
+Tiny Text (labels):
+- Font: System, size: 10pt, weight: medium
+- Color: Purple or Secondary text
+
+Emoji in Lists:
+- Font: System, size: 32pt (for main icons)
+- Examples: 🧵 Projects, 🧶 Yarn Stash, 📝 Recipes, 🔢 Calculator, ✨ Stitch, 📏 Ruler
+
+===============================================================================
+4. NAVIGATION STRUCTURE
+===============================================================================
+
+ROOT NAVIGATION (ContentView):
+├── Projects (NavigationLink)
+│   ├── Project Detail View
+│   │   ├── Edit fields (inline)
+│   │   └── Add/Edit modals
+│   └── Add Project (Sheet modal)
+│
+├── Yarn Stash (NavigationLink)
+│   ├── Yarn Detail View
+│   └── Add/Edit Yarn (Sheet modal)
+│
+├── Recipes (NavigationLink)
+│   ├── Recipe Detail View
+│   └── Add/Edit Recipe (Sheet modal)
+│
+├── Yarn Calculator (NavigationLink)
+│   └── Settings Gear (Sheet modal)
+│
+├── Stitch Calculator (NavigationLink)
+│
+├── Ruler (NavigationLink)
+│
+└── Settings (Toolbar Gear Icon, NavigationLink)
+
+NAVIGATION STYLE:
+- Stack navigation (not tabs)
+- Standard iOS push/pop animations
+- Modal sheets for add/edit operations
+- Full-screen modals for image galleries
+- Swipe-to-delete and swipe actions on list items
+
+BACK BUTTON:
+- Standard iOS back chevron with previous screen title
+- White/Default color (not custom colored)
+
+===============================================================================
+5. MAIN SCREEN (ContentView)
+===============================================================================
+
+LAYOUT:
+- NavigationView with List
+- List Style: InsetGroupedListStyle
+- Title: "Knit&Calc" (center aligned)
+- Toolbar: Settings gear icon (top right)
+
+LIST ITEMS (6 rows):
+1. 🧵 Prosjekter (Projects)
+2. 🧶 Garnlager (Yarn Stash)
+3. 📝 Oppskrifter (Recipes)
+4. 🔢 Garnkalkulator (Yarn Calculator)
+5. ✨ Strikkekalkulator (Stitch Calculator)
+6. 📏 Linjal (Ruler)
+
+ROW DESIGN (CalculatorRow):
+- HStack with spacing: 16
+- Emoji icon: 32pt
+- Text: 18pt, medium weight, primary color
+- Vertical padding: 8pt
+- Chevron indicator (automatic from NavigationLink)
+
+VISUAL SPECIFICATIONS:
+- Background: System grouped background
+- Row Background: System background (white/dark)
+- Separator: System default
+- Safe Area: Respected at top and bottom
+
+===============================================================================
+6. CALCULATOR FEATURES
+===============================================================================
+
+-------------------------------------------------------------------------------
+6.1. YARN CALCULATOR (YarnCalculatorView)
+-------------------------------------------------------------------------------
+
+PURPOSE:
+Calculate required skeins when substituting yarn with different yardage.
+Includes optional tension/gauge adjustment feature.
+
+LAYOUT:
+ScrollView with VStack, spacing: 24pt
+Padding: horizontal 16pt, vertical 24pt
+
+COMPONENTS:
+
+1. DESCRIPTION TEXT
+   - Font: 14pt system
+   - Color: Secondary text
+   - Text: "Finn ut hvor mye garn du trenger når du bytter til et annet
+     med forskjellig løpelengde. Husk at strikkefastheten skal være lik."
+   - Padding: horizontal
+
+2. UNIT SELECTOR (Meter/Yards)
+   - HStack with spacing: 8pt
+   - Two buttons side by side
+   - Button Style:
+     * Selected: Purple background (#6b52a3), white text
+     * Unselected: Gray background (systemGray5), gray text
+     * Font: 15pt system
+     * Padding: vertical 10pt
+     * Corner radius: 8pt
+   - Full width buttons
+   - Padding: horizontal
+
+3. RECIPE SECTION
+   - Title: "Garnet i oppskriften" (18pt, semibold)
+   - Two text fields:
+     a) "Løpelengde per nøste" (Length per skein)
+     b) "Antall nøster i oppskriften" (Number of skeins in pattern)
+   - Field Labels: 14pt, secondary text, above field
+   - Text Fields:
+     * CustomTextFieldStyle: 12pt padding, white background
+     * Border: 2pt purple (#6b52a3) with 50% opacity
+     * Corner radius: 8pt
+     * Keyboard: Decimal pad
+   - Spacing: 12pt between fields
+   - Padding: horizontal
+
+4. YOUR YARN SECTION
+   - Title: "Garnet du vil bruke" (18pt, semibold)
+   - Text field: "Løpelengde per nøste"
+   - Same styling as Recipe Section
+   - Auto-scroll to Calculate button when focused
+   - Padding: horizontal
+
+5. CALCULATE BUTTON
+   - Text: "Beregn" (Calculate)
+   - Font: 16pt, medium weight
+   - Color: White
+   - Background: Purple (#6b52a3)
+   - Full width
+   - Padding: 16pt vertical
+   - Corner radius: 8pt
+   - Padding: horizontal
+
+6. TENSION HINT (Before calculation, if not enabled)
+   - Icon: 💡
+   - Font: 13pt system
+   - Color: Purple (#6b52a3)
+   - Text: "Du kan legge til strikkefasthetsberegning under
+     tannhjulet øverst til høyre."
+   - Padding: top 8pt
+
+7. TENSION ACTIVE INDICATOR (Before calculation, if enabled)
+   - Icon: Checkmark circle (filled, 13pt, purple)
+   - Font: 13pt, medium
+   - Color: Purple
+   - Text: "Strikkefasthetsberegning er aktivert"
+   - Padding: top 8pt
+
+8. RESULT BOX (After calculation)
+   - VStack with spacing: 16pt
+   - Emoji: 🧶🧶🧶 (48pt font)
+   - Result text: 16pt, semibold, primary color
+   - Center aligned
+   - Padding: 24pt all sides
+   - Background: Secondary system background
+   - Corner radius: 12pt
+   - Padding: horizontal
+   - Auto-scroll to result after calculation
+
+TOOLBAR:
+- Settings gear icon (top right)
+- Opens Tension Settings Sheet
+
+TENSION SETTINGS MODAL:
+Title: "Innstillinger" (Settings)
+- Toggle: "Aktiver strikkefasthetsberegning"
+  * Tint: Purple
+- Info Box (when enabled):
+  * Title: "Hvordan måle strikkefasthet:" (14pt, semibold)
+  * Instructions: 13pt, secondary text
+  * Background: Result background color
+  * Corner radius: 8pt
+  * Padding: 12pt vertical, horizontal
+- Two Fields:
+  a) "Masker per 10cm i oppskriften" (Stitches per 10cm in pattern)
+  b) "Masker per 10cm med ditt garn" (Stitches per 10cm with your yarn)
+  * Labels: 14pt, secondary text
+  * Decimal pad keyboard
+- Done button: Top right, purple color
+
+CALCULATION LOGIC:
+1. Get inputs: lengthRecipe, countRecipe, lengthYours
+2. Calculate total yarn needed: totalYarn = lengthRecipe × countRecipe
+3. If tension enabled:
+   - Get tensionFrom and tensionTo
+   - Calculate ratio: tensionRatio = tensionTo / tensionFrom
+   - Adjust total: totalYarn = totalYarn × tensionRatio
+   - Calculate percentage: (tensionRatio - 1.0) × 100
+4. Calculate skeins: skeinsNeeded = totalYarn / lengthYours
+5. Format result with 1 decimal place
+6. If tension applied, show percentage adjustment in result
+
+RESULT FORMAT:
+"Du trenger [X.X] nøster med løpelengde [XXX]m"
+If tension applied: " (+X% pga. strikkefasthet)" or " (-X% pga. strikkefasthet)"
+
+-------------------------------------------------------------------------------
+6.2. STITCH CALCULATOR (StitchCalculatorView)
+-------------------------------------------------------------------------------
+
+PURPOSE:
+Generate even distribution instructions for increases/decreases across a row.
+
+LAYOUT:
+ScrollView with VStack, spacing: 24pt
+Padding: vertical 24pt
+
+COMPONENTS:
+
+1. MODE SELECTOR (Øke/Felle = Increase/Decrease)
+   - HStack with spacing: 8pt
+   - Two buttons side by side
+   - Button Style:
+     * Selected: Purple background, white text
+     * Unselected: Gray background, gray text
+     * Font: 16pt system
+     * Padding: vertical 12pt
+     * Corner radius: 8pt
+   - Full width buttons
+   - Padding: horizontal
+
+2. INPUT FIELDS
+   - Two fields with spacing: 16pt
+   a) "Antall masker på pinnen:" (Stitches on needle)
+   b) "Antall økninger:" or "Antall fellinger:" (Number of increases/decreases)
+   - Labels: 14pt, secondary text, above field
+   - Text Fields:
+     * StitchTextFieldStyle: 12pt padding
+     * Border: 1pt purple with 50% opacity
+     * Corner radius: 8pt
+     * Keyboard: Number pad (integers only)
+   - Padding: horizontal
+
+3. CALCULATE BUTTON
+   - Text: "Beregn"
+   - Font: 18pt, bold
+   - Color: White
+   - Background: Purple
+   - Full width
+   - Padding: 16pt vertical
+   - Corner radius: 8pt
+   - Padding: horizontal, top 8pt
+
+4. RESULT BOX (After calculation)
+   - VStack with spacing: 16pt
+   - Padding: 20pt
+   - Background: Secondary system background
+   - Corner radius: 8pt
+   - Padding: horizontal
+
+   FOR MORE THAN 2 INSTRUCTION LINES:
+   - Checkboxes for each instruction
+   - Button with HStack:
+     * Checkbox icon: 22pt (square or checkmark.square.fill)
+     * Color: Purple (checked) or systemGray3 (unchecked)
+     * Instruction text: 16pt, primary color
+     * Strikethrough when checked
+     * Opacity: 0.5 when checked
+     * Spacing: 12pt between icon and text
+     * Alignment: top
+
+   FOR 1-2 LINES:
+   - Plain text, no checkboxes
+   - Font: 16pt, primary color
+
+   TOTAL STITCHES:
+   - Font: 16pt, bold
+   - Color: Purple
+   - Full width
+   - Padding: 16pt
+   - Background: Result background
+   - Corner radius: 8pt
+   - Center aligned
+
+ALGORITHM (INCREASE MODE):
+1. Get inputs: S (stitches on needle), D (increases)
+2. If D = 0: Show "Ingen økninger valgt"
+3. Calculate:
+   - totalKnit = S
+   - base = totalKnit / D (integer division)
+   - extra = totalKnit % D (remainder)
+   - startExtra = extra / 2 (first half of extras)
+   - endExtra = extra - startExtra (second half)
+   - middleCount = D - extra
+4. Build sequence:
+   - Add startExtra instructions with (base+1) stitches before increase
+   - Add middleCount instructions with base stitches before increase
+   - Add endExtra instructions with (base+1) stitches before increase
+5. Group consecutive identical instructions
+6. Format: "*[instruction]* [count] gang/ganger"
+7. Total: "Du har nå [S + D] masker på pinnen"
+
+INSTRUCTION FORMAT (INCREASE):
+- 0 stitches before: "Øk 1 maske"
+- 1 stitch before: "Strikk 1 maske, øk 1 maske"
+- N stitches before: "Strikk [N] masker, øk 1 maske"
+
+ALGORITHM (DECREASE MODE):
+1. Get inputs: S (stitches), D (decreases)
+2. Validate: Max decreases = floor(S/2)
+3. If D > max: Show error message
+4. Calculate:
+   - totalKnit = S - 2×D (subtract stitches consumed by decreases)
+   - base = totalKnit / D
+   - extra = totalKnit % D
+   - startExtra = extra / 2
+   - endExtra = extra - startExtra
+   - middleCount = D - extra
+5. Build sequence (same as increase)
+6. Total: "Du har nå [S - D] masker på pinnen"
+
+INSTRUCTION FORMAT (DECREASE):
+- 0 stitches before: "Strikk 2 sammen"
+- 1 stitch before: "Strikk 1 maske, strikk 2 sammen"
+- N stitches before: "Strikk [N] masker, strikk 2 sammen"
+
+GROUPING LOGIC:
+- Consecutive identical instructions are grouped
+- Output format: "*[instruction]* [count] gang" (singular) or "ganger" (plural)
+- Example: "*Strikk 5 masker, øk 1 maske* 3 ganger"
+
+-------------------------------------------------------------------------------
+6.3. RULER (RulerView)
+-------------------------------------------------------------------------------
+
+PURPOSE:
+On-screen ruler supporting centimeters and inches with calibration.
+
+LAYOUT:
+ZStack with GeometryReader
+- Bottom layer: Scrollable content area
+- Top layer: Fixed ruler marks (horizontal and vertical)
+- Bottom overlay: Unit selector and calibration controls
+
+VISUAL STRUCTURE:
+
+1. SCROLLABLE CONTENT
+   - OffsetTrackingScrollView (custom UIScrollView wrapper)
+   - Content: Large colored rectangle (100+ cm/in scrollable area)
+   - Background: System background
+   - Tracks scroll offset for synchronized ruler marks
+   - No scroll indicators
+   - Bounces disabled
+
+2. FIXED HORIZONTAL RULER (Top)
+   - Height: 54pt
+   - Corner square: 54×54pt (top-left, empty)
+   - Marks: Start at 54pt from left edge
+   - Background: System background
+   - Only renders marks visible in current scroll area (performance)
+
+3. FIXED VERTICAL RULER (Left)
+   - Width: 64pt
+   - Corner space: 64×54pt (top, empty)
+   - Marks: Start at 54pt from top edge
+   - Background: System background
+   - Only renders marks visible in current scroll area
+
+4. RULER MARKS SPECIFICATION:
+
+   CENTIMETER MODE:
+   - Pixels per cm: Device PPI / 2.54 / screen scale
+   - Small divisions: 10 (millimeters)
+   - Main mark height: 30pt (horizontal), 30pt width (vertical)
+   - Mid mark height: 20pt (at 5mm)
+   - Small mark height: 15pt
+   - Main mark width: 2pt
+   - Mid mark width: 1.5pt
+   - Small mark width: 1pt
+   - Color: gray (white: 0.3) for main, (white: 0.5) for small
+   - Numbers: 11pt, medium, rounded font, gray
+   - 0.5mm offset before and after each cm mark
+
+   INCH MODE:
+   - Pixels per inch: Device PPI / screen scale
+   - Small divisions: 16 (16th of an inch)
+   - Main mark height: 30pt
+   - Mid mark height: 20pt (at 8/16)
+   - Small mark height: 15pt
+   - Same widths and colors as cm mode
+   - Numbers: 11pt horizontal, 13pt vertical (rotated 90°)
+   - No offset
+
+5. NUMBERS ON RULER:
+   - Appear below horizontal marks, to the right of vertical marks
+   - Vertical numbers: Rotated 90° clockwise
+   - Frame height: 24pt (horizontal), 34pt (vertical)
+   - Font: System, size: 11pt (H) / 13pt (V), weight: medium, design: rounded
+   - Color: gray (white: 0.3)
+   - Start at 1 (0 has no number)
+
+6. BOTTOM CONTROLS:
+   - VStack with spacing: 12pt
+   - Padding: horizontal 16pt, bottom 20pt
+
+   RESET BUTTON (appears when scrolled > 10 units):
+   - HStack: Arrow icon + "Nullstill" text
+   - Icon: arrow.up.left, 14pt, semibold, white
+   - Text: 16pt, medium, white
+   - Background: Purple
+   - Padding: 20pt horizontal, 10pt vertical
+   - Corner radius: 20pt (pill shape)
+   - Shadow: black 15% opacity, 4pt radius, 2pt offset Y
+   - Transition: scale + opacity
+
+   UNIT BUTTONS:
+   - HStack with spacing: 12pt
+   - Calibration button (left): Ruler/slider icon toggle
+     * Size: 50×50pt
+     * Icon: "ruler" or "slider.horizontal.3", 18pt, bold
+     * Background: Purple (active) or gray (inactive)
+     * Corner radius: 12pt
+     * Shadow: black 10% opacity, 3pt radius, 2pt offset Y
+   - CM button: 80×50pt
+   - IN button: 80×50pt
+   - Button style (CM/IN):
+     * Text: 18pt, bold, white (selected) or gray (unselected)
+     * Background: Purple (selected) or gray (unselected)
+     * Corner radius: 12pt
+     * Shadow: same as calibration
+
+   CALIBRATION PANEL (when visible):
+   - VStack with spacing: 8pt
+   - Title: "Kalibrering", 14pt, medium, secondary text
+   - HStack controls:
+     * Minus button: 40×40pt, purple, white icon (minus), 16pt bold
+     * Slider: Purple accent, range -0.2 to 0.2, step 0.005
+     * Plus button: 40×40pt, purple, white icon (plus), 16pt bold
+     * Spacing: 12pt
+   - Action buttons (HStack, spacing: 8pt):
+     * Save: "Lagre", 14pt medium, white, purple background
+     * Reset: "Tilbakestill", 14pt medium, gray text, gray background
+     * Padding: 16pt horizontal, 8pt vertical
+     * Corner radius: 8pt
+   - Background: Secondary system background
+   - Corner radius: 12pt
+   - Padding: 16pt all sides
+   - Padding: horizontal
+   - Transition: move (from bottom) + opacity
+
+CALIBRATION LOGIC:
+1. Each unit (cm/inch) has separate calibration value
+2. Stored in @AppStorage: "rulerCalibrationCM" and "rulerCalibrationInch"
+3. Default values: CM: -0.03, Inch: 0.06
+4. User can adjust with slider (-0.2 to +0.2 in 0.005 steps)
+5. Also +/- buttons for 0.01 adjustments
+6. When saved, adds to base calibration value
+7. Affects pixels per unit calculation: baseValue × (1.0 + calibration)
+8. Round button appears if manual adjustment creates decimal skeins
+
+DEVICE PPI DATABASE (DeviceInfo.swift):
+- Hardcoded dictionary of iPhone/iPad models
+- Maps model identifier (e.g., "iPhone15,2") to PPI value
+- iPhone: mostly 326 PPI (Retina), some 401-460 PPI (Plus/Pro)
+- iPad: mostly 264 PPI, iPad mini: 326 PPI
+- Uses utsname to get model identifier
+- Fallback: 163 PPI if device not found
+
+SCROLL OFFSET TRACKING:
+1. Custom UIScrollView wrapper (OffsetTrackingScrollView)
+2. Binds scroll offset to @State variable
+3. Offset used to:
+   - Synchronize ruler marks position
+   - Show/hide reset button (threshold: 10 units)
+   - Calculate visible range for mark rendering
+4. Clamps offset to prevent negative values
+
+RESET FUNCTIONALITY:
+- Posts notification: .scrollToTop
+- Scroll view observes notification
+- Animates scroll to (0, 0)
+
+PERFORMANCE OPTIMIZATION:
+- Only renders marks in visible range
+- Calculates: startUnit = floor(offset / pixelsPerUnit)
+- Calculates: endUnit = ceil((offset + viewSize) / pixelsPerUnit)
+- Renders marks from startUnit to endUnit only
+- Offsets mark container to match scroll position
+
+===============================================================================
+7. PROJECT MANAGEMENT
+===============================================================================
+
+OVERVIEW:
+Manage knitting projects with three status categories: Planned, Active, Completed.
+
+NAVIGATION:
+Main Menu → Projects → Project List → Project Detail
+
+-------------------------------------------------------------------------------
+7.1. PROJECT LIST VIEW (ProjectListView)
+-------------------------------------------------------------------------------
+
+LAYOUT:
+VStack with:
+1. Status tabs (top)
+2. Category filter tabs (below status, if categories exist)
+3. Project list or empty state
+
+STATUS TABS:
+- HStack with spacing: 8pt
+- Three buttons: "Planlagt", "Aktive", "Fullført"
+- Selected style:
+  * Background: Purple
+  * Text: White, 15pt medium
+  * Padding: 16pt horizontal, 8pt vertical
+  * Corner radius: 16pt (pill shape)
+- Unselected style:
+  * Background: Gray (systemGray5)
+  * Text: Secondary label color, 15pt medium
+- Full width container
+- Padding: 16pt
+- Background: Secondary system background
+
+CATEGORY FILTER TABS (if recipes linked):
+- Horizontal ScrollView (no indicators)
+- Height: 40pt
+- HStack with spacing: 8pt
+- "Alle" button (always present) + dynamic category buttons
+- Button style:
+  * Font: 14pt, medium
+  * Padding: 12pt horizontal, 6pt vertical
+  * Corner radius: 12pt
+  * Selected: Purple background, white text
+  * Unselected: Gray background, gray text
+- Background: Secondary system background
+- Categories derived from linked recipes
+
+PROJECT LIST:
+- List (PlainListStyle)
+- Each row: NavigationLink to ProjectDetailView
+- Swipe actions:
+  * Delete (red, trailing, trash icon)
+  * Edit (purple #B0A6D1, trailing, pencil icon)
+
+PROJECT ROW (ProjectRowView):
+- HStack with spacing: 12pt
+- Left side:
+  * If primary image: 44×44pt rounded image (8pt corner radius)
+    - Tap to open gallery
+  * If no image: 44pt circle with status icon (20pt)
+    - Background: Gray
+    - Icon color: Purple
+    - Status icons:
+      - Planned: "calendar"
+      - Active: "arrow.right.circle.fill"
+      - Completed: "checkmark.circle.fill"
+- Center:
+  * VStack (leading alignment, spacing: 4pt)
+  * Project name: 16pt, medium, primary color
+  * Recipe info (if linked): "[Recipe] • [Category]", 13pt, secondary color
+- Right side:
+  * Date: 12pt, secondary color
+  * Shows start date (Planned/Active) or completed date (Completed)
+  * Format: DateFormatter.dateStyle = .medium, timeStyle = .none
+- Padding: vertical 8pt
+
+COMPLETED PROJECTS SUMMARY (at bottom, if completed tab active):
+- Only shown if completed projects exist and have yarn usage
+- VStack with spacing: 12pt
+- Divider at top (8pt vertical padding)
+- Title: "Totalt brukt i fullførte prosjekter", 16pt semibold
+- Subtitle: "For morro skyld", 12pt, secondary text
+- HStack with two boxes (spacing: 20pt):
+  * Weight box:
+    - Value: 24pt, bold, purple (metric: grams, imperial: oz)
+    - Label: 13pt, secondary (e.g., "gram totalt")
+    - Background: Gray background
+    - Corner radius: 12pt
+    - Padding: 16pt
+  * Length box: Same format (meters/yards)
+- Padding: horizontal 16pt, bottom 8pt
+- Background: Secondary system background
+- Calculates from all yarn linked to completed projects
+
+EMPTY STATE:
+- VStack, centered
+- Icon: "tray", 60pt, tertiary text color
+- Title: "Ingen prosjekter", 18pt medium, secondary text
+- Subtitle: "Trykk + for å legge til", 14pt, secondary text
+- Spacers above and below
+
+TOOLBAR:
+- Plus icon (top right, 18pt semibold, purple)
+- Opens AddProjectView sheet
+
+ADD PROJECT FLOW:
+- Sheet modal with AddProjectView
+- On save, navigates automatically to new project detail
+- Uses hidden NavigationLink with isActive binding
+
+-------------------------------------------------------------------------------
+7.2. PROJECT DETAIL VIEW (ProjectDetailView)
+-------------------------------------------------------------------------------
+
+LAYOUT:
+Form with multiple sections
+Navigation title: Project name (inline)
+Toolbar: "Lagre" button (top right, purple)
+
+SECTIONS:
+
+1. STATUS
+   - Picker with three options (Planned/Active/Completed)
+   - Style: Default form picker (push to new screen)
+
+2. RECIPE (Oppskrift)
+   - If linked:
+     * Recipe name (16pt, medium) + category (13pt, secondary)
+     * Chevron to RecipeDetailView
+     * "Bytt oppskrift" button (arrow.triangle.2.circlepath icon, purple)
+   - If not linked:
+     * "Legg til oppskrift" button (plus.circle icon, purple)
+   - Opens RecipePickerView sheet
+
+3. DETAILS (Detaljer)
+   - Size field: TextField, label "Størrelse"
+   - Gauge field: TextField, label "Strikkefasthet"
+
+4. NEEDLE SIZES (Pinnestørrelse)
+   - Picker to add sizes (dropdown)
+   - Options: 1, 1.5, 2, 2.5, ... 10, "Annet" (custom)
+   - If "Annet" selected: Show text field + "Legg til"/"Avbryt" buttons
+   - List of added sizes with X button to remove
+   - HStack per size: Name (16pt) + X button (systemGray color)
+
+5. DATES (Datoer)
+   - Start date (if set):
+     * DatePicker + X button to remove
+   - "Legg til startdato" button (if not set)
+   - Completion date: Same pattern
+   - DatePicker style: Date only (no time)
+
+6. YARN (Garn)
+   - ForEach linked yarns:
+     * Display: Brand Type, quantity + unit, 16pt medium
+     * Quantity: 13pt, secondary
+     * Trash button to remove (red)
+   - "Legg til garn" button (plus.circle icon, purple)
+   - Opens AddProjectYarnView sheet
+
+7. NOTES (Notater)
+   - TextEditor, minimum height: 100pt
+   - Multi-line text input
+
+8. IMAGES (Bilder)
+   - Horizontal ScrollView of image thumbnails (100×100pt)
+   - 8pt corner radius
+   - Primary image: 3pt purple border
+   - Label "Hovedbilde" (10pt, medium, purple) if primary
+   - Trash button below each thumbnail (14pt, red)
+   - "Legg til bilder" button + count
+   - Opens image picker (multi-select)
+   - Tap thumbnail → Full-screen gallery
+
+9. ROW COUNTERS (Omgangsteller)
+   - ForEach counters:
+     * Name field: 16pt, medium, editable
+     * HStack controls:
+       - Minus button (32pt circle, filled, purple)
+       - Count number (24pt, semibold, 50pt min width)
+       - Plus button (32pt circle, filled, purple)
+       - Spacer
+       - Trash button (18pt, red)
+     * Padding: vertical 4pt
+   - "Legg til teller" button (plus.circle, purple)
+   - Counters saved in project model
+
+10. DELETE SECTION
+    - Red "Slett prosjekt" button (17pt, semibold)
+    - Full width, centered
+    - Alert confirmation:
+      * Title: "Slett prosjekt"
+      * Message: "Er du sikker... [name]?" + tip about swipe actions
+      * Cancel + Delete (destructive)
+
+RECIPE PICKER MODAL:
+- NavigationView with List
+- Title: "Velg oppskrift" (inline)
+- Sections:
+  * All: Shows all recipes
+  * Planned: Recipes in planned projects
+  * Active: Recipes in active projects
+  * Completed: Recipes in completed projects
+  - Only show status sections if recipes exist in that status
+- Row: Recipe name (16pt, medium) + category (13pt, secondary)
+- Checkmark icon (purple) if selected
+- Toolbar:
+  * Leading: "Fjern oppskrift" (red) if recipe selected
+  * Trailing: "Ferdig"
+
+IMAGE GALLERY:
+- Full-screen modal
+- Black background
+- TabView with page style
+- Swipeable between images
+- Top controls (HStack):
+  * X button (left): Close gallery, 32pt white with shadow
+  * Star button (center): Set as primary image
+    - Filled if primary, outline if not
+    - 32pt white with shadow
+  * Download button (right): Save to photo library
+    - arrow.down.circle.fill, 32pt white
+    - Requests photo library permission
+    - Alert confirmation
+- Images: Fit to screen, scaledToFit
+
+TOOLBAR:
+- Keyboard toolbar: "Ferdig" button (spacer + button)
+- Navigation toolbar: "Lagre" button (dismisses view)
+
+-------------------------------------------------------------------------------
+7.3. DATA MODEL (Project)
+-------------------------------------------------------------------------------
+
+struct Project: Identifiable, Codable, Equatable {
+    var id: UUID
+    var name: String
+    var status: ProjectStatus  // .planned, .active, .completed
+    var recipeId: UUID?
+    var size: String
+    var gauge: String
+    var needleSizes: [String]  // Array of strings (e.g., ["3", "4", "5.5"])
+    var startDate: Date?
+    var completedDate: Date?
+    var notes: String
+    var rowCounters: [RowCounter]
+    var linkedYarns: [ProjectYarn]
+    var images: [String]  // Filenames in Documents directory
+    var primaryImageIndex: Int?
+    var dateCreated: Date
+}
+
+struct RowCounter: Identifiable, Codable {
+    var id: UUID
+    var name: String
+    var count: Int  // Can go negative
+}
+
+struct ProjectYarn: Identifiable, Codable {
+    var id: UUID
+    var yarnStashId: UUID  // References YarnStashEntry
+    var quantityType: YarnQuantityType  // .skeins, .meters, .grams
+    var quantity: Double
+    var dateAdded: Date
+}
+
+enum ProjectStatus: String, CaseIterable, Codable {
+    case planned, active, completed
+}
+
+enum YarnQuantityType: String, CaseIterable, Codable {
+    case skeins = "nøster"
+    case meters = "meter"
+    case grams = "gram"
+}
+
+BACKWARD COMPATIBILITY:
+- Old projects had single needleSize (String)
+- Decoder handles both needleSize and needleSizes
+- Converts old single value to array
+
+===============================================================================
+8. YARN STASH MANAGEMENT
+===============================================================================
+
+OVERVIEW:
+Manage yarn inventory with grouping by brand/type, color tracking, and
+project reservation system.
+
+NAVIGATION:
+Main Menu → Yarn Stash → Yarn List → Yarn Detail
+
+-------------------------------------------------------------------------------
+8.1. YARN STASH LIST VIEW (YarnStashListView)
+-------------------------------------------------------------------------------
+
+LAYOUT:
+VStack with:
+1. Search bar (top)
+2. Yarn list (grouped by brand/type) or empty state
+
+SEARCH BAR:
+- HStack with spacing: default
+- Icon: magnifyingglass (secondary text color)
+- TextField: "Søk i garnlager", plain style
+- Clear button (X circle, filled) if text present
+- Padding: 10pt all sides
+- Background: Gray (systemGray5)
+- Corner radius: 10pt
+- Padding: horizontal 16pt, vertical 8pt
+- Background: Secondary system background
+
+SEARCH FUNCTIONALITY:
+- Filters on: brand, type, color, lot number, notes
+- Case insensitive
+- Live filtering as user types
+
+YARN GROUPING:
+- Groups by: "[brand]|[type]" key
+- Sorts groups alphabetically by key
+- Within group: Sorts by color alphabetically
+
+YARN LIST:
+- List (PlainListStyle)
+- ForEach grouped yarns
+- Each group is a Section
+
+GROUP HEADER (Collapsible):
+- Button (full width) to expand/collapse
+- HStack (alignment: top, spacing: 12pt):
+  * Left side (VStack, leading, spacing: 4pt):
+    - Title: "[Brand] [Type]", 17pt semibold, primary color
+    - Max width: 280pt, 2 lines, leading alignment
+    - Metadata (HStack, spacing: 8pt):
+      * "[N] farge/farger" (13pt, secondary)
+      * "•" (13pt, secondary)
+      * Total weight (formatted with unit), 13pt, secondary
+  * Right side (HStack, spacing: 20pt):
+    - Plus button (if expanded): 20pt circle filled, purple
+      * Opens QuickAddYarnView
+    - Chevron: up/down, 14pt, secondary, 2pt top padding
+- Padding: vertical 8pt
+- Background: Tertiary system background
+- Tap to expand/collapse (animated)
+
+COLOR ROWS (When group expanded):
+- NavigationLink to YarnStashDetailView
+- YarnColorRowView component
+- HStack with spacing: 8pt:
+  * Left side (VStack, leading, spacing: 4pt):
+    - HStack with spacing: 8pt:
+      * Color + number (if both): "Color (Number)", 15pt medium
+        or just Color, 15pt medium
+        - Frame: min width = maxColorWidth (calculated per group)
+        - Max width: 175pt, 2 lines, leading
+      * "•" (13pt, secondary)
+      * Skeins: "[X] nøster", 13pt, secondary
+      * "•" (13pt, secondary)
+      * Length: formatted with unit, 13pt, secondary
+      * "•" (13pt, secondary)
+      * Weight: formatted with unit, 13pt, secondary
+  * Right side (if reserved > 0):
+    - VStack (trailing, spacing: 1pt):
+      * Percentage: "[X]%", 12pt semibold
+        - Color: Red if >100%, purple otherwise
+      * Label: "reservert", 8pt, secondary
+- Padding: vertical 8pt
+- Swipe actions:
+  * Delete (red, trailing, trash)
+  * Edit (purple, trailing, pencil)
+
+RESERVED CALCULATION:
+- For each project, sum yarn usage for this yarn ID
+- Convert all quantities to grams:
+  * skeins: quantity × weightPerSkein
+  * meters: quantity × (weightPerSkein / lengthPerSkein)
+  * grams: quantity as-is
+- Calculate percentage: (totalReserved / totalAvailable) × 100
+- totalAvailable = numberOfSkeins × weightPerSkein
+
+SUMMARY (At bottom, if yarns exist):
+- VStack with spacing: 12pt
+- Divider at top (8pt vertical padding)
+- Title: "Totalt på lager", 16pt semibold
+- Subtitle: "For morro skyld", 12pt, secondary
+- HStack with two boxes (spacing: 20pt):
+  * Weight box: Total grams/oz, 24pt bold purple + label
+  * Length box: Total meters/yards, 24pt bold purple + label
+- Same styling as project summary
+- Background: Secondary system background
+
+EMPTY STATE:
+- VStack, centered
+- Icon: "tray", 60pt, tertiary text
+- Title: "Ingen garn" (or "Ingen treff" if searching)
+- Subtitle: "Trykk + for å legge til" (or "Prøv et annet søk")
+- Spacers above and below
+
+TOOLBAR:
+- Plus icon (top right, 18pt semibold, purple)
+- Opens AddYarnStashView sheet
+
+QUICK ADD MODAL (QuickAddYarnView):
+- For adding another color to existing brand/type
+- Pre-fills brand and type
+- References most recent yarn entry for that brand/type
+- Fields:
+  * Color name (required)
+  * Color number
+  * Lot number
+  * Total weight (required, number pad)
+  * Calculated skeins (read-only, from weight / reference weight)
+- Uses reference yarn's weightPerSkein, lengthPerSkein, gauge
+- Auto-focus on color name field after 0.5s
+- Title: "Legg til farge" (inline)
+- Toolbar: "Avbryt" (left), "Lagre" (right, disabled if invalid)
+- Lagre button: Purple if valid, gray if invalid
+
+-------------------------------------------------------------------------------
+8.2. YARN STASH DETAIL VIEW (YarnStashDetailView)
+-------------------------------------------------------------------------------
+
+LAYOUT:
+ScrollView with VStack, spacing: 20pt
+Background: Secondary system background
+Navigation title: "[Brand] [Type]" (inline)
+Toolbar: "Rediger" button (top right, purple)
+
+SECTIONS:
+
+1. YARN INFO (Garninformasjon)
+   - Title: "Garninformasjon", 20pt semibold, primary, horizontal padding
+   - VStack with spacing: 12pt
+   - Background: System background
+   - Corner radius: 12pt
+   - Padding: 16pt all sides, then 16pt horizontal
+   - Info rows:
+     * Farge (if not empty)
+     * Fargenummer (if not empty)
+     * Vekt per nøste (formatted with unit)
+     * Lengde per nøste (formatted with unit)
+     * Antall nøster (ADJUSTABLE - see below)
+     * Innfarging/Partinummer (if not empty)
+     * Strikkefasthet (display name)
+
+   SKEIN ADJUSTER:
+   - Special row with HStack:
+     * Label: "Antall nøster", 15pt, secondary text
+     * Spacer
+     * HStack controls (spacing: 12pt):
+       - Minus button (24pt circle filled, purple)
+       - VStack center (spacing: 4pt):
+         * Count: formatted (X or X,X), 15pt medium
+         * Round button (if has decimal after manual adjustment):
+           - "[X,X] => [Y]", 11pt, purple
+           - Tappable to round to whole number
+           - Confirmation alert
+         * Min width: 50pt
+       - Plus button (24pt circle filled, purple)
+   - Buttons adjust by ±1.0
+   - Shows round suggestion if decimal part exists after modification
+   - Alert for rounding: "Avrund antall nøster"
+     * Message shows current and rounded value
+     * Cancel + Avrund (destructive)
+
+2. SUMMARY (Oversikt)
+   - Title: "Oversikt", 20pt semibold, primary
+   - VStack with spacing: 12pt
+   - Background: Gray background
+   - Corner radius: 12pt
+   - Padding: 16pt all, then 16pt horizontal
+   - Info rows:
+     * Total vekt (calculated: numberOfSkeins × weightPerSkein)
+     * Total lengde (calculated: numberOfSkeins × lengthPerSkein)
+   - Both formatted with current unit system
+
+3. RESERVED TO PROJECTS (if any linked projects)
+   - HStack title:
+     * "Reservert til prosjekter", 20pt semibold, primary
+     * Spacer
+     * Percentage: "[X]%", 18pt bold
+       - Color: Red if >100%, purple otherwise
+   - VStack with project rows (spacing: 8pt)
+   - Background: System background
+   - Corner radius: 12pt
+   - Padding: 16pt all, then 16pt horizontal
+   - Each project row:
+     * VStack (leading, spacing: 6pt):
+       - Project name: 15pt, medium, primary
+       - HStack metadata (spacing: 8pt):
+         * Status icon (12pt, secondary)
+         * Status name (13pt, secondary)
+         * "•"
+         * Quantity with unit (13pt, secondary)
+         * Shows all linked yarn entries for this project
+     * Padding: vertical 4pt
+   - Bottom summary row:
+     * "Totalt reservert:", 15pt medium, secondary
+     * Spacer
+     * Total in grams/oz: 15pt semibold, primary
+
+4. NOTES (if not empty)
+   - Title: "Notater", 20pt semibold, primary
+   - Text: 15pt, primary, leading alignment
+   - Background: System background
+   - Corner radius: 12pt
+   - Padding: 16pt all, then 16pt horizontal
+
+5. DELETE SECTION
+   - Red "Slett garn" button (17pt, semibold, centered)
+   - Background: System background
+   - Corner radius: 12pt
+   - Padding: 16pt
+   - Horizontal padding: 16pt
+   - Alert confirmation with tip
+
+INFO ROW COMPONENT:
+- HStack
+- Label: 15pt, secondary text
+- Spacer
+- Value: 15pt, medium, primary text
+
+EDIT MODAL:
+- Opens EditYarnStashView sheet
+- On dismiss, refreshes view (new UUID for id)
+
+DELETE ALERT:
+- Title: "Slett garn"
+- Message: "Er du sikker... [Brand Type]?" + tip about swipe
+- Cancel + Slett (destructive)
+
+-------------------------------------------------------------------------------
+8.3. DATA MODEL (YarnStashEntry)
+-------------------------------------------------------------------------------
+
+struct YarnStashEntry: Identifiable, Codable, Equatable {
+    var id: UUID
+    var brand: String
+    var type: String
+    var weightPerSkein: Double  // Grams
+    var lengthPerSkein: Double  // Meters
+    var numberOfSkeins: Double  // Can have decimals
+    var color: String
+    var colorNumber: String
+    var lotNumber: String
+    var notes: String
+    var gauge: GaugeOption
+    var dateCreated: Date
+
+    // Computed properties:
+    var totalLength: Double { numberOfSkeins * lengthPerSkein }
+    var totalWeight: Double { numberOfSkeins * weightPerSkein }
+}
+
+enum GaugeOption: String, CaseIterable, Codable {
+    case none = "ingen"
+    case other = "annet"
+    case gauge8 = "8/10"
+    case gauge10 = "10/10"
+    case gauge12 = "12/10"
+    ... (even numbers up to gauge40 = "40/10")
+}
+
+FORMATTING RULES:
+Skeins: If whole number → "X", if decimal → "X,X" (comma separator)
+Weight: Metric → "X g", Imperial → "X.X oz"
+Length: Metric → "X m", Imperial → "X yd"
+
+===============================================================================
+9. RECIPE MANAGEMENT
+===============================================================================
+
+OVERVIEW:
+Store knitting patterns in three formats: PDF, Images, Web Links.
+Organize by predefined categories or custom categories.
+
+NAVIGATION:
+Main Menu → Recipes → Recipe List → Recipe Detail
+
+-------------------------------------------------------------------------------
+9.1. RECIPE LIST VIEW (RecipeListView)
+-------------------------------------------------------------------------------
+
+LAYOUT:
+VStack with:
+1. Category filter tabs (top, horizontal scroll)
+2. Recipe list or empty state
+
+CATEGORY TABS:
+- Horizontal ScrollView (no indicators)
+- HStack with spacing: 8pt
+- Padding: horizontal 16pt, vertical 12pt
+- Background: Secondary system background
+- Buttons:
+  * "Alle" (All)
+  * "Gensere" (Sweaters)
+  * "Bukser" (Pants)
+  * "Luer" (Hats)
+  * "Sokker" (Socks)
+  * "Votter" (Mittens)
+  * Custom category names (dynamically added)
+- Button style:
+  * Font: 15pt, medium
+  * Padding: 16pt horizontal, 8pt vertical
+  * Corner radius: 16pt (pill)
+  * Selected: Purple background, white text
+  * Unselected: Gray background, gray text
+
+RECIPE LIST:
+- List (PlainListStyle)
+- Each row: NavigationLink to RecipeDetailView
+- Swipe actions:
+  * Delete (red, trailing, trash)
+  * Edit (purple, trailing, pencil)
+
+RECIPE ROW (RecipeRowView):
+- HStack with spacing: 12pt
+- Left side: Icon circle (44pt)
+  * Circle background: Gray
+  * Icon: Based on recipe type (20pt, purple)
+    - PDF: "doc.fill"
+    - Images: "photo.fill"
+    - Link: "link"
+- Center: VStack (leading, spacing: 4pt)
+  * Recipe name: 16pt, medium, primary
+  * Category: 13pt, secondary
+- Right: Automatic chevron
+- Padding: vertical 8pt
+
+EMPTY STATE:
+- VStack, centered
+- Icon: "doc.text", 60pt, tertiary text
+- Title: "Ingen oppskrifter", 18pt medium, secondary
+- Subtitle: "Trykk + for å legge til", 14pt, secondary
+- Spacers above and below
+
+TOOLBAR:
+- Plus icon (top right, 18pt semibold, purple)
+- Opens AddRecipeView sheet
+
+CATEGORY FILTERING:
+- Tapping "All" shows all recipes
+- Tapping predefined category shows only that category
+- Tapping custom category shows recipes with that custom name
+- Custom categories appear only if recipes exist with that category
+
+-------------------------------------------------------------------------------
+9.2. RECIPE DETAIL VIEW (RecipeDetailView)
+-------------------------------------------------------------------------------
+
+CONTENT DISPLAY BY TYPE:
+
+PDF:
+- PDFKit view (full screen scrollable)
+- Loads from Documents directory
+- Pinch to zoom, swipe to scroll
+
+IMAGES:
+- Vertical ScrollView of images
+- Each image: Full width, aspect fit
+- Pinch to zoom per image
+- Loads from Documents directory (JSON array of filenames)
+
+LINK:
+- WKWebView with URL
+- Full browser functionality
+- Back/Forward navigation
+- Refresh button
+- Share button
+
+TOOLBAR:
+- "Rediger" button (top right, purple)
+- Opens EditRecipeView sheet
+- Delete button (in edit modal)
+
+DELETE FLOW:
+- In EditRecipeView
+- Red "Slett oppskrift" button at bottom
+- Alert confirmation
+- Removes recipe from list
+- Deletes associated files (PDFs/images) from Documents directory
+
+-------------------------------------------------------------------------------
+9.3. DATA MODEL (Recipe)
+-------------------------------------------------------------------------------
+
+struct Recipe: Identifiable, Codable, Equatable {
+    var id: UUID
+    var name: String
+    var category: RecipeCategory
+    var customCategoryName: String?  // Used if category == .custom
+    var type: RecipeType  // .pdf, .images, .link
+    var content: String
+    // For PDF: filename in Documents directory
+    // For Images: JSON array of filenames as string
+    // For Link: URL string
+    var dateAdded: Date
+
+    var displayCategory: String {
+        // Returns customCategoryName if custom, else localized category
+    }
+}
+
+enum RecipeCategory: String, CaseIterable, Codable {
+    case all, sweaters, pants, hats, socks, mittens, custom
+}
+
+enum RecipeType: String, Codable {
+    case pdf, images, link
+}
+
+FILE STORAGE:
+- PDFs: Save to Documents directory with UUID filename
+- Images: Save each to Documents directory with UUID filename
+  Store array of filenames as JSON in content field
+- Links: Store URL string directly in content field
+
+===============================================================================
+10. SETTINGS & PREFERENCES
+===============================================================================
+
+NAVIGATION:
+Main Menu (Gear Icon) → Settings
+
+-------------------------------------------------------------------------------
+10.1. SETTINGS VIEW (SettingsView)
+-------------------------------------------------------------------------------
+
+LAYOUT:
+Form with multiple sections
+
+SECTIONS:
+
+1. LANGUAGE (Språk)
+   - Picker: "Språk"
+   - Options: Norsk, English, Dansk, Suomi, Français, Deutsch, Svenska
+   - On change: Alert warning
+     * Title: "Language change requires restart"
+     * Message: "The app will restart to apply the new language"
+     * Cancel + Confirm
+   - Sets AppleLanguages UserDefault
+   - Requires app restart to take effect
+
+2. UNITS (Enheter)
+   - Segmented Picker: Metric / Imperial
+   - Options: "Metrisk" (Metric), "Imperial" (Imperial)
+   - Affects all yarn/project calculations
+   - Conversions:
+     * Meters ↔ Yards (1m = 1.09361yd)
+     * Grams ↔ Ounces (1g = 0.035274oz)
+   - Also changes ruler default unit
+
+3. FACEBOOK GROUP (Only Norwegian)
+   - VStack with spacing: 8pt
+   - Title: "Bli med i KnitAndCalc-gruppen på Facebook", 15pt medium
+   - Description: "Del tips, få hjelp og gi tilbakemeldinger...", 13pt secondary
+   - Button: "Gå til Facebook-gruppen" (person.3.fill icon, purple)
+     * Opens: https://www.facebook.com/groups/knitandcalc/
+   - Hint: "Skriv 'CalcAndKnit' for å bli medlem", 12pt secondary
+   - Padding: vertical 4pt
+
+4. NOTIFICATIONS (Varsler) - Only Norwegian
+   - Toggle: "Påminnelser om strikking (bare for gøy)"
+   - Subtitle: "Får kun varsel hvis appen ikke er brukt på 3 dager"
+   - Tint: Purple
+   - On enable:
+     * Requests notification permission
+     * If denied: Alert to go to Settings
+   - Schedules notification 3 days after app goes to background
+   - Cancels notification when app opens
+   - 10 random notification texts (personalized with project/yarn data)
+
+5. BACKUP
+   - "Eksporter backup" button (square.and.arrow.up icon, purple)
+     * Alert: Choose "Med filer" or "Uten filer"
+     * Creates JSON file with all data
+     * If "Med filer": Includes base64-encoded images/PDFs
+     * Opens share sheet with generated file
+     * Filename: "KnitAndCalc_Backup_[date]_[time].json"
+   - "Importer backup" button (square.and.arrow.down icon, purple)
+     * Opens document picker (JSON files only)
+     * Reads and decodes backup file
+     * Restores all data to UserDefaults
+     * Restores files to Documents directory
+     * Success/error alert
+
+6. RATING (Only if not rated before)
+   - Title: "Liker du KnitAndCalc?", 15pt
+   - 5 star buttons (32pt, filled, purple)
+   - On tap:
+     * Set hasRatedApp = true (hides section)
+     * If 1-4 stars: Open feedback form (Google Forms)
+       URL: https://forms.gle/kbhC6jx9qnRhxsrH6
+     * If 5 stars: Request App Store review (SKStoreReviewController)
+   - Padding: vertical 8pt
+   - Centered
+
+7. CONTACT (Kontakt)
+   - Title: "Any questions or feedback?", 15pt medium
+   - Button: "morten@punnerud.net" (envelope.fill icon, purple)
+     * Opens mailto: link
+   - Padding: vertical 4pt
+
+8. ABOUT APP & FUTURE (Only Norwegian)
+   - Title: "Om appen og fremtiden"
+   - Two subsections:
+     a) Prising (Pricing)
+        - Title: "Prising", 15pt semibold
+        - Text: Info about keeping app free or max 20kr/month
+        - Font: 13pt, secondary, fixed size
+     b) Fremtidig funksjon: Anonymt søk
+        - Title: "Fremtidig funksjon: Anonymt søk", 15pt semibold
+        - Text: Info about potential yarn matching feature
+        - Font: 13pt, secondary, fixed size
+   - Divider between subsections (4pt vertical padding)
+   - Padding: vertical 8pt
+
+9. APP INFO
+   - Small text about app version and developer
+   - Font: 12-13pt, secondary
+
+DEBUG MENU (Hidden):
+- Activated by sequence:
+  1. Metric → Imperial
+  2. Imperial → Metric
+  3. Metric → Imperial
+  4. Imperial → Metric
+  5. Notifications OFF
+  6. Notifications ON
+  7. Metric → Imperial
+  8. Imperial → Metric
+- All within 10 seconds
+- Opens DebugMenuView sheet
+- For developer/testing purposes
+
+BACKUP DATA FORMAT:
+struct BackupData: Codable {
+    let yarnStash: [YarnStashEntry]
+    let projects: [Project]
+    let recipes: [Recipe]
+    let files: [FileData]?  // Optional, if "Med filer" selected
+    let exportDate: Date
+    let appVersion: String
+}
+
+struct FileData: Codable {
+    let fileName: String
+    let base64Data: String
+    let mimeType: String  // "application/pdf", "image/jpeg", "image/png"
+}
+
+===============================================================================
+11. DATA MODELS (Complete Reference)
+===============================================================================
+
+STORAGE KEYS:
+- "savedProjects" → [Project]
+- "savedYarnStash" → [YarnStashEntry]
+- "savedRecipes" → [Recipe]
+- "appLanguage" → String (e.g., "nb")
+- "unitSystem" → String ("metric" or "imperial")
+- "hasSetDefaults" → Bool
+- "rulerCalibrationCM" → Double
+- "rulerCalibrationInch" → Double
+- "hasRatedApp" → Bool
+- "notificationsEnabled" → Bool
+- "lastAppOpenDate" → Date
+
+All arrays are JSON-encoded with JSONEncoder/JSONDecoder.
+
+-------------------------------------------------------------------------------
+PROJECT MODEL (Complete)
+-------------------------------------------------------------------------------
+
+struct Project: Identifiable, Codable, Equatable {
+    var id: UUID
+    var name: String
+    var status: ProjectStatus
+    var recipeId: UUID?
+    var size: String
+    var gauge: String
+    var needleSizes: [String]
+    var startDate: Date?
+    var completedDate: Date?
+    var notes: String
+    var rowCounters: [RowCounter]
+    var linkedYarns: [ProjectYarn]
+    var images: [String]
+    var primaryImageIndex: Int?
+    var dateCreated: Date
+}
+
+struct RowCounter: Identifiable, Codable, Equatable {
+    var id: UUID
+    var name: String
+    var count: Int
+}
+
+struct ProjectYarn: Identifiable, Codable, Equatable {
+    var id: UUID
+    var yarnStashId: UUID
+    var quantityType: YarnQuantityType
+    var quantity: Double
+    var dateAdded: Date
+}
+
+enum ProjectStatus: String, CaseIterable, Codable {
+    case planned = "planned"
+    case active = "active"
+    case completed = "completed"
+}
+
+enum YarnQuantityType: String, Codable, CaseIterable {
+    case skeins = "nøster"
+    case meters = "meter"
+    case grams = "gram"
+}
+
+enum NeedleSize: String, CaseIterable {
+    // Defined sizes: 1, 1.5, 2, 2.5, ... 10, "Annet"
+    case none = ""
+    case size1 = "1"
+    case size1_5 = "1,5"
+    ...
+    case size10 = "10"
+    case other = "Annet"
+}
+
+-------------------------------------------------------------------------------
+YARN STASH MODEL (Complete)
+-------------------------------------------------------------------------------
+
+struct YarnStashEntry: Identifiable, Codable, Equatable {
+    var id: UUID
+    var brand: String
+    var type: String
+    var weightPerSkein: Double
+    var lengthPerSkein: Double
+    var numberOfSkeins: Double
+    var color: String
+    var colorNumber: String
+    var lotNumber: String
+    var notes: String
+    var gauge: GaugeOption
+    var dateCreated: Date
+
+    var totalLength: Double {
+        numberOfSkeins * lengthPerSkein
+    }
+
+    var totalWeight: Double {
+        numberOfSkeins * weightPerSkein
+    }
+}
+
+enum GaugeOption: String, Codable, CaseIterable {
+    case other = "annet"
+    case none = "ingen"
+    case gauge8 = "8/10"
+    case gauge10 = "10/10"
+    case gauge12 = "12/10"
+    case gauge14 = "14/10"
+    case gauge16 = "16/10"
+    case gauge18 = "18/10"
+    case gauge20 = "20/10"
+    case gauge22 = "22/10"
+    case gauge24 = "24/10"
+    case gauge26 = "26/10"
+    case gauge28 = "28/10"
+    case gauge30 = "30/10"
+    case gauge32 = "32/10"
+    case gauge34 = "34/10"
+    case gauge36 = "36/10"
+    case gauge38 = "38/10"
+    case gauge40 = "40/10"
+}
+
+-------------------------------------------------------------------------------
+RECIPE MODEL (Complete)
+-------------------------------------------------------------------------------
+
+struct Recipe: Identifiable, Codable, Equatable {
+    var id: UUID
+    var name: String
+    var category: RecipeCategory
+    var customCategoryName: String?
+    var type: RecipeType
+    var content: String
+    var dateAdded: Date
+
+    var displayCategory: String {
+        if category == .custom, let customName = customCategoryName {
+            return customName
+        }
+        return category.localizedName
+    }
+}
+
+enum RecipeCategory: String, CaseIterable, Codable {
+    case all = "all"
+    case sweaters = "sweaters"
+    case pants = "pants"
+    case hats = "hats"
+    case socks = "socks"
+    case mittens = "mittens"
+    case custom = "custom"
+
+    var displayName: LocalizedStringKey {
+        // Returns localized string
+    }
+}
+
+enum RecipeType: String, Codable {
+    case pdf
+    case images
+    case link
+
+    var iconName: String {
+        switch self {
+        case .pdf: return "doc.fill"
+        case .images: return "photo.fill"
+        case .link: return "link"
+        }
+    }
+}
+
+-------------------------------------------------------------------------------
+SETTINGS MODEL
+-------------------------------------------------------------------------------
+
+class AppSettings: ObservableObject {
+    static let shared = AppSettings()
+
+    @AppStorage("appLanguage") var language: String = ""
+    @AppStorage("unitSystem") var unitSystem: String = ""
+    @AppStorage("hasSetDefaults") private var hasSetDefaults: Bool = false
+
+    var currentLanguage: AppLanguage { ... }
+    var currentUnitSystem: UnitSystem { ... }
+}
+
+enum AppLanguage: String, CaseIterable {
+    case norwegian = "nb"
+    case english = "en"
+    case danish = "da"
+    case finnish = "fi"
+    case french = "fr"
+    case german = "de"
+    case swedish = "sv"
+}
+
+enum UnitSystem: String, CaseIterable {
+    case metric = "metric"
+    case imperial = "imperial"
+}
+
+struct UnitConverter {
+    static let metersToYards: Double = 1.09361
+    static let gramsToOunces: Double = 0.035274
+
+    static func metersToYards(_ meters: Double) -> Double
+    static func yardsToMeters(_ yards: Double) -> Double
+    static func gramsToOunces(_ grams: Double) -> Double
+    static func ouncesToGrams(_ ounces: Double) -> Double
+    static func formatLength(_ meters: Double, unit: UnitSystem) -> String
+    static func formatWeight(_ grams: Double, unit: UnitSystem) -> String
+}
+
+===============================================================================
+12. VISUAL DESIGN SPECIFICATIONS
+===============================================================================
+
+-------------------------------------------------------------------------------
+12.1. SPACING & PADDING
+-------------------------------------------------------------------------------
+
+STANDARD SPACINGS:
+- 4pt: Tight spacing (within small groups)
+- 6pt: Small spacing (between related items)
+- 8pt: Medium spacing (list items, buttons)
+- 12pt: Default spacing (sections, groups)
+- 16pt: Standard horizontal padding
+- 20pt: Large spacing (major sections)
+- 24pt: Extra large spacing (screen sections)
+
+PADDING PATTERNS:
+- Screen edges: 16pt horizontal
+- List rows: 8pt vertical
+- Buttons: 10-16pt vertical, 16-20pt horizontal
+- Sections: 12pt between items, 20pt between sections
+- Cards/Boxes: 16-24pt all sides
+
+-------------------------------------------------------------------------------
+12.2. CORNER RADIUS
+-------------------------------------------------------------------------------
+
+- Text fields: 8pt
+- Buttons (small): 8pt
+- Buttons (medium): 12pt
+- Buttons (pill/tab): 16pt or 20pt (half of height)
+- Cards/Result boxes: 12pt
+- Image thumbnails: 8pt
+- Reset button (ruler): 20pt (pill shape)
+
+-------------------------------------------------------------------------------
+12.3. SHADOWS
+-------------------------------------------------------------------------------
+
+USAGE: Rarely used, only for:
+- Floating buttons (ruler controls)
+- Gallery controls (image viewer)
+
+SHADOW SPECS:
+- Color: Black with 10-15% opacity
+- Radius: 3-4pt
+- Offset: Y = 2pt (down)
+
+-------------------------------------------------------------------------------
+12.4. ICONS & SF SYMBOLS
+-------------------------------------------------------------------------------
+
+SYSTEM ICONS (SF Symbols):
+- Navigation: "chevron.left", "chevron.right", "chevron.up", "chevron.down"
+- Actions: "plus", "plus.circle", "plus.circle.fill", "minus.circle.fill"
+- Edit: "pencil", "trash", "gearshape", "xmark", "xmark.circle.fill"
+- Status: "checkmark", "checkmark.circle.fill", "checkmark.square.fill", "square"
+- Calendar: "calendar"
+- Flow: "arrow.right.circle.fill", "arrow.up.left", "arrow.down.circle.fill"
+- Content: "doc.fill", "doc.text", "photo.fill", "photo.on.rectangle.angled"
+- Link: "link", "arrow.triangle.2.circlepath"
+- Social: "person.3.fill", "envelope.fill"
+- Tools: "ruler", "slider.horizontal.3", "magnifyingglass"
+- Star: "star", "star.fill"
+- Misc: "tray"
+
+EMOJI ICONS (Main Menu):
+🧵 Projects (Thread)
+🧶 Yarn Stash (Yarn ball)
+📝 Recipes (Notepad)
+🔢 Yarn Calculator (Numbers)
+✨ Stitch Calculator (Sparkles)
+📏 Ruler (Ruler)
+🧶🧶🧶 Yarn result (3 yarn balls)
+💡 Hint/Tip (Lightbulb)
+
+ICON SIZES:
+- Toolbar: 18pt
+- List icons: 20pt (in circles)
+- Button icons: 14-18pt
+- Checkboxes: 22pt
+- Counters: 32pt
+- Menu emoji: 32pt
+- Result emoji: 48pt
+- Empty state: 60pt
+
+COLOR:
+- Primary: Purple (#6b52a3)
+- Gray: Secondary label color
+- Red: Destructive actions
+- White: On purple background
+
+-------------------------------------------------------------------------------
+12.5. ANIMATIONS & TRANSITIONS
+-------------------------------------------------------------------------------
+
+STANDARD ANIMATIONS:
+- Navigation: Default SwiftUI push/pop (slide from right)
+- Modal sheets: Default SwiftUI slide from bottom
+- List operations: Default SwiftUI fade/slide
+- State changes: withAnimation() with default timing
+
+CUSTOM ANIMATIONS:
+- Tab/button selection: Spring animation
+  * response: 0.3, dampingFraction: 0.7
+- Reset button (ruler): scale + opacity transition
+- Calibration panel: move(edge: .bottom) + opacity
+- Expand/collapse groups: default withAnimation()
+- Checkbox toggle: Default (no custom animation)
+
+HAPTICS:
+- Not explicitly implemented in code
+- Could add for: button taps, counter increments, state changes
+
+-------------------------------------------------------------------------------
+12.6. TYPOGRAPHY HIERARCHY
+-------------------------------------------------------------------------------
+
+LEVEL 1 - Large Title (Navigation):
+- Size: 34pt (system default for .large)
+- Weight: Default (bold)
+- Use: Navigation titles when displayMode = .large
+
+LEVEL 2 - Title (Navigation):
+- Size: 17pt (system default for .inline)
+- Weight: Default (semibold)
+- Use: Navigation titles when displayMode = .inline
+
+LEVEL 3 - Section Heading:
+- Size: 18-20pt
+- Weight: Semibold
+- Use: Major section headers in detail views
+
+LEVEL 4 - Item Title:
+- Size: 16-17pt
+- Weight: Medium
+- Use: List item titles, form labels
+
+LEVEL 5 - Body:
+- Size: 14-15pt
+- Weight: Regular
+- Use: Body text, field labels
+
+LEVEL 6 - Caption:
+- Size: 12-13pt
+- Weight: Regular
+- Use: Metadata, secondary info
+
+LEVEL 7 - Small Caption:
+- Size: 10-11pt
+- Weight: Medium
+- Use: Tiny labels, hints
+
+LEVEL 8 - Button Text:
+- Size: 15-18pt
+- Weight: Medium/Bold
+- Use: Primary action buttons
+
+LEVEL 9 - Result Text:
+- Size: 16-24pt
+- Weight: Semibold/Bold
+- Use: Calculated results, numbers
+
+===============================================================================
+13. ANIMATIONS & TRANSITIONS
+===============================================================================
+
+Already covered in section 12.5, but key points:
+
+NAVIGATION TRANSITIONS:
+- Push: Slide from right (standard iOS)
+- Pop: Slide to right (standard iOS)
+- Modal: Slide from bottom
+- Full-screen modal: Fade + slide (image gallery)
+
+STATE TRANSITIONS:
+- Opacity changes: Default fade
+- Position changes: Default slide
+- Size changes: Default scale
+- Combined: Multiple simultaneous
+
+USER FEEDBACK:
+- Disabled states: Reduced opacity (visual)
+- Loading states: Not implemented (instant operations)
+- Error states: Alerts with messages
+- Success states: Alerts or inline messages
+
+SCROLL BEHAVIOR:
+- Auto-scroll: In yarn calculator (to button/result)
+- Smooth scroll: withAnimation wrapper
+- Scroll to top: Ruler reset (animated)
+
+===============================================================================
+14. NOTIFICATIONS SYSTEM
+===============================================================================
+
+PURPOSE:
+Gentle reminders to open the app if not used for 3 days.
+Only for Norwegian users who enable the feature.
+
+IMPLEMENTATION:
+- Manager: NotificationManager.shared
+- Permission: Requested on toggle enable in Settings
+- Scheduling: When app enters background
+- Cancellation: When app becomes active
+- Identifier: "appEngagementReminder"
+
+SCHEDULE LOGIC:
+1. Check language = Norwegian
+2. Check notificationsEnabled = true
+3. Check authorization status = authorized
+4. Cancel existing notifications
+5. Schedule new notification for 3 days later (259200 seconds)
+
+NOTIFICATION CONTENT:
+- Title: "KnitAndCalc"
+- Body: Random text from 10 variations
+- Sound: Default
+- Badge: Default
+
+NOTIFICATION TEXTS (10 variations):
+1. "Du har [N] prosjekt som venter på deg! 🧶"
+2. "Det er [X]g garn i lageret ditt som vil bli strikket! ✨"
+3. "Husk å oppdatere prosjektene dine i KnitAndCalc! 📝"
+4. "Strikkingen venter! Du har [N] aktive prosjekter 🎨"
+5. "Tid for litt strikking? Sjekk ut garnlageret ditt! 🧵"
+6. "Har du gjort fremgang på prosjektene dine? Oppdater nå! 💫"
+7. "Ditt garnlager har [X]g med muligheter! 🌟"
+8. "Ikke glem strikkingen! Åpne KnitAndCalc og se hva du har på gang 🎁"
+9. "Klart for neste rad? Du har [N] prosjekter å velge mellom! 🪡"
+10. "Strikkegleden venter! Sjekk inn og se fremgangen din 🎉"
+
+PERSONALIZATION:
+- [N]: Count of active + planned projects
+- [X]: Total grams in yarn stash
+- Loads data from UserDefaults to calculate
+
+UPDATE FLOW:
+1. App launches: updateLastOpenDate() + cancel notifications
+2. App goes active: updateLastOpenDate() + cancel notifications
+3. App goes background: scheduleNotificationIfNeeded()
+4. Notification delivered after 3 days (if app not opened)
+5. User opens app: Cycle repeats
+
+SETTINGS INTEGRATION:
+- Toggle in Settings (Norwegian only)
+- On enable: Request permission → if granted, enable; if denied, show alert
+- On disable: Set flag to false (automatic cancellation on next background)
+- Alert message: "Gå til Innstillinger > KnitAndCalc > Varsler for å aktivere varsler"
+
+===============================================================================
+15. BACKUP/EXPORT SYSTEM
+===============================================================================
+
+PURPOSE:
+Allow users to export all app data for backup or transfer to another device.
+
+EXPORT FLOW:
+1. Settings → "Eksporter backup"
+2. Alert: Choose "Med filer" or "Uten filer"
+3. System creates JSON file with all data
+4. If "Med filer": Includes base64-encoded images/PDFs (larger file)
+5. File saved to temporary directory
+6. Share sheet presented with file
+7. User can save to Files, iCloud, email, etc.
+
+EXPORT DATA STRUCTURE:
+{
+  "yarnStash": [YarnStashEntry],
+  "projects": [Project],
+  "recipes": [Recipe],
+  "files": [FileData]?,  // Optional
+  "exportDate": "2025-10-14T12:00:00Z",
+  "appVersion": "1.0"
+}
+
+FileData structure (if "Med filer"):
+{
+  "fileName": "uuid.jpg",
+  "base64Data": "base64 encoded string...",
+  "mimeType": "image/jpeg"
+}
+
+IMPORT FLOW:
+1. Settings → "Importer backup"
+2. Document picker (JSON files only)
+3. System reads and validates JSON
+4. Extracts data:
+   - Decodes JSON to BackupData struct
+   - Restores files from base64 to Documents directory
+   - Saves arrays to UserDefaults
+5. Success alert or error alert
+6. App data immediately updated
+
+FILE COLLECTION:
+For "Med filer" option:
+1. Iterate all recipes
+2. For PDF recipes: Read file, encode base64
+3. For Image recipes: Parse JSON array, read each file, encode base64
+4. For Link recipes: No files needed
+5. Iterate all projects
+6. For each project image: Read file, encode base64
+7. Create FileData array with all collected files
+
+FILE RESTORATION:
+1. Iterate files array from backup
+2. Decode base64 to Data
+3. Write to Documents directory with original filename
+4. Create directories if needed
+5. Overwrite existing files
+
+ERROR HANDLING:
+- Invalid JSON: Show error alert with description
+- Missing files: Continue with available data
+- Decode failures: Show error alert
+- Permission issues: Show error alert
+
+FILENAME FORMAT:
+KnitAndCalc_Backup_YYYY-MM-DD_HHmmss.json
+Example: KnitAndCalc_Backup_2025-10-14_143022.json
+
+SECURITY NOTES:
+- No encryption (plain JSON)
+- User responsible for secure storage
+- Files can be large if "Med filer" selected
+- No cloud sync (manual process)
+
+COMPATIBILITY:
+- Future versions should handle old backup formats
+- appVersion field helps with migration logic
+- Currently version 1.0
+
+===============================================================================
+END OF DOCUMENTATION
+===============================================================================
+
+This document provides comprehensive details for recreating the KnitAndCalc
+iOS app in Android. All visual specifications, calculations, data models, and
+user flows are documented.
+
+For implementation:
+1. Use this doc alongside Swift source files
+2. Translate SwiftUI components to Jetpack Compose/XML
+3. Replace UIKit components with Android equivalents
+4. Replace UserDefaults with SharedPreferences/DataStore
+5. Replace FileManager with Android file APIs
+6. Maintain identical visual design using Material Design where needed
+7. Keep all calculation algorithms exactly as specified
+8. Preserve all data models for cross-platform compatibility
+
+Additional assets needed:
+- App icon (included in xcassets)
+- Launch screen
+- Localization files (Localizable.strings for each language)
+- SF Symbols → Material Icons mapping
+
+For questions or clarifications, contact: morten@punnerud.net
