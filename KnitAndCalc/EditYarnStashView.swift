@@ -13,9 +13,11 @@ struct EditYarnStashView: View {
     let yarn: YarnStashEntry
     var projects: Binding<[Project]>? = nil
     @ObservedObject private var settings = AppSettings.shared
+    @ObservedObject private var locationManager = LocationManager.shared
 
     private static var newBrandKey: String { String(localized: "(Nytt merke)") }
     private static var newTypeKey: String { String(localized: "(Ny type)") }
+    private static var newLocationKey: String { String(localized: "(Ny lokasjon)") }
 
     @State private var selectedBrand: String = ""
     @State private var selectedType: String = ""
@@ -23,6 +25,9 @@ struct EditYarnStashView: View {
     @State private var customType: String = ""
     @State private var showCustomBrandField: Bool = false
     @State private var showCustomTypeField: Bool = false
+    @State private var selectedLocation: String = ""
+    @State private var customLocation: String = ""
+    @State private var showCustomLocationField: Bool = false
     @State private var weightPerSkein: String = ""
     @State private var lengthPerSkein: String = ""
     @State private var numberOfSkeins: String = ""
@@ -43,7 +48,7 @@ struct EditYarnStashView: View {
     @State private var isUpdatingSkeins: Bool = false
 
     enum FormField {
-        case customBrand, customType, weightPerSkein, lengthPerSkein, numberOfSkeins, totalWeight, color, colorNumber, lotNumber, notes
+        case customBrand, customType, customLocation, weightPerSkein, lengthPerSkein, numberOfSkeins, totalWeight, color, colorNumber, lotNumber, notes
     }
 
     var existingBrands: [String] {
@@ -72,6 +77,14 @@ struct EditYarnStashView: View {
 
     var finalType: String {
         selectedType == Self.newTypeKey ? customType : selectedType
+    }
+
+    var locationsWithNew: [String] {
+        locationManager.getLocationsWithNew()
+    }
+
+    var finalLocation: String {
+        selectedLocation == Self.newLocationKey ? customLocation : selectedLocation
     }
 
     var currentProjects: [Project] {
@@ -213,18 +226,34 @@ struct EditYarnStashView: View {
                     }
                 }
 
+                Section(header: Text("Notater")) {
+                    TextEditor(text: $notes)
+                        .frame(minHeight: 100)
+                        .focused($focusedField, equals: .notes)
+                }
+
+                Section(header: Text("Lokasjon")) {
+                    Picker("Lokasjon", selection: $selectedLocation) {
+                        ForEach(locationsWithNew, id: \.self) { location in
+                            Text(location).tag(location)
+                        }
+                    }
+                    .onChange(of: selectedLocation) { newValue in
+                        showCustomLocationField = (newValue == Self.newLocationKey)
+                    }
+
+                    if showCustomLocationField {
+                        TextField("Skriv inn lokasjon", text: $customLocation)
+                            .focused($focusedField, equals: .customLocation)
+                    }
+                }
+
                 Section(header: Text("Strikkefasthet")) {
                     Picker("Strikkefasthet", selection: $selectedGauge) {
                         ForEach(GaugeOption.allCases, id: \.self) { gauge in
                             Text(gauge.displayName).tag(gauge)
                         }
                     }
-                }
-
-                Section(header: Text("Notater")) {
-                    TextEditor(text: $notes)
-                        .frame(minHeight: 100)
-                        .focused($focusedField, equals: .notes)
                 }
 
                 Section {
@@ -422,6 +451,20 @@ struct EditYarnStashView: View {
         colorNumber = yarn.colorNumber
         lotNumber = yarn.lotNumber
         notes = yarn.notes
+
+        // Load location
+        if locationManager.locations.contains(yarn.location) {
+            selectedLocation = yarn.location
+            showCustomLocationField = false
+        } else if !yarn.location.isEmpty {
+            selectedLocation = Self.newLocationKey
+            customLocation = yarn.location
+            showCustomLocationField = true
+        } else {
+            selectedLocation = ""
+            showCustomLocationField = false
+        }
+
         selectedGauge = yarn.gauge
     }
 
@@ -436,6 +479,11 @@ struct EditYarnStashView: View {
         let weightInGrams = settings.currentUnitSystem == .imperial ? UnitConverter.ouncesToGrams(weight) : weight
         let lengthInMeters = settings.currentUnitSystem == .imperial ? UnitConverter.yardsToMeters(length) : length
 
+        // Save new location if needed
+        if !finalLocation.isEmpty && !locationManager.locations.contains(finalLocation) {
+            locationManager.addLocation(finalLocation)
+        }
+
         if let index = yarnEntries.firstIndex(where: { $0.id == yarn.id }) {
             yarnEntries[index].brand = finalBrand
             yarnEntries[index].type = finalType
@@ -446,6 +494,7 @@ struct EditYarnStashView: View {
             yarnEntries[index].colorNumber = colorNumber
             yarnEntries[index].lotNumber = lotNumber
             yarnEntries[index].notes = notes
+            yarnEntries[index].location = finalLocation
             yarnEntries[index].gauge = selectedGauge
         }
 

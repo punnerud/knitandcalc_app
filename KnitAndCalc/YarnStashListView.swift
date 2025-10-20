@@ -675,9 +675,11 @@ struct YarnStashEntry: Identifiable, Codable, Equatable {
     var lotNumber: String
     var notes: String
     var gauge: GaugeOption
+    var location: String
+    var lastChecked: Date?
     var dateCreated: Date
 
-    init(id: UUID = UUID(), brand: String, type: String, weightPerSkein: Double, lengthPerSkein: Double, numberOfSkeins: Double, color: String = "", colorNumber: String = "", lotNumber: String, notes: String = "", gauge: GaugeOption = .none, dateCreated: Date = Date()) {
+    init(id: UUID = UUID(), brand: String, type: String, weightPerSkein: Double, lengthPerSkein: Double, numberOfSkeins: Double, color: String = "", colorNumber: String = "", lotNumber: String, notes: String = "", gauge: GaugeOption = .none, location: String = "", lastChecked: Date? = nil, dateCreated: Date = Date()) {
         self.id = id
         self.brand = brand
         self.type = type
@@ -689,6 +691,8 @@ struct YarnStashEntry: Identifiable, Codable, Equatable {
         self.lotNumber = lotNumber
         self.notes = notes
         self.gauge = gauge
+        self.location = location
+        self.lastChecked = lastChecked
         self.dateCreated = dateCreated
     }
 

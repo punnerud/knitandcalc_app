@@ -11,12 +11,14 @@ struct AddYarnStashView: View {
     @Environment(\.dismiss) var dismiss
     @Binding var yarnEntries: [YarnStashEntry]
     @ObservedObject private var settings = AppSettings.shared
+    @ObservedObject private var locationManager = LocationManager.shared
     var projects: Binding<[Project]>? = nil
     var linkToProjectId: UUID? = nil
     var onYarnCreated: ((YarnStashEntry) -> Void)?
 
     private static var newBrandKey: String { String(localized: "(Nytt merke)") }
     private static var newTypeKey: String { String(localized: "(Ny type)") }
+    private static var newLocationKey: String { String(localized: "(Ny lokasjon)") }
 
     @State private var selectedBrand: String = AddYarnStashView.newBrandKey
     @State private var selectedType: String = AddYarnStashView.newTypeKey
@@ -32,6 +34,9 @@ struct AddYarnStashView: View {
     @State private var colorNumber: String = ""
     @State private var lotNumber: String = ""
     @State private var notes: String = ""
+    @State private var selectedLocation: String = ""
+    @State private var customLocation: String = ""
+    @State private var showCustomLocationField: Bool = false
     @State private var selectedGauge: GaugeOption = .none
     @State private var linkToProject: Bool = false
     @State private var quantity: String = ""
@@ -42,7 +47,7 @@ struct AddYarnStashView: View {
     @State private var isUpdatingSkeins: Bool = false
 
     enum FormField {
-        case customBrand, weightPerSkein, lengthPerSkein, numberOfSkeins, totalWeight, color, colorNumber, lotNumber, notes, quantity
+        case customBrand, weightPerSkein, lengthPerSkein, numberOfSkeins, totalWeight, color, colorNumber, lotNumber, notes, customLocation, quantity
     }
 
     var existingBrands: [String] {
@@ -71,6 +76,14 @@ struct AddYarnStashView: View {
 
     var finalType: String {
         selectedType == Self.newTypeKey ? customType : selectedType
+    }
+
+    var locationsWithNew: [String] {
+        locationManager.getLocationsWithNew()
+    }
+
+    var finalLocation: String {
+        selectedLocation == Self.newLocationKey ? customLocation : selectedLocation
     }
 
     var isFormValid: Bool {
@@ -209,18 +222,34 @@ struct AddYarnStashView: View {
                     }
                 }
 
+                Section(header: Text("Notater")) {
+                    TextEditor(text: $notes)
+                        .frame(minHeight: 100)
+                        .focused($focusedField, equals: .notes)
+                }
+
+                Section(header: Text("Lokasjon")) {
+                    Picker("Lokasjon", selection: $selectedLocation) {
+                        ForEach(locationsWithNew, id: \.self) { location in
+                            Text(location).tag(location)
+                        }
+                    }
+                    .onChange(of: selectedLocation) { newValue in
+                        showCustomLocationField = (newValue == Self.newLocationKey)
+                    }
+
+                    if showCustomLocationField {
+                        TextField("Skriv inn lokasjon", text: $customLocation)
+                            .focused($focusedField, equals: .customLocation)
+                    }
+                }
+
                 Section(header: Text("Strikkefasthet")) {
                     Picker("Strikkefasthet", selection: $selectedGauge) {
                         ForEach(GaugeOption.allCases, id: \.self) { gauge in
                             Text(gauge.displayName).tag(gauge)
                         }
                     }
-                }
-
-                Section(header: Text("Notater")) {
-                    TextEditor(text: $notes)
-                        .frame(minHeight: 100)
-                        .focused($focusedField, equals: .notes)
                 }
 
                 if linkToProjectId != nil, projects != nil {
@@ -305,6 +334,11 @@ struct AddYarnStashView: View {
         let weightInGrams = settings.currentUnitSystem == .imperial ? UnitConverter.ouncesToGrams(weight) : weight
         let lengthInMeters = settings.currentUnitSystem == .imperial ? UnitConverter.yardsToMeters(length) : length
 
+        // Save new location if needed
+        if !finalLocation.isEmpty && !locationManager.locations.contains(finalLocation) {
+            locationManager.addLocation(finalLocation)
+        }
+
         let yarn = YarnStashEntry(
             brand: finalBrand,
             type: finalType,
@@ -315,7 +349,8 @@ struct AddYarnStashView: View {
             colorNumber: colorNumber,
             lotNumber: lotNumber,
             notes: notes,
-            gauge: selectedGauge
+            gauge: selectedGauge,
+            location: finalLocation
         )
 
         yarnEntries.append(yarn)

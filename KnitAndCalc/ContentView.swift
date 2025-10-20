@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var showAdvanced: Bool = false
+
     var body: some View {
         NavigationView {
             List {
@@ -33,6 +35,30 @@ struct ContentView: View {
 
                 NavigationLink(destination: RulerView()) {
                     CalculatorRow(title: NSLocalizedString("menu.ruler", comment: ""), icon: "📏")
+                }
+
+                Section {
+                    DisclosureGroup(isExpanded: $showAdvanced) {
+                        NavigationLink(destination: YarnStockCounterView()) {
+                            HStack(spacing: 16) {
+                                Text("📦")
+                                    .font(.system(size: 24))
+                                Text("Garnlager telling")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.appText)
+                            }
+                            .padding(.vertical, 4)
+                        }
+                    } label: {
+                        HStack(spacing: 16) {
+                            Text("⚙️")
+                                .font(.system(size: 32))
+                            Text("Avansert")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundColor(.primary)
+                        }
+                        .padding(.vertical, 8)
+                    }
                 }
             }
             .navigationTitle("Knit&Calc")

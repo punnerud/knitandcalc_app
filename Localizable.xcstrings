@@ -4,6 +4,9 @@
     "" : {
 
     },
+    "(%@)" : {
+
+    },
     "(Ny kategori)" : {
       "localizations" : {
         "da" : {
@@ -43,6 +46,9 @@
           }
         }
       }
+    },
+    "(Ny lokasjon)" : {
+
     },
     "(Ny type)" : {
       "localizations" : {
@@ -403,6 +409,9 @@
         }
       }
     },
+    "%@ nøster" : {
+
+    },
     "%lf %@ (%@)" : {
       "localizations" : {
         "en" : {
@@ -543,6 +552,19 @@
         }
       }
     },
+    "%lld dager" : {
+
+    },
+    "%lld farge%@ • %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld farge%2$@ • %3$@"
+          }
+        }
+      }
+    },
     "%lld g" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -583,6 +605,9 @@
           }
         }
       }
+    },
+    "%lld garn" : {
+
     },
     "%lld m" : {
       "extractionState" : "stale",
@@ -790,7 +815,13 @@
         }
       }
     },
+    "⚙️" : {
+
+    },
     "💡 Du kan legge til strikkefasthetsberegning under tannhjulet øverst til høyre." : {
+
+    },
+    "📦" : {
 
     },
     "🧶🧶🧶" : {
@@ -836,6 +867,9 @@
     "Actions" : {
 
     },
+    "Administrer lokasjoner" : {
+
+    },
     "Aktive" : {
       "localizations" : {
         "da" : {
@@ -877,6 +911,9 @@
       }
     },
     "Aktiver strikkefasthetsberegning" : {
+
+    },
+    "Aldri" : {
 
     },
     "Aldri synkronisert" : {
@@ -921,6 +958,21 @@
           }
         }
       }
+    },
+    "Alle garn har blitt sjekket nylig" : {
+
+    },
+    "Alle garn har lokasjon" : {
+
+    },
+    "Alle merker" : {
+
+    },
+    "Alle typer" : {
+
+    },
+    "Alt er oppdatert!" : {
+
     },
     "Annet" : {
       "localizations" : {
@@ -1210,6 +1262,9 @@
           }
         }
       }
+    },
+    "Avansert" : {
+
     },
     "Avbryt" : {
       "localizations" : {
@@ -1840,6 +1895,9 @@
     "Dette vil nullstille all synkroniseringsstatistikk og la deg teste synkronisering på nytt." : {
 
     },
+    "Disse garnene har ikke blitt sjekket på over 30 dager" : {
+
+    },
     "Du har nå %lld masker på pinnen" : {
       "localizations" : {
         "da" : {
@@ -2174,6 +2232,19 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Är du säker på att du vill ta bort detta garn från \"%@\"? Projektet kommer också att förlora garnet i sin översikt."
+          }
+        }
+      }
+    },
+    "Er du sikker på at du vil slette '%@'?" : {
+
+    },
+    "Er du sikker på at du vil slette '%@'? %lld garn bruker denne lokasjonen og vil bli satt til ingen lokasjon." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Er du sikker på at du vil slette '%1$@'? %2$lld garn bruker denne lokasjonen og vil bli satt til ingen lokasjon."
           }
         }
       }
@@ -2584,6 +2655,9 @@
         }
       }
     },
+    "Filter" : {
+
+    },
     "Finn ut hvor mye garn du trenger når du bytter til et annet med forskjellig løpelengde. Husk at strikkefastheten skal være lik." : {
       "localizations" : {
         "da" : {
@@ -2663,6 +2737,9 @@
           }
         }
       }
+    },
+    "Flytt til:" : {
+
     },
     "For morro skyld" : {
       "localizations" : {
@@ -2881,6 +2958,9 @@
         }
       }
     },
+    "garn" : {
+
+    },
     "Garn" : {
       "localizations" : {
         "da" : {
@@ -2920,6 +3000,12 @@
           }
         }
       }
+    },
+    "garn i lokasjon" : {
+
+    },
+    "Garn lagt til i '%@' og merket som sjekket" : {
+
     },
     "Garnet du vil bruke" : {
       "localizations" : {
@@ -3122,6 +3208,9 @@
       }
     },
     "Garnlager Data" : {
+
+    },
+    "Garnlager telling" : {
 
     },
     "Gensere" : {
@@ -3459,6 +3548,9 @@
     "Idempotency Key:" : {
 
     },
+    "Ikke sjekket garn" : {
+
+    },
     "Importer backup" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3724,6 +3816,9 @@
         }
       }
     },
+    "Ingen farge" : {
+
+    },
     "Ingen garn" : {
       "localizations" : {
         "da" : {
@@ -3764,6 +3859,12 @@
         }
       }
     },
+    "Ingen garn funnet" : {
+
+    },
+    "Ingen garn i '%@'" : {
+
+    },
     "Ingen garn på lager" : {
       "localizations" : {
         "da" : {
@@ -3803,6 +3904,9 @@
           }
         }
       }
+    },
+    "Ingen lokasjoner" : {
+
     },
     "Ingen oppskrifter" : {
       "localizations" : {
@@ -4501,6 +4605,9 @@
     "Lagre bilde" : {
 
     },
+    "Lagt til i økten: %lld garn" : {
+
+    },
     "Laster PDF..." : {
 
     },
@@ -4553,6 +4660,9 @@
           }
         }
       }
+    },
+    "Legg til en lokasjon over" : {
+
     },
     "Legg til farge" : {
 
@@ -4676,6 +4786,9 @@
           }
         }
       }
+    },
+    "Legg til nytt garn" : {
+
     },
     "Legg til oppskrift" : {
       "localizations" : {
@@ -4962,6 +5075,18 @@
           }
         }
       }
+    },
+    "Lokasjon" : {
+
+    },
+    "Lokasjon: %@" : {
+
+    },
+    "Lokasjoner" : {
+
+    },
+    "Lokasjonsnavn" : {
+
     },
     "Løpelengde per nøste" : {
       "localizations" : {
@@ -5958,6 +6083,12 @@
     "Nullstill statistikk" : {
 
     },
+    "Ny lokasjon" : {
+
+    },
+    "Ny lokasjonsnavn" : {
+
+    },
     "Ny oppskrift" : {
       "localizations" : {
         "da" : {
@@ -6281,6 +6412,9 @@
         }
       }
     },
+    "Opprett og fortsett" : {
+
+    },
     "Oppskrift" : {
       "localizations" : {
         "da" : {
@@ -6495,6 +6629,12 @@
       }
     },
     "Påminnelser om strikking (bare for gøy)" : {
+
+    },
+    "Parti:" : {
+
+    },
+    "Parti: %@" : {
 
     },
     "Partinummer" : {
@@ -6819,6 +6959,9 @@
           }
         }
       }
+    },
+    "Prøv å justere filtrene" : {
+
     },
     "Prøv et annet søk" : {
       "localizations" : {
@@ -7801,13 +7944,22 @@
         }
       }
     },
+    "siden" : {
+
+    },
     "Sist synkronisert:" : {
 
     },
     "Siste respons:" : {
 
     },
+    "Sjekk alle synlige" : {
+
+    },
     "Skriv \"CalcAndKnit\" for å bli medlem" : {
+
+    },
+    "Skriv inn lokasjon" : {
 
     },
     "Skriv inn merke" : {
@@ -8017,6 +8169,9 @@
         }
       }
     },
+    "Slett lokasjon" : {
+
+    },
     "Slett oppskrift" : {
       "localizations" : {
         "da" : {
@@ -8137,6 +8292,9 @@
         }
       }
     },
+    "Søk farge, fargenummer, partinummer..." : {
+
+    },
     "Søk i garnlager" : {
       "localizations" : {
         "da" : {
@@ -8177,6 +8335,9 @@
         }
       }
     },
+    "Søk på flere ord (f.eks: sandnes rød)" : {
+
+    },
     "Sokker" : {
       "localizations" : {
         "da" : {
@@ -8216,6 +8377,12 @@
           }
         }
       }
+    },
+    "Start telling" : {
+
+    },
+    "Start telling i '%@'" : {
+
     },
     "Startet" : {
       "localizations" : {
@@ -8552,7 +8719,13 @@
     "Synkronisering" : {
 
     },
+    "Talt i denne økten (%lld)" : {
+
+    },
     "Test idempotency key" : {
+
+    },
+    "Tilbake" : {
 
     },
     "Tilbakestill" : {
@@ -8595,6 +8768,9 @@
         }
       }
     },
+    "Tilgjengelig garn" : {
+
+    },
     "Total lengde" : {
       "localizations" : {
         "da" : {
@@ -8635,10 +8811,16 @@
         }
       }
     },
+    "total vekt" : {
+
+    },
     "Total vekt" : {
 
     },
     "Totalt brukt i fullførte prosjekter" : {
+
+    },
+    "totalt i lokasjon" : {
 
     },
     "Totalt på lager" : {
@@ -8763,6 +8945,12 @@
           }
         }
       }
+    },
+    "Trykk på garn for å telle og legge til i '%@'" : {
+
+    },
+    "Trykk X for å angre (fjerner fra lokasjon og tilbakestiller)" : {
+
     },
     "Type" : {
       "localizations" : {
@@ -9112,6 +9300,15 @@
         }
       }
     },
+    "Velg hvilken lokasjon du vil telle garn i" : {
+
+    },
+    "Velg lokasjon" : {
+
+    },
+    "Velg lokasjon for telling" : {
+
+    },
     "Velg oppskrift" : {
       "localizations" : {
         "da" : {
@@ -9249,6 +9446,9 @@
       }
     },
     "Vil du lagre dette bildet til fotoalbum?" : {
+
+    },
+    "Vis ikke sjekket garn" : {
 
     },
     "Votter" : {
