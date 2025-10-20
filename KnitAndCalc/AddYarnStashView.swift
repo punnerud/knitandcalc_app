@@ -15,6 +15,7 @@ struct AddYarnStashView: View {
     var projects: Binding<[Project]>? = nil
     var linkToProjectId: UUID? = nil
     var onYarnCreated: ((YarnStashEntry) -> Void)?
+    var detectedInfo: DetectedYarnInfo? = nil
 
     private static var newBrandKey: String { String(localized: "(Nytt merke)") }
     private static var newTypeKey: String { String(localized: "(Ny type)") }
@@ -215,6 +216,16 @@ struct AddYarnStashView: View {
                         TextField("", text: $colorNumber)
                             .multilineTextAlignment(.trailing)
                             .focused($focusedField, equals: .colorNumber)
+                        if !colorNumber.isEmpty && detectedInfo?.color != nil {
+                            Button(action: {
+                                colorNumber = ""
+                            }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.gray)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
                     }
 
                     HStack {
@@ -223,6 +234,16 @@ struct AddYarnStashView: View {
                         TextField("", text: $lotNumber)
                             .multilineTextAlignment(.trailing)
                             .focused($focusedField, equals: .lotNumber)
+                        if !lotNumber.isEmpty && detectedInfo?.lotNumber != nil {
+                            Button(action: {
+                                lotNumber = ""
+                            }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.gray)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
                     }
 
                     HStack {
@@ -231,6 +252,16 @@ struct AddYarnStashView: View {
                         TextField("", text: $barcode)
                             .multilineTextAlignment(.trailing)
                             .focused($focusedField, equals: .barcode)
+                        if !barcode.isEmpty && detectedInfo?.barcode != nil {
+                            Button(action: {
+                                barcode = ""
+                            }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.gray)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
                         Button(action: {
                             showBarcodeScanner = true
                         }) {
@@ -297,8 +328,75 @@ struct AddYarnStashView: View {
                 if linkToProjectId != nil {
                     linkToProject = true
                 }
+
+                // Pre-fill from detected info
+                if let info = detectedInfo {
+                    if let barcodeValue = info.barcode {
+                        barcode = barcodeValue
+                    }
+
+                    // Clean and validate color number (A-Z, 0-9 only, min 3 chars)
+                    if let colorValue = info.color {
+                        if let cleaned = cleanAndValidateCode(colorValue) {
+                            colorNumber = cleaned
+                        }
+                    }
+
+                    // Clean and validate lot number (A-Z, 0-9 only, min 3 chars)
+                    if let lotValue = info.lotNumber {
+                        if let cleaned = cleanAndValidateCode(lotValue) {
+                            lotNumber = cleaned
+                        }
+                    }
+
+                    // Pre-fill brand from EAN company name (preferred)
+                    let brandToUse = info.detectedCompany ?? info.brandName
+
+                    if let brandValue = brandToUse {
+                        // Try to find matching existing brand
+                        if let matchingBrand = existingBrands.first(where: {
+                            $0.lowercased().contains(brandValue.lowercased()) ||
+                            brandValue.lowercased().contains($0.lowercased())
+                        }) {
+                            selectedBrand = matchingBrand
+                            showCustomBrandField = false
+                        } else {
+                            customBrand = brandValue
+                        }
+                    }
+
+                    // Pre-fill type from product name if available
+                    if let productName = info.productName {
+                        // Try to find matching existing type for the selected brand
+                        let typesForBrand = yarnEntries
+                            .filter { $0.brand == (showCustomBrandField ? customBrand : selectedBrand) }
+                            .map { $0.type }
+
+                        if let matchingType = typesForBrand.first(where: {
+                            $0.lowercased().contains(productName.lowercased()) ||
+                            productName.lowercased().contains($0.lowercased())
+                        }) {
+                            selectedType = matchingType
+                            showCustomTypeField = false
+                        } else {
+                            customType = productName
+                        }
+                    }
+                }
+
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    focusedField = .customBrand
+                    if detectedInfo == nil {
+                        focusedField = .customBrand
+                    } else {
+                        // Focus on first empty required field
+                        if customBrand.isEmpty && selectedBrand == AddYarnStashView.newBrandKey {
+                            focusedField = .customBrand
+                        } else if customType.isEmpty && selectedType == AddYarnStashView.newTypeKey {
+                            focusedField = .weightPerSkein
+                        } else {
+                            focusedField = .weightPerSkein
+                        }
+                    }
                 }
             }
             .toolbar {
@@ -405,6 +503,15 @@ struct AddYarnStashView: View {
 
         onYarnCreated?(yarn)
         dismiss()
+    }
+
+    // Clean and validate code (color/lot number): A-Z, 0-9 only, min 3 chars
+    func cleanAndValidateCode(_ input: String) -> String? {
+        // Strip to only alphanumeric characters (A-Z, 0-9)
+        let cleaned = input.filter { $0.isLetter || $0.isNumber }
+
+        // Only return if 3 or more characters
+        return cleaned.count >= 3 ? cleaned : nil
     }
 }
 

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import VisionKit
 
 struct YarnCountingSessionView: View {
     @Environment(\.dismiss) var dismiss
@@ -33,6 +34,11 @@ struct YarnCountingSessionView: View {
     @State private var matchedYarn: YarnStashEntry?
     @State private var showBarcodeUpdateAlert: Bool = false
     @State private var yarnToUpdateBarcode: YarnStashEntry?
+
+    // Quantity input states
+    @State private var showQuantityInput: Bool = false
+    @State private var yarnToCount: YarnStashEntry?
+    @State private var detectedInfoForYarn: DetectedYarnInfo?
 
     var countedYarns: [YarnStashEntry] {
         yarnEntries.filter { countedYarnIds.contains($0.id) }
@@ -144,18 +150,51 @@ struct YarnCountingSessionView: View {
                     addNewYarnToCount(newYarn)
                 }
             }
-            .sheet(isPresented: $showCameraScanner) {
-                BarcodeScannerView(
-                    scannedCode: $scannedBarcode,
-                    scannedText: $scannedText,
-                    showOCR: true,
-                    onBarcodeScanned: { code in
-                        handleBarcodeScanned(code)
-                    },
-                    onTextRecognized: { text in
-                        handleTextRecognized(text)
+            .sheet(isPresented: $showCameraScanner, onDismiss: {
+                // After camera scanner dismisses, show quantity input if yarn was selected
+                if yarnToCount != nil {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        showQuantityInput = true
                     }
-                )
+                }
+            }) {
+                if #available(iOS 16.0, *), DataScannerViewController.isSupported, DataScannerViewController.isAvailable {
+                    LiveCameraScannerView(
+                        yarnEntries: $yarnEntries,
+                        availableYarns: availableYarns,
+                        onYarnSelected: { yarn, detectedInfo in
+                            yarnToCount = yarn
+                            detectedInfoForYarn = detectedInfo
+                            // Don't show quantity input here - wait for camera to dismiss
+                        }
+                    )
+                } else {
+                    // Fallback for iOS 15 or unsupported devices
+                    BarcodeScannerView(
+                        scannedCode: $scannedBarcode,
+                        scannedText: $scannedText,
+                        showOCR: false,
+                        onBarcodeScanned: { code in
+                            handleBarcodeScanned(code)
+                        }
+                    )
+                }
+            }
+            .sheet(isPresented: $showQuantityInput, onDismiss: {
+                // Clear yarn selection state when quantity input closes
+                // (Note: addYarnToCountWithQuantity also clears this on confirm)
+                yarnToCount = nil
+                detectedInfoForYarn = nil
+            }) {
+                if let yarn = yarnToCount {
+                    YarnQuantityInputView(
+                        yarn: yarn,
+                        detectedInfo: detectedInfoForYarn,
+                        onConfirm: { skeinsToAdd in
+                            addYarnToCountWithQuantity(yarn, quantity: skeinsToAdd, detectedInfo: detectedInfoForYarn)
+                        }
+                    )
+                }
             }
             .alert("Update Barcode", isPresented: $showBarcodeUpdateAlert) {
                 Button("Cancel", role: .cancel) {
@@ -436,7 +475,9 @@ struct YarnCountingSessionView: View {
                 VStack(spacing: 0) {
                     ForEach(availableYarns) { yarn in
                         Button(action: {
-                            addYarnToCount(yarn)
+                            yarnToCount = yarn
+                            detectedInfoForYarn = nil
+                            showQuantityInput = true
                         }) {
                             HStack(spacing: 12) {
                                 VStack(alignment: .leading, spacing: 4) {
@@ -593,27 +634,55 @@ struct YarnCountingSessionView: View {
     }
 
     func addYarnToCount(_ yarn: YarnStashEntry) {
+        // Legacy function - redirect to quantity input
+        yarnToCount = yarn
+        detectedInfoForYarn = nil
+        showQuantityInput = true
+    }
+
+    func addYarnToCountWithQuantity(_ yarn: YarnStashEntry, quantity: Double, detectedInfo: DetectedYarnInfo?) {
         if let index = yarnEntries.firstIndex(where: { $0.id == yarn.id }) {
             // Store original state before modification
             let originalLocation = yarnEntries[index].location
             let originalLastChecked = yarnEntries[index].lastChecked
 
-            // Check if barcode needs updating
-            updateBarcodeIfNeeded(for: yarn)
+            // Update barcode if detected from camera (barcode is reliable)
+            if let info = detectedInfo, let barcode = info.barcode, !barcode.isEmpty {
+                if yarnEntries[index].barcode.isEmpty {
+                    yarnEntries[index].barcode = barcode
+                } else if yarnEntries[index].barcode != barcode {
+                    // Barcode mismatch - ask user
+                    scannedBarcode = barcode
+                    yarnToUpdateBarcode = yarn
+                    showBarcodeUpdateAlert = true
+                }
+            }
+
+            // Note: Color/lot NOT updated during counting - only barcode is safe
+            // OCR color/lot can be inaccurate, only use for adding new yarn
+
+            // Add quantity to existing count
+            yarnEntries[index].numberOfSkeins += quantity
 
             // Modify the yarn
             yarnEntries[index].location = selectedLocation
             yarnEntries[index].lastChecked = Date()
             saveYarnEntries()
 
-            // Add to counted list and store original state
-            countedYarnIds.insert(yarn.id)
-            originalYarnStates[yarn.id] = (originalLocation, originalLastChecked)
+            // Add to counted list and store original state if not already counted
+            if !countedYarnIds.contains(yarn.id) {
+                countedYarnIds.insert(yarn.id)
+                originalYarnStates[yarn.id] = (originalLocation, originalLastChecked)
+            }
 
             // Clear search and filters for next yarn
             searchText = ""
             selectedBrand = ""
             selectedType = ""
+
+            // Clear quantity input state
+            yarnToCount = nil
+            detectedInfoForYarn = nil
         }
     }
 

@@ -4,6 +4,9 @@
     "" : {
 
     },
+    "(%@ per nøste)" : {
+
+    },
     "(%@)" : {
 
     },
@@ -211,6 +214,9 @@
           }
         }
       }
+    },
+    "# %@" : {
+
     },
     "%@ (%@)" : {
       "localizations" : {
@@ -812,6 +818,9 @@
         }
       }
     },
+    "= %@ nøster" : {
+
+    },
     "⚙️" : {
 
     },
@@ -873,6 +882,9 @@
           }
         }
       }
+    },
+    "Add Yarn" : {
+
     },
     "Aktive" : {
       "localizations" : {
@@ -1180,6 +1192,9 @@
           }
         }
       }
+    },
+    "Antall nøster:" : {
+
     },
     "Antall økninger:" : {
       "localizations" : {
@@ -1558,6 +1573,9 @@
     "Bli med i KnitAndCalc-gruppen på Facebook" : {
 
     },
+    "Brand:" : {
+
+    },
     "Bruker-ID:" : {
 
     },
@@ -1808,6 +1826,9 @@
     "Cancel" : {
 
     },
+    "Color:" : {
+
+    },
     "Data er importert og appen er oppdatert" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2043,6 +2064,9 @@
           }
         }
       }
+    },
+    "EAN:" : {
+
     },
     "Egendefinert" : {
       "localizations" : {
@@ -5310,6 +5334,12 @@
         }
       }
     },
+    "Lot:" : {
+
+    },
+    "Lot: %@" : {
+
+    },
     "Luer" : {
       "localizations" : {
         "da" : {
@@ -7004,7 +7034,13 @@
         }
       }
     },
+    "Point camera at yarn label" : {
+
+    },
     "Prising" : {
+
+    },
+    "Product:" : {
 
     },
     "Prosent av lager:" : {
@@ -9349,6 +9385,9 @@
       }
     },
     "Vekt i gram" : {
+
+    },
+    "Vekt i gram:" : {
 
     },
     "Vekt i oz" : {
