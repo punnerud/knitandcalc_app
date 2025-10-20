@@ -23,7 +23,7 @@ struct LocationManagementView: View {
                 // Add new location section
                 VStack(spacing: 12) {
                     HStack {
-                        TextField("Ny lokasjon", text: $newLocationName)
+                        TextField(NSLocalizedString("location.new_location", comment: ""), text: $newLocationName)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .focused($focusedField)
 
@@ -90,7 +90,7 @@ struct LocationManagementView: View {
                                             .foregroundColor(.appText)
 
                                         let count = yarnCountForLocation(location)
-                                        Text("\(count) garn")
+                                        Text("\(count) \(NSLocalizedString("yarn_stock.yarn", comment: ""))")
                                             .font(.system(size: 13))
                                             .foregroundColor(.appSecondaryText)
                                     }
@@ -119,7 +119,7 @@ struct LocationManagementView: View {
                     .listStyle(PlainListStyle())
                 }
             }
-            .navigationTitle("Lokasjoner")
+            .navigationTitle(NSLocalizedString("location.locations", comment: ""))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -131,7 +131,7 @@ struct LocationManagementView: View {
             .onAppear {
                 loadYarnEntries()
             }
-            .alert("Slett lokasjon", isPresented: .constant(locationToDelete != nil), presenting: locationToDelete) { location in
+            .alert(NSLocalizedString("location.delete_location", comment: ""), isPresented: .constant(locationToDelete != nil), presenting: locationToDelete) { location in
                 Button("Avbryt", role: .cancel) {
                     locationToDelete = nil
                 }
@@ -141,9 +141,9 @@ struct LocationManagementView: View {
             } message: { location in
                 let count = yarnCountForLocation(location)
                 if count > 0 {
-                    Text("Er du sikker på at du vil slette '\(location)'? \(count) garn bruker denne lokasjonen og vil bli satt til ingen lokasjon.")
+                    Text(String(format: NSLocalizedString("location.delete_confirmation_with_yarn", comment: ""), location, count))
                 } else {
-                    Text("Er du sikker på at du vil slette '\(location)'?")
+                    Text(String(format: NSLocalizedString("location.delete_confirmation", comment: ""), location))
                 }
             }
         }

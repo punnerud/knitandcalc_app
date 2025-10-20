@@ -26,6 +26,14 @@ struct YarnCountingSessionView: View {
     @State private var searchText: String = ""
     @State private var showAddNewYarn: Bool = false
 
+    // Camera scanning states
+    @State private var showCameraScanner: Bool = false
+    @State private var scannedBarcode: String = ""
+    @State private var scannedText: String = ""
+    @State private var matchedYarn: YarnStashEntry?
+    @State private var showBarcodeUpdateAlert: Bool = false
+    @State private var yarnToUpdateBarcode: YarnStashEntry?
+
     var countedYarns: [YarnStashEntry] {
         yarnEntries.filter { countedYarnIds.contains($0.id) }
     }
@@ -41,7 +49,7 @@ struct YarnCountingSessionView: View {
     }
 
     var locationOptions: [String] {
-        var options = [String(localized: "(Ny lokasjon)")]
+        var options = [NSLocalizedString("location.new_location_placeholder", comment: "")]
         options.append(contentsOf: locationManager.locations)
         return options
     }
@@ -78,6 +86,7 @@ struct YarnCountingSessionView: View {
                     yarn.type,
                     yarn.color,
                     yarn.colorNumber,
+                    yarn.barcode,
                     yarn.lotNumber,
                     yarn.notes
                 ].joined(separator: " ")
@@ -103,7 +112,7 @@ struct YarnCountingSessionView: View {
                     countingInterfaceView
                 }
             }
-            .navigationTitle("Start telling")
+            .navigationTitle(selectedLocation.isEmpty ? NSLocalizedString("yarn_stock.start_count", comment: "") : NSLocalizedString("yarn_stock.counting", comment: ""))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -135,6 +144,36 @@ struct YarnCountingSessionView: View {
                     addNewYarnToCount(newYarn)
                 }
             }
+            .sheet(isPresented: $showCameraScanner) {
+                BarcodeScannerView(
+                    scannedCode: $scannedBarcode,
+                    scannedText: $scannedText,
+                    showOCR: true,
+                    onBarcodeScanned: { code in
+                        handleBarcodeScanned(code)
+                    },
+                    onTextRecognized: { text in
+                        handleTextRecognized(text)
+                    }
+                )
+            }
+            .alert("Update Barcode", isPresented: $showBarcodeUpdateAlert) {
+                Button("Cancel", role: .cancel) {
+                    yarnToUpdateBarcode = nil
+                    scannedBarcode = ""
+                }
+                Button("Update") {
+                    confirmBarcodeUpdate()
+                }
+            } message: {
+                if let yarn = yarnToUpdateBarcode {
+                    if yarn.barcode.isEmpty {
+                        Text("Add barcode '\(scannedBarcode)' to \(yarn.brand) \(yarn.type)?")
+                    } else {
+                        Text("Update barcode from '\(yarn.barcode)' to '\(scannedBarcode)' for \(yarn.brand) \(yarn.type)?")
+                    }
+                }
+            }
         }
     }
 
@@ -146,11 +185,11 @@ struct YarnCountingSessionView: View {
                     .foregroundColor(.appIconTint)
                     .padding(.top, 40)
 
-                Text("Velg lokasjon for telling")
+                Text(NSLocalizedString("location.select_for_count", comment: ""))
                     .font(.system(size: 20, weight: .semibold))
                     .foregroundColor(.appText)
 
-                Text("Velg hvilken lokasjon du vil telle garn i")
+                Text(NSLocalizedString("location.select_location_prompt", comment: ""))
                     .font(.system(size: 14))
                     .foregroundColor(.appSecondaryText)
                     .multilineTextAlignment(.center)
@@ -161,10 +200,10 @@ struct YarnCountingSessionView: View {
             VStack(spacing: 12) {
                 Picker("Lokasjon", selection: Binding(
                     get: {
-                        showNewLocationField ? String(localized: "(Ny lokasjon)") : selectedLocation
+                        showNewLocationField ? NSLocalizedString("location.new_location_placeholder", comment: "") : selectedLocation
                     },
                     set: { newValue in
-                        if newValue == String(localized: "(Ny lokasjon)") {
+                        if newValue == NSLocalizedString("location.new_location_placeholder", comment: "") {
                             showNewLocationField = true
                         } else {
                             showNewLocationField = false
@@ -172,7 +211,7 @@ struct YarnCountingSessionView: View {
                         }
                     }
                 )) {
-                    Text("Velg lokasjon").tag("")
+                    Text(NSLocalizedString("location.select_location", comment: "")).tag("")
                     ForEach(locationOptions, id: \.self) { location in
                         Text(location).tag(location)
                     }
@@ -182,14 +221,14 @@ struct YarnCountingSessionView: View {
 
                 if showNewLocationField {
                     VStack(spacing: 12) {
-                        TextField("Ny lokasjonsnavn", text: $newLocationName)
+                        TextField(NSLocalizedString("location.new_location_name", comment: ""), text: $newLocationName)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .padding(.horizontal)
 
                         Button(action: {
                             createNewLocation()
                         }) {
-                            Text("Opprett og fortsett")
+                            Text(NSLocalizedString("location.create_and_continue", comment: ""))
                                 .font(.system(size: 16, weight: .semibold))
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
@@ -274,24 +313,6 @@ struct YarnCountingSessionView: View {
             .padding(.horizontal)
             .padding(.vertical, 12)
 
-            // Summary row
-            HStack(spacing: 16) {
-                VStack(spacing: 4) {
-                    Text("\(yarnsInLocation.count)")
-                        .font(.system(size: 20, weight: .bold))
-                        .foregroundColor(.appIconTint)
-                    Text("garn i lokasjon")
-                        .font(.system(size: 11))
-                        .foregroundColor(.appSecondaryText)
-                }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.appButtonBackgroundUnselected)
-                .cornerRadius(12)
-            }
-            .padding(.horizontal)
-            .padding(.bottom, 8)
-
             Divider()
         }
         .background(Color.appSecondaryBackground)
@@ -340,6 +361,15 @@ struct YarnCountingSessionView: View {
                             .foregroundColor(.appSecondaryText)
                     }
                 }
+
+                Button(action: {
+                    showCameraScanner = true
+                }) {
+                    Image(systemName: "camera.fill")
+                        .font(.system(size: 20))
+                        .foregroundColor(.appIconTint)
+                }
+                .buttonStyle(PlainButtonStyle())
             }
             .padding(10)
             .background(Color.appButtonBackgroundUnselected)
@@ -568,6 +598,9 @@ struct YarnCountingSessionView: View {
             let originalLocation = yarnEntries[index].location
             let originalLastChecked = yarnEntries[index].lastChecked
 
+            // Check if barcode needs updating
+            updateBarcodeIfNeeded(for: yarn)
+
             // Modify the yarn
             yarnEntries[index].location = selectedLocation
             yarnEntries[index].lastChecked = Date()
@@ -652,6 +685,103 @@ struct YarnCountingSessionView: View {
         let formatter = DateFormatter()
         formatter.timeStyle = .short
         return formatter.string(from: date)
+    }
+
+    // Handle barcode scan result
+    func handleBarcodeScanned(_ code: String) {
+        // First, try exact barcode match
+        if let yarn = availableYarns.first(where: { $0.barcode == code }) {
+            addYarnToCount(yarn)
+            return
+        }
+
+        // If no exact match, store for potential update
+        scannedBarcode = code
+    }
+
+    // Handle OCR text result with fuzzy matching
+    func handleTextRecognized(_ text: String) {
+        // Split OCR text into words
+        let words = text.components(separatedBy: CharacterSet.whitespacesAndNewlines)
+            .filter { !$0.isEmpty }
+            .map { $0.lowercased() }
+
+        // Score each available yarn by matching words
+        var scoredYarns: [(yarn: YarnStashEntry, score: Int)] = []
+
+        for yarn in availableYarns {
+            var score = 0
+            let yarnWords = [
+                yarn.brand,
+                yarn.type,
+                yarn.color,
+                yarn.colorNumber,
+                yarn.lotNumber
+            ].joined(separator: " ").lowercased()
+
+            for word in words {
+                if yarnWords.contains(word) || fuzzyMatch(word, in: yarnWords) {
+                    score += 1
+                }
+            }
+
+            if score > 0 {
+                scoredYarns.append((yarn, score))
+            }
+        }
+
+        // Sort by score descending
+        scoredYarns.sort { $0.score > $1.score }
+
+        // If we have a good match (score >= 2), auto-select
+        if let bestMatch = scoredYarns.first, bestMatch.score >= 2 {
+            addYarnToCount(bestMatch.yarn)
+        } else if let firstMatch = scoredYarns.first {
+            // Show as potential match in search
+            searchText = firstMatch.yarn.brand + " " + firstMatch.yarn.type
+        }
+    }
+
+    // Simple fuzzy matching - checks if word is within the text with some tolerance
+    func fuzzyMatch(_ word: String, in text: String) -> Bool {
+        guard word.count >= 3 else { return false }
+
+        // Check for partial match (at least 80% of characters)
+        let threshold = Int(Double(word.count) * 0.8)
+        var matchCount = 0
+
+        for char in word {
+            if text.contains(char) {
+                matchCount += 1
+            }
+        }
+
+        return matchCount >= threshold
+    }
+
+    // Update barcode for yarn when counted
+    func updateBarcodeIfNeeded(for yarn: YarnStashEntry) {
+        // If yarn has no barcode and we scanned one, ask to add it
+        if yarn.barcode.isEmpty && !scannedBarcode.isEmpty {
+            yarnToUpdateBarcode = yarn
+            showBarcodeUpdateAlert = true
+        }
+        // If yarn has a different barcode, ask to update
+        else if !yarn.barcode.isEmpty && !scannedBarcode.isEmpty && yarn.barcode != scannedBarcode {
+            yarnToUpdateBarcode = yarn
+            showBarcodeUpdateAlert = true
+        }
+    }
+
+    func confirmBarcodeUpdate() {
+        guard let yarn = yarnToUpdateBarcode,
+              let index = yarnEntries.firstIndex(where: { $0.id == yarn.id }) else { return }
+
+        yarnEntries[index].barcode = scannedBarcode
+        saveYarnEntries()
+
+        yarnToUpdateBarcode = nil
+        scannedBarcode = ""
     }
 }
 

@@ -35,6 +35,7 @@ struct YarnStashListView: View {
                 yarn.type.localizedCaseInsensitiveContains(searchText) ||
                 yarn.color.localizedCaseInsensitiveContains(searchText) ||
                 yarn.lotNumber.localizedCaseInsensitiveContains(searchText) ||
+                yarn.barcode.localizedCaseInsensitiveContains(searchText) ||
                 yarn.notes.localizedCaseInsensitiveContains(searchText)
             }
         }
@@ -673,13 +674,14 @@ struct YarnStashEntry: Identifiable, Codable, Equatable {
     var color: String
     var colorNumber: String
     var lotNumber: String
+    var barcode: String
     var notes: String
     var gauge: GaugeOption
     var location: String
     var lastChecked: Date?
     var dateCreated: Date
 
-    init(id: UUID = UUID(), brand: String, type: String, weightPerSkein: Double, lengthPerSkein: Double, numberOfSkeins: Double, color: String = "", colorNumber: String = "", lotNumber: String, notes: String = "", gauge: GaugeOption = .none, location: String = "", lastChecked: Date? = nil, dateCreated: Date = Date()) {
+    init(id: UUID = UUID(), brand: String, type: String, weightPerSkein: Double, lengthPerSkein: Double, numberOfSkeins: Double, color: String = "", colorNumber: String = "", lotNumber: String, barcode: String = "", notes: String = "", gauge: GaugeOption = .none, location: String = "", lastChecked: Date? = nil, dateCreated: Date = Date()) {
         self.id = id
         self.brand = brand
         self.type = type
@@ -689,11 +691,41 @@ struct YarnStashEntry: Identifiable, Codable, Equatable {
         self.color = color
         self.colorNumber = colorNumber
         self.lotNumber = lotNumber
+        self.barcode = barcode
         self.notes = notes
         self.gauge = gauge
         self.location = location
         self.lastChecked = lastChecked
         self.dateCreated = dateCreated
+    }
+
+    // Custom decoding to handle backward compatibility
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        id = try container.decode(UUID.self, forKey: .id)
+        brand = try container.decode(String.self, forKey: .brand)
+        type = try container.decode(String.self, forKey: .type)
+        weightPerSkein = try container.decode(Double.self, forKey: .weightPerSkein)
+        lengthPerSkein = try container.decode(Double.self, forKey: .lengthPerSkein)
+        numberOfSkeins = try container.decode(Double.self, forKey: .numberOfSkeins)
+        color = try container.decode(String.self, forKey: .color)
+        colorNumber = try container.decode(String.self, forKey: .colorNumber)
+        lotNumber = try container.decode(String.self, forKey: .lotNumber)
+
+        // Backward compatible: default to empty string if barcode doesn't exist
+        barcode = try container.decodeIfPresent(String.self, forKey: .barcode) ?? ""
+
+        notes = try container.decode(String.self, forKey: .notes)
+        gauge = try container.decode(GaugeOption.self, forKey: .gauge)
+
+        // Backward compatible: default to empty string if location doesn't exist
+        location = try container.decodeIfPresent(String.self, forKey: .location) ?? ""
+
+        // Backward compatible: nil if lastChecked doesn't exist
+        lastChecked = try container.decodeIfPresent(Date.self, forKey: .lastChecked)
+
+        dateCreated = try container.decode(Date.self, forKey: .dateCreated)
     }
 
     var totalLength: Double {

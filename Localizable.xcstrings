@@ -606,9 +606,6 @@
         }
       }
     },
-    "%lld garn" : {
-
-    },
     "%lld m" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -867,8 +864,15 @@
     "Actions" : {
 
     },
-    "Administrer lokasjoner" : {
-
+    "Add barcode '%@' to %@ %@?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add barcode '%1$@' to %2$@ %3$@?"
+          }
+        }
+      }
     },
     "Aktive" : {
       "localizations" : {
@@ -959,7 +963,7 @@
         }
       }
     },
-    "Alle garn har blitt sjekket nylig" : {
+    "Alle garn har blitt talt nylig" : {
 
     },
     "Alle garn har lokasjon" : {
@@ -1264,7 +1268,15 @@
       }
     },
     "Avansert" : {
-
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advanced"
+          }
+        }
+      }
     },
     "Avbryt" : {
       "localizations" : {
@@ -1793,6 +1805,9 @@
         }
       }
     },
+    "Cancel" : {
+
+    },
     "Data er importert og appen er oppdatert" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1841,6 +1856,9 @@
       }
     },
     "Datoer" : {
+
+    },
+    "Days" : {
 
     },
     "Debug Menu" : {
@@ -1893,9 +1911,6 @@
       }
     },
     "Dette vil nullstille all synkroniseringsstatistikk og la deg teste synkronisering på nytt." : {
-
-    },
-    "Disse garnene har ikke blitt sjekket på over 30 dager" : {
 
     },
     "Du har nå %lld masker på pinnen" : {
@@ -2232,19 +2247,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Är du säker på att du vill ta bort detta garn från \"%@\"? Projektet kommer också att förlora garnet i sin översikt."
-          }
-        }
-      }
-    },
-    "Er du sikker på at du vil slette '%@'?" : {
-
-    },
-    "Er du sikker på at du vil slette '%@'? %lld garn bruker denne lokasjonen og vil bli satt til ingen lokasjon." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Er du sikker på at du vil slette '%1$@'? %2$lld garn bruker denne lokasjonen og vil bli satt til ingen lokasjon."
           }
         }
       }
@@ -2738,9 +2740,6 @@
         }
       }
     },
-    "Flytt til:" : {
-
-    },
     "For morro skyld" : {
       "localizations" : {
         "da" : {
@@ -2958,9 +2957,6 @@
         }
       }
     },
-    "garn" : {
-
-    },
     "Garn" : {
       "localizations" : {
         "da" : {
@@ -3000,9 +2996,6 @@
           }
         }
       }
-    },
-    "garn i lokasjon" : {
-
     },
     "Garn lagt til i '%@' og merket som sjekket" : {
 
@@ -3211,7 +3204,15 @@
 
     },
     "Garnlager telling" : {
-
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yarn Stock Count"
+          }
+        }
+      }
     },
     "Gensere" : {
       "localizations" : {
@@ -3546,9 +3547,6 @@
 
     },
     "Idempotency Key:" : {
-
-    },
-    "Ikke sjekket garn" : {
 
     },
     "Importer backup" : {
@@ -5076,13 +5074,197 @@
         }
       }
     },
+    "location.create_and_continue" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create and continue"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opprett og fortsett"
+          }
+        }
+      }
+    },
+    "location.delete_confirmation" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete '%@'?"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Er du sikker på at du vil slette '%@'?"
+          }
+        }
+      }
+    },
+    "location.delete_confirmation_with_yarn" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete '%@'? %d yarn(s) use this location and will be set to no location."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Er du sikker på at du vil slette '%@'? %d garn bruker denne lokasjonen og vil bli satt til ingen lokasjon."
+          }
+        }
+      }
+    },
+    "location.delete_location" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Location"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slett lokasjon"
+          }
+        }
+      }
+    },
+    "location.locations" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Locations"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lokasjoner"
+          }
+        }
+      }
+    },
+    "location.new_location" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Location"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ny lokasjon"
+          }
+        }
+      }
+    },
+    "location.new_location_name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New location name"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ny lokasjonsnavn"
+          }
+        }
+      }
+    },
+    "location.new_location_placeholder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(New location)"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Ny lokasjon)"
+          }
+        }
+      }
+    },
+    "location.select_for_count" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select location for count"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velg lokasjon for telling"
+          }
+        }
+      }
+    },
+    "location.select_location" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select location"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velg lokasjon"
+          }
+        }
+      }
+    },
+    "location.select_location_prompt" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select which location you want to count yarn in"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velg hvilken lokasjon du vil telle garn i"
+          }
+        }
+      }
+    },
     "Lokasjon" : {
 
     },
     "Lokasjon: %@" : {
-
-    },
-    "Lokasjoner" : {
 
     },
     "Lokasjonsnavn" : {
@@ -5342,6 +5524,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mängd"
+          }
+        }
+      }
+    },
+    "menu.advanced" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advanced"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avansert"
           }
         }
       }
@@ -5624,6 +5823,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Garnförråd"
+          }
+        }
+      }
+    },
+    "menu.yarn_stock_count" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yarn Stock Count"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Garnlager telling"
           }
         }
       }
@@ -6083,12 +6299,6 @@
     "Nullstill statistikk" : {
 
     },
-    "Ny lokasjon" : {
-
-    },
-    "Ny lokasjonsnavn" : {
-
-    },
     "Ny oppskrift" : {
       "localizations" : {
         "da" : {
@@ -6411,9 +6621,6 @@
           }
         }
       }
-    },
-    "Opprett og fortsett" : {
-
     },
     "Oppskrift" : {
       "localizations" : {
@@ -7329,6 +7536,9 @@
     "Roter (%lld°)" : {
 
     },
+    "Scan Barcode" : {
+
+    },
     "Se detaljer" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -7953,9 +8163,6 @@
     "Siste respons:" : {
 
     },
-    "Sjekk alle synlige" : {
-
-    },
     "Skriv \"CalcAndKnit\" for å bli medlem" : {
 
     },
@@ -8169,9 +8376,6 @@
         }
       }
     },
-    "Slett lokasjon" : {
-
-    },
     "Slett oppskrift" : {
       "localizations" : {
         "da" : {
@@ -8378,9 +8582,6 @@
         }
       }
     },
-    "Start telling" : {
-
-    },
     "Start telling i '%@'" : {
 
     },
@@ -8503,6 +8704,9 @@
           }
         }
       }
+    },
+    "Strekkode/EAN" : {
+
     },
     "Strikk" : {
       "extractionState" : "stale",
@@ -8811,9 +9015,6 @@
         }
       }
     },
-    "total vekt" : {
-
-    },
     "Total vekt" : {
 
     },
@@ -8988,6 +9189,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Typ"
+          }
+        }
+      }
+    },
+    "Update" : {
+
+    },
+    "Update Barcode" : {
+
+    },
+    "Update barcode from '%@' to '%@' for %@ %@?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Update barcode from '%1$@' to '%2$@' for %3$@ %4$@?"
           }
         }
       }
@@ -9300,15 +9517,6 @@
         }
       }
     },
-    "Velg hvilken lokasjon du vil telle garn i" : {
-
-    },
-    "Velg lokasjon" : {
-
-    },
-    "Velg lokasjon for telling" : {
-
-    },
     "Velg oppskrift" : {
       "localizations" : {
         "da" : {
@@ -9448,9 +9656,6 @@
     "Vil du lagre dette bildet til fotoalbum?" : {
 
     },
-    "Vis ikke sjekket garn" : {
-
-    },
     "Votter" : {
       "localizations" : {
         "da" : {
@@ -9499,6 +9704,210 @@
     },
     "Yarn Stash Sync Debug" : {
 
+    },
+    "yarn_stock.all" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle"
+          }
+        }
+      }
+    },
+    "yarn_stock.counting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Counting"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telling"
+          }
+        }
+      }
+    },
+    "yarn_stock.days_filter" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not counted in last %d days"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ikke talt siste %d dager"
+          }
+        }
+      }
+    },
+    "yarn_stock.manage_locations" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage Locations"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Administrer lokasjoner"
+          }
+        }
+      }
+    },
+    "yarn_stock.move_to" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move to:"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flytt til:"
+          }
+        }
+      }
+    },
+    "yarn_stock.no_location" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No location"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uten lokasjon"
+          }
+        }
+      }
+    },
+    "yarn_stock.show_unchecked" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Unchecked Yarn"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vis ikke sjekket garn"
+          }
+        }
+      }
+    },
+    "yarn_stock.show_uncounted" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Uncounted Yarn"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vis ikke talt garn"
+          }
+        }
+      }
+    },
+    "yarn_stock.start_count" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Count"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start telling"
+          }
+        }
+      }
+    },
+    "yarn_stock.total_weight" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "total weight"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "total vekt"
+          }
+        }
+      }
+    },
+    "yarn_stock.uncounted_yarn" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uncounted Yarn"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ikke talt garn"
+          }
+        }
+      }
+    },
+    "yarn_stock.yarn" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "yarn"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "garn"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

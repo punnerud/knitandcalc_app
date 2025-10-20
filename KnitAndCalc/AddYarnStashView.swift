@@ -33,6 +33,10 @@ struct AddYarnStashView: View {
     @State private var color: String = ""
     @State private var colorNumber: String = ""
     @State private var lotNumber: String = ""
+    @State private var barcode: String = ""
+    @State private var showBarcodeScanner: Bool = false
+    @State private var scannedBarcodeCode: String = ""
+    @State private var scannedBarcodeText: String = ""
     @State private var notes: String = ""
     @State private var selectedLocation: String = ""
     @State private var customLocation: String = ""
@@ -47,7 +51,7 @@ struct AddYarnStashView: View {
     @State private var isUpdatingSkeins: Bool = false
 
     enum FormField {
-        case customBrand, weightPerSkein, lengthPerSkein, numberOfSkeins, totalWeight, color, colorNumber, lotNumber, notes, customLocation, quantity
+        case customBrand, weightPerSkein, lengthPerSkein, numberOfSkeins, totalWeight, color, colorNumber, lotNumber, barcode, notes, customLocation, quantity
     }
 
     var existingBrands: [String] {
@@ -220,6 +224,22 @@ struct AddYarnStashView: View {
                             .multilineTextAlignment(.trailing)
                             .focused($focusedField, equals: .lotNumber)
                     }
+
+                    HStack {
+                        Text("Strekkode/EAN")
+                            .frame(width: 160, alignment: .leading)
+                        TextField("", text: $barcode)
+                            .multilineTextAlignment(.trailing)
+                            .focused($focusedField, equals: .barcode)
+                        Button(action: {
+                            showBarcodeScanner = true
+                        }) {
+                            Image(systemName: "camera.fill")
+                                .font(.system(size: 18))
+                                .foregroundColor(.appIconTint)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
                 }
 
                 Section(header: Text("Notater")) {
@@ -297,6 +317,16 @@ struct AddYarnStashView: View {
                     .foregroundColor(isFormValid ? .appIconTint : .appTertiaryText)
                 }
             }
+            .sheet(isPresented: $showBarcodeScanner) {
+                BarcodeScannerView(
+                    scannedCode: $scannedBarcodeCode,
+                    scannedText: $scannedBarcodeText,
+                    showOCR: false,
+                    onBarcodeScanned: { code in
+                        barcode = code
+                    }
+                )
+            }
         }
     }
 
@@ -348,6 +378,7 @@ struct AddYarnStashView: View {
             color: color,
             colorNumber: colorNumber,
             lotNumber: lotNumber,
+            barcode: barcode,
             notes: notes,
             gauge: selectedGauge,
             location: finalLocation

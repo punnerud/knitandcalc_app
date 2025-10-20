@@ -43,7 +43,7 @@ struct ContentView: View {
                             HStack(spacing: 16) {
                                 Text("📦")
                                     .font(.system(size: 24))
-                                Text("Garnlager telling")
+                                Text(NSLocalizedString("menu.yarn_stock_count", comment: ""))
                                     .font(.system(size: 16))
                                     .foregroundColor(.appText)
                             }
@@ -53,7 +53,7 @@ struct ContentView: View {
                         HStack(spacing: 16) {
                             Text("⚙️")
                                 .font(.system(size: 32))
-                            Text("Avansert")
+                            Text(NSLocalizedString("menu.advanced", comment: ""))
                                 .font(.system(size: 18, weight: .medium))
                                 .foregroundColor(.primary)
                         }

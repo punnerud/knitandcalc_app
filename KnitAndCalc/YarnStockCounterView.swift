@@ -74,7 +74,7 @@ struct YarnStockCounterView: View {
                 }) {
                     HStack(spacing: 4) {
                         Image(systemName: "play.circle.fill")
-                        Text("Start telling")
+                        Text(NSLocalizedString("yarn_stock.start_count", comment: ""))
                     }
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(.appIconTint)
@@ -86,13 +86,13 @@ struct YarnStockCounterView: View {
                     Button(action: {
                         showLocationManagement = true
                     }) {
-                        Label("Administrer lokasjoner", systemImage: "folder.badge.gearshape")
+                        Label(NSLocalizedString("yarn_stock.manage_locations", comment: ""), systemImage: "folder.badge.gearshape")
                     }
 
                     Button(action: {
                         showLongestUncheckedAlert = true
                     }) {
-                        Label("Vis ikke sjekket garn", systemImage: "exclamationmark.triangle")
+                        Label(NSLocalizedString("yarn_stock.show_uncounted", comment: ""), systemImage: "exclamationmark.triangle")
                     }
                 } label: {
                     Image(systemName: "ellipsis.circle")
@@ -106,6 +106,12 @@ struct YarnStockCounterView: View {
         }
         .onChange(of: yarnEntries) { _ in
             saveYarnEntries()
+        }
+        .onChange(of: showLocationManagement) { isShowing in
+            if !isShowing {
+                // Reload when location management sheet is dismissed
+                loadYarnEntries()
+            }
         }
         .sheet(isPresented: $showLongestUncheckedAlert) {
             LongestUncheckedYarnView(yarnEntries: yarnEntries)
@@ -123,7 +129,7 @@ struct YarnStockCounterView: View {
             // Filter picker
             Picker("Filter", selection: $selectedFilter) {
                 ForEach(filterOptions, id: \.self) { option in
-                    Text(option).tag(option)
+                    Text(localizedFilterName(option)).tag(option)
                 }
             }
             .pickerStyle(MenuPickerStyle())
@@ -135,6 +141,17 @@ struct YarnStockCounterView: View {
         .background(Color.appSecondaryBackground)
     }
 
+    func localizedFilterName(_ filter: String) -> String {
+        switch filter {
+        case "Alle":
+            return NSLocalizedString("yarn_stock.all", comment: "")
+        case "Uten lokasjon":
+            return NSLocalizedString("yarn_stock.no_location", comment: "")
+        default:
+            return filter
+        }
+    }
+
     var statsSummarySection: some View {
         VStack(spacing: 12) {
             HStack(spacing: 16) {
@@ -142,7 +159,7 @@ struct YarnStockCounterView: View {
                     Text("\(filteredYarns.count)")
                         .font(.system(size: 24, weight: .bold))
                         .foregroundColor(.appIconTint)
-                    Text("garn")
+                    Text(NSLocalizedString("yarn_stock.yarn", comment: ""))
                         .font(.system(size: 13))
                         .foregroundColor(.appSecondaryText)
                 }
@@ -155,7 +172,7 @@ struct YarnStockCounterView: View {
                     Text(UnitConverter.formatWeight(totalWeightFiltered, unit: settings.currentUnitSystem))
                         .font(.system(size: 20, weight: .bold))
                         .foregroundColor(.appIconTint)
-                    Text("total vekt")
+                    Text(NSLocalizedString("yarn_stock.total_weight", comment: ""))
                         .font(.system(size: 13))
                         .foregroundColor(.appSecondaryText)
                 }
@@ -404,7 +421,7 @@ struct YarnInventoryRowView: View {
                     Divider()
 
                     HStack {
-                        Text("Flytt til:")
+                        Text(NSLocalizedString("yarn_stock.move_to", comment: ""))
                             .font(.system(size: 14, weight: .medium))
                             .foregroundColor(.appSecondaryText)
 
@@ -459,14 +476,17 @@ struct YarnInventoryRowView: View {
 struct LongestUncheckedYarnView: View {
     let yarnEntries: [YarnStashEntry]
     @Environment(\.dismiss) var dismiss
+    @State private var selectedDays: Int = 30
 
-    var uncheckedYarns: [YarnStashEntry] {
+    let dayOptions = [2, 7, 14, 30, 60, 90, 180]
+
+    var uncountedYarns: [YarnStashEntry] {
         yarnEntries
             .filter { yarn in
                 if let lastChecked = yarn.lastChecked {
                     let interval = Date().timeIntervalSince(lastChecked)
                     let days = Int(interval / 86400)
-                    return days > 30
+                    return days >= selectedDays
                 }
                 return true
             }
@@ -479,29 +499,39 @@ struct LongestUncheckedYarnView: View {
 
     var body: some View {
         NavigationView {
-            if uncheckedYarns.isEmpty {
-                VStack(spacing: 16) {
-                    Spacer()
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 60))
-                        .foregroundColor(.green)
-                    Text("Alt er oppdatert!")
-                        .font(.system(size: 18, weight: .medium))
-                        .foregroundColor(.appText)
-                    Text("Alle garn har blitt sjekket nylig")
-                        .font(.system(size: 14))
-                        .foregroundColor(.appSecondaryText)
-                    Spacer()
+            VStack(spacing: 0) {
+                // Days filter picker
+                VStack(spacing: 12) {
+                    Picker("Days", selection: $selectedDays) {
+                        ForEach(dayOptions, id: \.self) { days in
+                            Text(String(format: NSLocalizedString("yarn_stock.days_filter", comment: ""), days)).tag(days)
+                        }
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                    .padding(.horizontal)
+                    .padding(.top, 12)
+
+                    Divider()
                 }
-            } else {
-                List {
-                    Section {
-                        Text("Disse garnene har ikke blitt sjekket på over 30 dager")
+                .background(Color.appSecondaryBackground)
+
+                if uncountedYarns.isEmpty {
+                    VStack(spacing: 16) {
+                        Spacer()
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 60))
+                            .foregroundColor(.green)
+                        Text("Alt er oppdatert!")
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundColor(.appText)
+                        Text("Alle garn har blitt talt nylig")
                             .font(.system(size: 14))
                             .foregroundColor(.appSecondaryText)
+                        Spacer()
                     }
-
-                    ForEach(uncheckedYarns) { yarn in
+                } else {
+                    List {
+                        ForEach(uncountedYarns) { yarn in
                         VStack(alignment: .leading, spacing: 6) {
                             HStack {
                                 VStack(alignment: .leading, spacing: 4) {
@@ -549,10 +579,11 @@ struct LongestUncheckedYarnView: View {
                         .padding(.vertical, 4)
                     }
                 }
-                .listStyle(InsetGroupedListStyle())
+                    .listStyle(InsetGroupedListStyle())
+                }
             }
         }
-        .navigationTitle("Ikke sjekket garn")
+        .navigationTitle(NSLocalizedString("yarn_stock.uncounted_yarn", comment: ""))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {

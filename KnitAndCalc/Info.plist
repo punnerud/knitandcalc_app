@@ -6,7 +6,5 @@
 	<array>
 		<string>remote-notification</string>
 	</array>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>KnitAndCalc trenger tilgang til fotoalbum for å lagre bilder av dine strikkeprodukter</string>
 </dict>
 </plist>
