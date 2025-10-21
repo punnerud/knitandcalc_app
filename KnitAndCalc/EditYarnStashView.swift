@@ -41,6 +41,7 @@ struct EditYarnStashView: View {
     @State private var scannedBarcodeText: String = ""
     @State private var notes: String = ""
     @State private var selectedGauge: GaugeOption = .none
+    @State private var customGauge: String = ""
     @State private var localProjects: [Project] = []
     @State private var projectYarnToUnlink: (project: Project, projectYarn: ProjectYarn)?
     @State private var showEditQuantity: Bool = false
@@ -52,7 +53,7 @@ struct EditYarnStashView: View {
     @State private var isUpdatingSkeins: Bool = false
 
     enum FormField {
-        case customBrand, customType, customLocation, weightPerSkein, lengthPerSkein, numberOfSkeins, totalWeight, color, colorNumber, lotNumber, barcode, notes
+        case customBrand, customType, customLocation, weightPerSkein, lengthPerSkein, numberOfSkeins, totalWeight, color, colorNumber, lotNumber, barcode, notes, customGauge
     }
 
     var existingBrands: [String] {
@@ -270,8 +271,18 @@ struct EditYarnStashView: View {
 
                 Section(header: Text("Strikkefasthet")) {
                     Picker("Strikkefasthet", selection: $selectedGauge) {
-                        ForEach(GaugeOption.allCases, id: \.self) { gauge in
+                        ForEach(GaugeOption.pickerCases, id: \.self) { gauge in
                             Text(gauge.displayName).tag(gauge)
+                        }
+                    }
+
+                    if selectedGauge == .other {
+                        HStack {
+                            Text("Angi verdi")
+                                .frame(width: 160, alignment: .leading)
+                            TextField("", text: $customGauge)
+                                .multilineTextAlignment(.trailing)
+                                .focused($focusedField, equals: .customGauge)
                         }
                     }
                 }
@@ -497,6 +508,7 @@ struct EditYarnStashView: View {
         }
 
         selectedGauge = yarn.gauge
+        customGauge = yarn.customGauge
     }
 
     func updateYarn() {
@@ -528,6 +540,7 @@ struct EditYarnStashView: View {
             yarnEntries[index].notes = notes
             yarnEntries[index].location = finalLocation
             yarnEntries[index].gauge = selectedGauge
+            yarnEntries[index].customGauge = customGauge
         }
 
         dismiss()

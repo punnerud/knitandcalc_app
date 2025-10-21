@@ -33,6 +33,11 @@ enum NeedleSize: String, CaseIterable {
     var displayName: String {
         return self.rawValue
     }
+
+    // Picker order: Annet first, then blank (none), then numeric sizes
+    static var pickerCases: [NeedleSize] {
+        return [.other, .none] + allCases.filter { $0 != .other && $0 != .none }
+    }
 }
 
 struct ProjectDetailView: View {
@@ -245,7 +250,7 @@ struct ProjectDetailView: View {
                 // Dropdown to add needle sizes
                 HStack {
                     Picker("Legg til pinnestørrelse", selection: $selectedNeedleSize) {
-                        ForEach(NeedleSize.allCases, id: \.self) { size in
+                        ForEach(NeedleSize.pickerCases, id: \.self) { size in
                             Text(size.displayName).tag(size)
                         }
                     }

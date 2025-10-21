@@ -677,11 +677,12 @@ struct YarnStashEntry: Identifiable, Codable, Equatable {
     var barcode: String
     var notes: String
     var gauge: GaugeOption
+    var customGauge: String
     var location: String
     var lastChecked: Date?
     var dateCreated: Date
 
-    init(id: UUID = UUID(), brand: String, type: String, weightPerSkein: Double, lengthPerSkein: Double, numberOfSkeins: Double, color: String = "", colorNumber: String = "", lotNumber: String, barcode: String = "", notes: String = "", gauge: GaugeOption = .none, location: String = "", lastChecked: Date? = nil, dateCreated: Date = Date()) {
+    init(id: UUID = UUID(), brand: String, type: String, weightPerSkein: Double, lengthPerSkein: Double, numberOfSkeins: Double, color: String = "", colorNumber: String = "", lotNumber: String, barcode: String = "", notes: String = "", gauge: GaugeOption = .none, customGauge: String = "", location: String = "", lastChecked: Date? = nil, dateCreated: Date = Date()) {
         self.id = id
         self.brand = brand
         self.type = type
@@ -694,6 +695,7 @@ struct YarnStashEntry: Identifiable, Codable, Equatable {
         self.barcode = barcode
         self.notes = notes
         self.gauge = gauge
+        self.customGauge = customGauge
         self.location = location
         self.lastChecked = lastChecked
         self.dateCreated = dateCreated
@@ -718,6 +720,9 @@ struct YarnStashEntry: Identifiable, Codable, Equatable {
 
         notes = try container.decode(String.self, forKey: .notes)
         gauge = try container.decode(GaugeOption.self, forKey: .gauge)
+
+        // Backward compatible: default to empty string if customGauge doesn't exist
+        customGauge = try container.decodeIfPresent(String.self, forKey: .customGauge) ?? ""
 
         // Backward compatible: default to empty string if location doesn't exist
         location = try container.decodeIfPresent(String.self, forKey: .location) ?? ""
@@ -764,6 +769,11 @@ enum GaugeOption: String, Codable, CaseIterable {
         case .other: return "Annet"
         default: return LocalizedStringKey(self.rawValue)
         }
+    }
+
+    // Picker order: Annet first, then Ingen, then numeric gauges
+    static var pickerCases: [GaugeOption] {
+        return [.other, .none] + allCases.filter { $0 != .other && $0 != .none }
     }
 }
 

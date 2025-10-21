@@ -43,6 +43,7 @@ struct AddYarnStashView: View {
     @State private var customLocation: String = ""
     @State private var showCustomLocationField: Bool = false
     @State private var selectedGauge: GaugeOption = .none
+    @State private var customGauge: String = ""
     @State private var linkToProject: Bool = false
     @State private var quantity: String = ""
     @State private var quantityType: YarnQuantityType = .skeins
@@ -52,7 +53,7 @@ struct AddYarnStashView: View {
     @State private var isUpdatingSkeins: Bool = false
 
     enum FormField {
-        case customBrand, weightPerSkein, lengthPerSkein, numberOfSkeins, totalWeight, color, colorNumber, lotNumber, barcode, notes, customLocation, quantity
+        case customBrand, weightPerSkein, lengthPerSkein, numberOfSkeins, totalWeight, color, colorNumber, lotNumber, barcode, notes, customLocation, quantity, customGauge
     }
 
     var existingBrands: [String] {
@@ -297,8 +298,18 @@ struct AddYarnStashView: View {
 
                 Section(header: Text("Strikkefasthet")) {
                     Picker("Strikkefasthet", selection: $selectedGauge) {
-                        ForEach(GaugeOption.allCases, id: \.self) { gauge in
+                        ForEach(GaugeOption.pickerCases, id: \.self) { gauge in
                             Text(gauge.displayName).tag(gauge)
+                        }
+                    }
+
+                    if selectedGauge == .other {
+                        HStack {
+                            Text("Angi verdi")
+                                .frame(width: 160, alignment: .leading)
+                            TextField("", text: $customGauge)
+                                .multilineTextAlignment(.trailing)
+                                .focused($focusedField, equals: .customGauge)
                         }
                     }
                 }
@@ -479,6 +490,7 @@ struct AddYarnStashView: View {
             barcode: barcode,
             notes: notes,
             gauge: selectedGauge,
+            customGauge: customGauge,
             location: finalLocation
         )
 
