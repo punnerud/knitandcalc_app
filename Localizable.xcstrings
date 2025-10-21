@@ -418,6 +418,16 @@
     "%@ nøster" : {
 
     },
+    "%@%@ nøster" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@%2$@ nøster"
+          }
+        }
+      }
+    },
     "%lf %@ (%@)" : {
       "localizations" : {
         "en" : {
@@ -818,9 +828,6 @@
         }
       }
     },
-    "= %@ nøster" : {
-
-    },
     "⚙️" : {
 
     },
@@ -1195,9 +1202,6 @@
           }
         }
       }
-    },
-    "Antall nøster:" : {
-
     },
     "Antall økninger:" : {
       "localizations" : {
@@ -1977,6 +1981,9 @@
         }
       }
     },
+    "Du har talt %lld garn. Vil du lagre tellingen eller forkaste endringene?" : {
+
+    },
     "Du prøver å felle for mange masker. Maks antall fellinger for %lld masker er %lld." : {
       "localizations" : {
         "en" : {
@@ -2684,6 +2691,9 @@
         }
       }
     },
+    "Ferdig og lagre" : {
+
+    },
     "Filter" : {
 
     },
@@ -2901,6 +2911,9 @@
           }
         }
       }
+    },
+    "Gå tilbake uten å lagre" : {
+
     },
     "gang" : {
       "extractionState" : "stale",
@@ -3841,6 +3854,9 @@
         }
       }
     },
+    "Ingen endring" : {
+
+    },
     "Ingen farge" : {
 
     },
@@ -4628,6 +4644,9 @@
       }
     },
     "Lagre bilde" : {
+
+    },
+    "Lagre tellingen?" : {
 
     },
     "Lagt til i økten: %lld garn" : {
@@ -6043,6 +6062,9 @@
     "morten@punnerud.net" : {
 
     },
+    "Nåværende telling:" : {
+
+    },
     "Navn" : {
       "localizations" : {
         "da" : {
@@ -6371,6 +6393,12 @@
           }
         }
       }
+    },
+    "Ny telling (antall nøster):" : {
+
+    },
+    "Ny telling (vekt i gram):" : {
+
     },
     "Nytt garn" : {
       "localizations" : {
@@ -9388,9 +9416,6 @@
       }
     },
     "Vekt i gram" : {
-
-    },
-    "Vekt i gram:" : {
 
     },
     "Vekt i oz" : {

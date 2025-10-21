@@ -38,7 +38,12 @@ struct YarnQuantityInputView: View {
     }
 
     var isValid: Bool {
-        calculatedSkeins != nil && (calculatedSkeins ?? 0) > 0
+        calculatedSkeins != nil && (calculatedSkeins ?? 0) >= 0
+    }
+
+    var hasChanged: Bool {
+        guard let newCount = calculatedSkeins else { return false }
+        return abs(newCount - yarn.numberOfSkeins) > 0.001
     }
 
     var body: some View {
@@ -74,6 +79,22 @@ struct YarnQuantityInputView: View {
                 .background(Color.appSecondaryBackground)
                 .cornerRadius(8)
 
+                // Current count display
+                VStack(spacing: 6) {
+                    Text("Nåværende telling:")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(.appSecondaryText)
+
+                    Text("\(formatSkeins(yarn.numberOfSkeins)) nøster")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(.appText)
+                }
+                .padding(.vertical, 8)
+                .frame(maxWidth: .infinity)
+                .background(Color.appButtonBackgroundUnselected)
+                .cornerRadius(8)
+                .padding(.horizontal)
+
                 // Quantity type selector
                 Picker("Type", selection: $quantityType) {
                     ForEach(QuantityType.allCases, id: \.self) { type in
@@ -85,7 +106,7 @@ struct YarnQuantityInputView: View {
 
                 // Quantity input
                 VStack(alignment: .center, spacing: 4) {
-                    Text(quantityType == .skeins ? "Antall nøster:" : "Vekt i gram:")
+                    Text(quantityType == .skeins ? "Ny telling (antall nøster):" : "Ny telling (vekt i gram):")
                         .font(.system(size: 13, weight: .medium))
                         .foregroundColor(.appSecondaryText)
 
@@ -107,19 +128,50 @@ struct YarnQuantityInputView: View {
                 }
                 .padding(.horizontal)
 
-                // Conversion info
-                if let skeins = calculatedSkeins {
-                    VStack(spacing: 2) {
-                        if quantityType == .grams {
-                            Text("= \(formatSkeins(skeins)) nøster")
-                                .font(.system(size: 14, weight: .semibold))
+                // Change indicator with arrow notation
+                if let skeins = calculatedSkeins, hasChanged {
+                    VStack(spacing: 6) {
+                        HStack(spacing: 8) {
+                            Text(formatSkeins(yarn.numberOfSkeins))
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.appSecondaryText)
+
+                            Image(systemName: "arrow.right")
+                                .font(.system(size: 14))
                                 .foregroundColor(.appIconTint)
+
+                            Text(formatSkeins(skeins))
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(.appIconTint)
+
+                            Text("nøster")
+                                .font(.system(size: 14))
+                                .foregroundColor(.appSecondaryText)
                         }
 
-                        Text("(\(formatWeight(yarn.weightPerSkein)) per nøste)")
-                            .font(.system(size: 11))
-                            .foregroundColor(.appSecondaryText)
+                        if quantityType == .grams {
+                            Text("(\(formatWeight(yarn.weightPerSkein)) per nøste)")
+                                .font(.system(size: 11))
+                                .foregroundColor(.appSecondaryText)
+                        }
+
+                        let difference = skeins - yarn.numberOfSkeins
+                        if abs(difference) > 0.001 {
+                            HStack(spacing: 4) {
+                                Image(systemName: difference > 0 ? "arrow.up.circle.fill" : "arrow.down.circle.fill")
+                                    .foregroundColor(difference > 0 ? .green : .orange)
+                                Text("\(difference > 0 ? "+" : "")\(formatSkeins(difference)) nøster")
+                                    .font(.system(size: 12, weight: .semibold))
+                                    .foregroundColor(difference > 0 ? .green : .orange)
+                            }
+                        }
                     }
+                    .padding(.vertical, 8)
+                } else if calculatedSkeins != nil, !hasChanged {
+                    Text("Ingen endring")
+                        .font(.system(size: 13))
+                        .foregroundColor(.appSecondaryText)
+                        .padding(.vertical, 4)
                 }
 
                 Spacer()
@@ -144,7 +196,7 @@ struct YarnQuantityInputView: View {
                 .padding(.bottom, 8)
             }
             .padding(.vertical, 12)
-            .navigationTitle(detectedInfo != nil ? yarn.brand : "Antall")
+            .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

@@ -18,8 +18,9 @@ struct YarnCountingSessionView: View {
     @State private var newLocationName: String = ""
     @State private var showNewLocationField: Bool = false
     @State private var countedYarnIds: Set<UUID> = []
-    @State private var originalYarnStates: [UUID: (location: String, lastChecked: Date?)] = [:]
+    @State private var originalYarnStates: [UUID: (location: String, lastChecked: Date?, numberOfSkeins: Double)] = [:]
     @State private var sessionStartTime: Date = Date()
+    @State private var showBackWarning: Bool = false
 
     // Search and filter states
     @State private var selectedBrand: String = ""
@@ -36,7 +37,6 @@ struct YarnCountingSessionView: View {
     @State private var yarnToUpdateBarcode: YarnStashEntry?
 
     // Quantity input states
-    @State private var showQuantityInput: Bool = false
     @State private var yarnToCount: YarnStashEntry?
     @State private var detectedInfoForYarn: DetectedYarnInfo?
 
@@ -128,7 +128,11 @@ struct YarnCountingSessionView: View {
                         }
                     } else {
                         Button("Tilbake") {
-                            selectedLocation = ""
+                            if !countedYarnIds.isEmpty {
+                                showBackWarning = true
+                            } else {
+                                selectedLocation = ""
+                            }
                         }
                     }
                 }
@@ -150,14 +154,7 @@ struct YarnCountingSessionView: View {
                     addNewYarnToCount(newYarn)
                 }
             }
-            .sheet(isPresented: $showCameraScanner, onDismiss: {
-                // After camera scanner dismisses, show quantity input if yarn was selected
-                if yarnToCount != nil {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        showQuantityInput = true
-                    }
-                }
-            }) {
+            .sheet(isPresented: $showCameraScanner) {
                 if #available(iOS 16.0, *), DataScannerViewController.isSupported, DataScannerViewController.isAvailable {
                     LiveCameraScannerView(
                         yarnEntries: $yarnEntries,
@@ -180,21 +177,17 @@ struct YarnCountingSessionView: View {
                     )
                 }
             }
-            .sheet(isPresented: $showQuantityInput, onDismiss: {
-                // Clear yarn selection state when quantity input closes
-                // (Note: addYarnToCountWithQuantity also clears this on confirm)
-                yarnToCount = nil
+            .sheet(item: $yarnToCount, onDismiss: {
+                // Clear detected info when sheet closes
                 detectedInfoForYarn = nil
-            }) {
-                if let yarn = yarnToCount {
-                    YarnQuantityInputView(
-                        yarn: yarn,
-                        detectedInfo: detectedInfoForYarn,
-                        onConfirm: { skeinsToAdd in
-                            addYarnToCountWithQuantity(yarn, quantity: skeinsToAdd, detectedInfo: detectedInfoForYarn)
-                        }
-                    )
-                }
+            }) { yarn in
+                YarnQuantityInputView(
+                    yarn: yarn,
+                    detectedInfo: detectedInfoForYarn,
+                    onConfirm: { skeinsToAdd in
+                        addYarnToCountWithQuantity(yarn, quantity: skeinsToAdd, detectedInfo: detectedInfoForYarn)
+                    }
+                )
             }
             .alert("Update Barcode", isPresented: $showBarcodeUpdateAlert) {
                 Button("Cancel", role: .cancel) {
@@ -212,6 +205,18 @@ struct YarnCountingSessionView: View {
                         Text("Update barcode from '\(yarn.barcode)' to '\(scannedBarcode)' for \(yarn.brand) \(yarn.type)?")
                     }
                 }
+            }
+            .alert("Lagre tellingen?", isPresented: $showBackWarning) {
+                Button("Gå tilbake uten å lagre", role: .destructive) {
+                    revertCountingSession()
+                    selectedLocation = ""
+                }
+                Button("Avbryt", role: .cancel) {}
+                Button("Ferdig og lagre") {
+                    finishCounting()
+                }
+            } message: {
+                Text("Du har talt \(countedYarnIds.count) garn. Vil du lagre tellingen eller forkaste endringene?")
             }
         }
     }
@@ -475,9 +480,8 @@ struct YarnCountingSessionView: View {
                 VStack(spacing: 0) {
                     ForEach(availableYarns) { yarn in
                         Button(action: {
-                            yarnToCount = yarn
                             detectedInfoForYarn = nil
-                            showQuantityInput = true
+                            yarnToCount = yarn
                         }) {
                             HStack(spacing: 12) {
                                 VStack(alignment: .leading, spacing: 4) {
@@ -600,16 +604,47 @@ struct YarnCountingSessionView: View {
                                 .foregroundColor(.appSecondaryText)
                         }
 
-                        HStack(spacing: 4) {
-                            Text("\(formatSkeins(yarn.numberOfSkeins)) nøster")
-                                .font(.system(size: 12))
-                                .foregroundColor(.appSecondaryText)
-                            Text("•")
-                                .font(.system(size: 12))
-                                .foregroundColor(.appSecondaryText)
-                            Text("Lokasjon: \(yarn.location)")
-                                .font(.system(size: 12))
-                                .foregroundColor(.green)
+                        // Show count change with arrow notation
+                        if let originalState = originalYarnStates[yarn.id] {
+                            HStack(spacing: 4) {
+                                if abs(originalState.numberOfSkeins - yarn.numberOfSkeins) > 0.001 {
+                                    Text(formatSkeins(originalState.numberOfSkeins))
+                                        .font(.system(size: 12))
+                                        .foregroundColor(.appSecondaryText)
+                                        .strikethrough()
+                                    Image(systemName: "arrow.right")
+                                        .font(.system(size: 10))
+                                        .foregroundColor(.appIconTint)
+                                    Text(formatSkeins(yarn.numberOfSkeins))
+                                        .font(.system(size: 12, weight: .semibold))
+                                        .foregroundColor(.appIconTint)
+                                    Text("nøster")
+                                        .font(.system(size: 12))
+                                        .foregroundColor(.appSecondaryText)
+                                } else {
+                                    Text("\(formatSkeins(yarn.numberOfSkeins)) nøster")
+                                        .font(.system(size: 12))
+                                        .foregroundColor(.appSecondaryText)
+                                }
+                                Text("•")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.appSecondaryText)
+                                Text("Lokasjon: \(yarn.location)")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.green)
+                            }
+                        } else {
+                            HStack(spacing: 4) {
+                                Text("\(formatSkeins(yarn.numberOfSkeins)) nøster")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.appSecondaryText)
+                                Text("•")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.appSecondaryText)
+                                Text("Lokasjon: \(yarn.location)")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.green)
+                            }
                         }
                     }
 
@@ -635,16 +670,21 @@ struct YarnCountingSessionView: View {
 
     func addYarnToCount(_ yarn: YarnStashEntry) {
         // Legacy function - redirect to quantity input
-        yarnToCount = yarn
         detectedInfoForYarn = nil
-        showQuantityInput = true
+        yarnToCount = yarn
     }
 
     func addYarnToCountWithQuantity(_ yarn: YarnStashEntry, quantity: Double, detectedInfo: DetectedYarnInfo?) {
         if let index = yarnEntries.firstIndex(where: { $0.id == yarn.id }) {
-            // Store original state before modification
-            let originalLocation = yarnEntries[index].location
-            let originalLastChecked = yarnEntries[index].lastChecked
+            // Store original state before modification (only once per yarn)
+            if !countedYarnIds.contains(yarn.id) {
+                let originalLocation = yarnEntries[index].location
+                let originalLastChecked = yarnEntries[index].lastChecked
+                let originalCount = yarnEntries[index].numberOfSkeins
+
+                countedYarnIds.insert(yarn.id)
+                originalYarnStates[yarn.id] = (originalLocation, originalLastChecked, originalCount)
+            }
 
             // Update barcode if detected from camera (barcode is reliable)
             if let info = detectedInfo, let barcode = info.barcode, !barcode.isEmpty {
@@ -661,19 +701,13 @@ struct YarnCountingSessionView: View {
             // Note: Color/lot NOT updated during counting - only barcode is safe
             // OCR color/lot can be inaccurate, only use for adding new yarn
 
-            // Add quantity to existing count
-            yarnEntries[index].numberOfSkeins += quantity
+            // Set new quantity (not add - we're counting what's actually there)
+            yarnEntries[index].numberOfSkeins = quantity
 
             // Modify the yarn
             yarnEntries[index].location = selectedLocation
             yarnEntries[index].lastChecked = Date()
-            saveYarnEntries()
-
-            // Add to counted list and store original state if not already counted
-            if !countedYarnIds.contains(yarn.id) {
-                countedYarnIds.insert(yarn.id)
-                originalYarnStates[yarn.id] = (originalLocation, originalLastChecked)
-            }
+            // Don't save yet - only save when clicking "Ferdig"
 
             // Clear search and filters for next yarn
             searchText = ""
@@ -691,15 +725,16 @@ struct YarnCountingSessionView: View {
             // For new yarn, original state is its current state (which was just set in AddYarnStashView)
             let originalLocation = yarnEntries[index].location
             let originalLastChecked = yarnEntries[index].lastChecked
+            let originalCount = yarnEntries[index].numberOfSkeins
 
             // Update with counting session location
             yarnEntries[index].location = selectedLocation
             yarnEntries[index].lastChecked = Date()
-            saveYarnEntries()
+            // Don't save yet - only save when clicking "Ferdig"
 
             // Add to counted list and store original state
             countedYarnIds.insert(newYarn.id)
-            originalYarnStates[newYarn.id] = (originalLocation, originalLastChecked)
+            originalYarnStates[newYarn.id] = (originalLocation, originalLastChecked, originalCount)
 
             // Clear search and filters for next yarn
             searchText = ""
@@ -726,7 +761,8 @@ struct YarnCountingSessionView: View {
            let index = yarnEntries.firstIndex(where: { $0.id == yarn.id }) {
             yarnEntries[index].location = originalState.location
             yarnEntries[index].lastChecked = originalState.lastChecked
-            saveYarnEntries()
+            yarnEntries[index].numberOfSkeins = originalState.numberOfSkeins
+            // Don't save yet
         }
 
         originalYarnStates.removeValue(forKey: yarn.id)
@@ -739,7 +775,25 @@ struct YarnCountingSessionView: View {
     }
 
     func finishCounting() {
+        // Save all changes
+        saveYarnEntries()
         dismiss()
+    }
+
+    func revertCountingSession() {
+        // Restore all yarns to their original state
+        for yarnId in countedYarnIds {
+            if let originalState = originalYarnStates[yarnId],
+               let index = yarnEntries.firstIndex(where: { $0.id == yarnId }) {
+                yarnEntries[index].location = originalState.location
+                yarnEntries[index].lastChecked = originalState.lastChecked
+                yarnEntries[index].numberOfSkeins = originalState.numberOfSkeins
+            }
+        }
+
+        // Clear session state
+        countedYarnIds.removeAll()
+        originalYarnStates.removeAll()
     }
 
     func formatSkeins(_ count: Double) -> String {
@@ -847,7 +901,7 @@ struct YarnCountingSessionView: View {
               let index = yarnEntries.firstIndex(where: { $0.id == yarn.id }) else { return }
 
         yarnEntries[index].barcode = scannedBarcode
-        saveYarnEntries()
+        // Don't save yet - only save when clicking "Ferdig"
 
         yarnToUpdateBarcode = nil
         scannedBarcode = ""
@@ -1142,7 +1196,7 @@ struct YarnCountingAddView: View {
             // Modify the yarn
             yarnEntries[index].location = location
             yarnEntries[index].lastChecked = Date()
-            saveYarnEntries()
+            // Note: Don't save here - parent view handles saving
 
             // Pass yarn and original state to callback
             onYarnAdded(yarn, originalLocation, originalLastChecked)
