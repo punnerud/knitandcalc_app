@@ -579,6 +579,91 @@ $expand_user = isset($_GET['expand']) ? $_GET['expand'] : null;
                     </div>
                 </div>
 
+                <?php
+                // Calculate average usage statistics
+                $usage_stats_query = "
+                    SELECT
+                        AVG(CAST(json_extract(payload_json, '$.usageStatistics.projectsCount') AS INTEGER)) as avg_projects,
+                        AVG(CAST(json_extract(payload_json, '$.usageStatistics.recipesCount') AS INTEGER)) as avg_recipes,
+                        AVG(CAST(json_extract(payload_json, '$.usageStatistics.projectsOpenCount') AS INTEGER)) as avg_projects_open,
+                        AVG(CAST(json_extract(payload_json, '$.usageStatistics.yarnStashOpenCount') AS INTEGER)) as avg_yarnstash_open,
+                        AVG(CAST(json_extract(payload_json, '$.usageStatistics.recipesOpenCount') AS INTEGER)) as avg_recipes_open,
+                        AVG(CAST(json_extract(payload_json, '$.usageStatistics.yarnCalculatorOpenCount') AS INTEGER)) as avg_yarncalc_open,
+                        AVG(CAST(json_extract(payload_json, '$.usageStatistics.stitchCalculatorOpenCount') AS INTEGER)) as avg_stitchcalc_open,
+                        AVG(CAST(json_extract(payload_json, '$.usageStatistics.rulerOpenCount') AS INTEGER)) as avg_ruler_open,
+                        AVG(CAST(json_extract(payload_json, '$.usageStatistics.yarnStockCounterOpenCount') AS INTEGER)) as avg_counter_open,
+                        AVG(CAST(json_extract(payload_json, '$.usageStatistics.settingsOpenCount') AS INTEGER)) as avg_settings_open
+                    FROM yarn_stash_submissions
+                    WHERE json_extract(payload_json, '$.usageStatistics') IS NOT NULL
+                ";
+                $usage_stmt = $db->query($usage_stats_query);
+                $usage_stats = $usage_stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($usage_stats && $usage_stats['avg_projects'] !== null):
+                ?>
+                <!-- Usage Statistics Section -->
+                <div class="users-table" style="margin-bottom: 20px;">
+                    <div style="padding: 20px; border-bottom: 1px solid #f5f5f7;">
+                        <h2 style="font-size: 20px; font-weight: 600; margin: 0;">📊 Bruksstatistikk (gjennomsnitt per bruker)</h2>
+                        <p style="font-size: 14px; color: #86868b; margin-top: 8px;">Gjennomsnittlig bruk av funksjoner basert på siste data fra hver bruker</p>
+                    </div>
+                    <div style="padding: 20px;">
+                        <div class="stats-grid">
+                            <div class="stat-card" style="background: #f0f9ff; border-left: 4px solid #0ea5e9;">
+                                <h3>Prosjekter</h3>
+                                <div class="value" style="color: #0ea5e9;"><?php echo number_format($usage_stats['avg_projects'], 1, ',', ' '); ?></div>
+                                <div class="label">avg. antall</div>
+                            </div>
+                            <div class="stat-card" style="background: #f0fdf4; border-left: 4px solid #10b981;">
+                                <h3>Oppskrifter</h3>
+                                <div class="value" style="color: #10b981;"><?php echo number_format($usage_stats['avg_recipes'], 1, ',', ' '); ?></div>
+                                <div class="label">avg. antall</div>
+                            </div>
+                            <div class="stat-card" style="background: #fef3c7; border-left: 4px solid #f59e0b;">
+                                <h3>Prosjekter åpnet</h3>
+                                <div class="value" style="color: #f59e0b;"><?php echo number_format($usage_stats['avg_projects_open'], 1, ',', ' '); ?></div>
+                                <div class="label">avg. antall</div>
+                            </div>
+                            <div class="stat-card" style="background: #fce7f3; border-left: 4px solid #ec4899;">
+                                <h3>Garnlager åpnet</h3>
+                                <div class="value" style="color: #ec4899;"><?php echo number_format($usage_stats['avg_yarnstash_open'], 1, ',', ' '); ?></div>
+                                <div class="label">avg. antall</div>
+                            </div>
+                            <div class="stat-card" style="background: #ede9fe; border-left: 4px solid #a855f7;">
+                                <h3>Oppskrifter åpnet</h3>
+                                <div class="value" style="color: #a855f7;"><?php echo number_format($usage_stats['avg_recipes_open'], 1, ',', ' '); ?></div>
+                                <div class="label">avg. antall</div>
+                            </div>
+                            <div class="stat-card" style="background: #dbeafe; border-left: 4px solid #3b82f6;">
+                                <h3>Garnkalkulator</h3>
+                                <div class="value" style="color: #3b82f6;"><?php echo number_format($usage_stats['avg_yarncalc_open'], 1, ',', ' '); ?></div>
+                                <div class="label">avg. åpnet</div>
+                            </div>
+                            <div class="stat-card" style="background: #f3e8ff; border-left: 4px solid #8b5cf6;">
+                                <h3>Strikkekalkulator</h3>
+                                <div class="value" style="color: #8b5cf6;"><?php echo number_format($usage_stats['avg_stitchcalc_open'], 1, ',', ' '); ?></div>
+                                <div class="label">avg. åpnet</div>
+                            </div>
+                            <div class="stat-card" style="background: #fef2f2; border-left: 4px solid #ef4444;">
+                                <h3>Linjal</h3>
+                                <div class="value" style="color: #ef4444;"><?php echo number_format($usage_stats['avg_ruler_open'], 1, ',', ' '); ?></div>
+                                <div class="label">avg. åpnet</div>
+                            </div>
+                            <div class="stat-card" style="background: #ecfdf5; border-left: 4px solid #059669;">
+                                <h3>Garnlager Teller</h3>
+                                <div class="value" style="color: #059669;"><?php echo number_format($usage_stats['avg_counter_open'], 1, ',', ' '); ?></div>
+                                <div class="label">avg. åpnet</div>
+                            </div>
+                            <div class="stat-card" style="background: #f5f5f7; border-left: 4px solid #6b7280;">
+                                <h3>Innstillinger</h3>
+                                <div class="value" style="color: #6b7280;"><?php echo number_format($usage_stats['avg_settings_open'], 1, ',', ' '); ?></div>
+                                <div class="label">avg. åpnet</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
+
                 <!-- Users Table -->
                 <div class="users-table">
                     <div class="table-wrapper">
@@ -722,6 +807,68 @@ $expand_user = isset($_GET['expand']) ? $_GET['expand'] : null;
                                                 endforeach;
                                             endif;
                                             ?>
+
+                                            <!-- Usage Statistics section -->
+                                            <?php
+                                            if (isset($payload['usageStatistics']) && is_array($payload['usageStatistics'])):
+                                                $stats = $payload['usageStatistics'];
+                                            ?>
+                                            <div class="history-section" style="border-top: 2px solid #e5e5e5; margin-top: 20px; padding-top: 20px;">
+                                                <h3 style="margin-bottom: 15px; color: #1d1d1f;">📊 Bruksstatistikk</h3>
+                                                <div class="stats-grid">
+                                                    <div class="stat-card" style="background: #f0f9ff; border-left: 4px solid #0ea5e9;">
+                                                        <h3>Prosjekter</h3>
+                                                        <div class="value" style="color: #0ea5e9; font-size: 24px;"><?php echo $stats['projectsCount'] ?? 0; ?></div>
+                                                        <div class="label">antall</div>
+                                                    </div>
+                                                    <div class="stat-card" style="background: #f0fdf4; border-left: 4px solid #10b981;">
+                                                        <h3>Oppskrifter</h3>
+                                                        <div class="value" style="color: #10b981; font-size: 24px;"><?php echo $stats['recipesCount'] ?? 0; ?></div>
+                                                        <div class="label">antall</div>
+                                                    </div>
+                                                    <div class="stat-card" style="background: #fef3c7; border-left: 4px solid #f59e0b;">
+                                                        <h3>Prosjekter åpnet</h3>
+                                                        <div class="value" style="color: #f59e0b; font-size: 24px;"><?php echo $stats['projectsOpenCount'] ?? 0; ?></div>
+                                                        <div class="label">ganger</div>
+                                                    </div>
+                                                    <div class="stat-card" style="background: #fce7f3; border-left: 4px solid #ec4899;">
+                                                        <h3>Garnlager åpnet</h3>
+                                                        <div class="value" style="color: #ec4899; font-size: 24px;"><?php echo $stats['yarnStashOpenCount'] ?? 0; ?></div>
+                                                        <div class="label">ganger</div>
+                                                    </div>
+                                                    <div class="stat-card" style="background: #ede9fe; border-left: 4px solid #a855f7;">
+                                                        <h3>Oppskrifter åpnet</h3>
+                                                        <div class="value" style="color: #a855f7; font-size: 24px;"><?php echo $stats['recipesOpenCount'] ?? 0; ?></div>
+                                                        <div class="label">ganger</div>
+                                                    </div>
+                                                    <div class="stat-card" style="background: #dbeafe; border-left: 4px solid #3b82f6;">
+                                                        <h3>Garnkalkulator</h3>
+                                                        <div class="value" style="color: #3b82f6; font-size: 24px;"><?php echo $stats['yarnCalculatorOpenCount'] ?? 0; ?></div>
+                                                        <div class="label">åpnet</div>
+                                                    </div>
+                                                    <div class="stat-card" style="background: #f3e8ff; border-left: 4px solid #8b5cf6;">
+                                                        <h3>Strikkekalkulator</h3>
+                                                        <div class="value" style="color: #8b5cf6; font-size: 24px;"><?php echo $stats['stitchCalculatorOpenCount'] ?? 0; ?></div>
+                                                        <div class="label">åpnet</div>
+                                                    </div>
+                                                    <div class="stat-card" style="background: #fef2f2; border-left: 4px solid #ef4444;">
+                                                        <h3>Linjal</h3>
+                                                        <div class="value" style="color: #ef4444; font-size: 24px;"><?php echo $stats['rulerOpenCount'] ?? 0; ?></div>
+                                                        <div class="label">åpnet</div>
+                                                    </div>
+                                                    <div class="stat-card" style="background: #ecfdf5; border-left: 4px solid #059669;">
+                                                        <h3>Garnlager Teller</h3>
+                                                        <div class="value" style="color: #059669; font-size: 24px;"><?php echo $stats['yarnStockCounterOpenCount'] ?? 0; ?></div>
+                                                        <div class="label">åpnet</div>
+                                                    </div>
+                                                    <div class="stat-card" style="background: #f5f5f7; border-left: 4px solid #6b7280;">
+                                                        <h3>Innstillinger</h3>
+                                                        <div class="value" style="color: #6b7280; font-size: 24px;"><?php echo $stats['settingsOpenCount'] ?? 0; ?></div>
+                                                        <div class="label">åpnet</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <?php endif; ?>
 
                                             <!-- History section -->
                                             <?php

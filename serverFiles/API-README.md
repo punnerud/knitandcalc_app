@@ -43,7 +43,7 @@ Filen `yarn.db` opprettes automatisk ved første bruk.
 | id | INTEGER | Primærnøkkel (auto-increment) |
 | user_id | TEXT | Anonym bruker-ID fra app |
 | idempotency_key | TEXT | SHA256 hash av yarnStash array (for duplikatsjekk) |
-| payload_json | TEXT | Full JSON payload |
+| payload_json | TEXT | Full JSON payload (inkluderer usageStatistics) |
 | timestamp_first_received | TEXT | Første gang denne data ble mottatt (ISO 8601) |
 | timestamp_last_received | TEXT | Siste gang denne data ble mottatt (ISO 8601) |
 | timestamp_file | TEXT | Tidspunkt fra payload |
@@ -57,6 +57,18 @@ Filen `yarn.db` opprettes automatisk ved første bruk.
 | yarn_count | INTEGER | Antall garn i payload |
 | receive_count | INTEGER | Antall ganger samme data er mottatt (default: 1) |
 | created_at | DATETIME | Opprettet tidspunkt (database timestamp) |
+
+**Bruksstatistikk (inkludert i `usageStatistics` felt i payload_json):**
+- `projectsCount`: Antall prosjekter brukeren har
+- `recipesCount`: Antall oppskrifter brukeren har
+- `projectsOpenCount`: Antall ganger Prosjekter-visningen er åpnet
+- `yarnStashOpenCount`: Antall ganger Garnlager-visningen er åpnet
+- `recipesOpenCount`: Antall ganger Oppskrifter-visningen er åpnet
+- `yarnCalculatorOpenCount`: Antall ganger Garnkalkulator er åpnet
+- `stitchCalculatorOpenCount`: Antall ganger Strikkekalkulator er åpnet
+- `rulerOpenCount`: Antall ganger Linjal er åpnet
+- `yarnStockCounterOpenCount`: Antall ganger Garnlager Teller er åpnet
+- `settingsOpenCount`: Antall ganger Innstillinger er åpnet
 
 **Indekser:**
 - `idx_user_id` - For rask søk på bruker-ID
@@ -100,7 +112,19 @@ X-App-Version: <versjon> (<build>)
       "gauge": "22/10",
       "dateCreated": "2025-10-08T12:00:00Z"
     }
-  ]
+  ],
+  "usageStatistics": {
+    "projectsCount": 5,
+    "recipesCount": 12,
+    "projectsOpenCount": 23,
+    "yarnStashOpenCount": 45,
+    "recipesOpenCount": 8,
+    "yarnCalculatorOpenCount": 15,
+    "stitchCalculatorOpenCount": 32,
+    "rulerOpenCount": 7,
+    "yarnStockCounterOpenCount": 3,
+    "settingsOpenCount": 6
+  }
 }
 ```
 
@@ -158,6 +182,21 @@ sqlite3 yarn.db "SELECT COUNT(*) FROM yarn_stash_submissions;"
 
 # Se siste 10 innsendinger med receive_count
 sqlite3 yarn.db "SELECT id, user_id, yarn_count, receive_count, timestamp_last_received FROM yarn_stash_submissions ORDER BY id DESC LIMIT 10;"
+
+# Se bruksstatistikk fra siste innsendinger
+sqlite3 yarn.db "SELECT user_id, json_extract(payload_json, '$.usageStatistics') as stats FROM yarn_stash_submissions ORDER BY id DESC LIMIT 10;"
+
+# Se gjennomsnittlig bruk per funksjon
+sqlite3 yarn.db "SELECT
+  AVG(CAST(json_extract(payload_json, '$.usageStatistics.projectsOpenCount') AS INTEGER)) as avg_projects,
+  AVG(CAST(json_extract(payload_json, '$.usageStatistics.yarnStashOpenCount') AS INTEGER)) as avg_yarnstash,
+  AVG(CAST(json_extract(payload_json, '$.usageStatistics.recipesOpenCount') AS INTEGER)) as avg_recipes,
+  AVG(CAST(json_extract(payload_json, '$.usageStatistics.yarnCalculatorOpenCount') AS INTEGER)) as avg_yarncalc,
+  AVG(CAST(json_extract(payload_json, '$.usageStatistics.stitchCalculatorOpenCount') AS INTEGER)) as avg_stitchcalc,
+  AVG(CAST(json_extract(payload_json, '$.usageStatistics.rulerOpenCount') AS INTEGER)) as avg_ruler,
+  AVG(CAST(json_extract(payload_json, '$.usageStatistics.yarnStockCounterOpenCount') AS INTEGER)) as avg_counter,
+  AVG(CAST(json_extract(payload_json, '$.usageStatistics.settingsOpenCount') AS INTEGER)) as avg_settings
+FROM yarn_stash_submissions;"
 
 # Se statistikk per enhet
 sqlite3 yarn.db "SELECT device_info, COUNT(*) as count FROM yarn_stash_submissions GROUP BY device_info ORDER BY count DESC;"

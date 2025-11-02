@@ -261,6 +261,9 @@ struct SettingsView: View {
         }
         .navigationTitle(NSLocalizedString("settings.title", comment: ""))
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            UsageStatisticsManager.shared.recordSettingsOpen()
+        }
         .alert(NSLocalizedString("settings.language.restart.title", comment: ""), isPresented: $showLanguageChangeAlert) {
             Button(NSLocalizedString("settings.language.restart.cancel", comment: ""), role: .cancel) {
                 pendingLanguage = nil

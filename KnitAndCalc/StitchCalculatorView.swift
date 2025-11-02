@@ -145,6 +145,9 @@ struct StitchCalculatorView: View {
         }
         .navigationTitle("Strikkekalkulator")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            UsageStatisticsManager.shared.recordStitchCalculatorOpen()
+        }
     }
 
     func calculate() {

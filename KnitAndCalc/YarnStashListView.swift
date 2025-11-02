@@ -134,6 +134,7 @@ struct YarnStashListView: View {
         .onAppear {
             loadYarnEntries()
             loadProjects()
+            UsageStatisticsManager.shared.recordYarnStashOpen()
         }
     }
 

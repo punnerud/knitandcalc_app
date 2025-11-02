@@ -103,6 +103,7 @@ struct YarnStockCounterView: View {
         }
         .onAppear {
             loadYarnEntries()
+            UsageStatisticsManager.shared.recordYarnStockCounterOpen()
         }
         .onChange(of: yarnEntries) { _ in
             saveYarnEntries()

@@ -183,6 +183,9 @@ struct YarnCalculatorView: View {
                     tensionTo: $tensionTo
                 )
             }
+            .onAppear {
+                UsageStatisticsManager.shared.recordYarnCalculatorOpen()
+            }
         }
     }
 

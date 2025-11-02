@@ -236,6 +236,7 @@ struct RulerView: View {
         .onAppear {
             // Set initial unit based on settings
             selectedUnit = settings.currentUnitSystem == .imperial ? .inch : .cm
+            UsageStatisticsManager.shared.recordRulerOpen()
         }
     }
 

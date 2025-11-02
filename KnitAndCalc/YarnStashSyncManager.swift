@@ -48,10 +48,12 @@ class YarnStashSyncManager {
 
         // Prepare payload
         let timestamp = ISO8601DateFormatter().string(from: Date())
+        let usageStats = UsageStatisticsManager.shared.getStatistics()
         let payload: [String: Any] = [
             "userId": userID,
             "timestamp": timestamp,
-            "yarnStash": yarnStashData
+            "yarnStash": yarnStashData,
+            "usageStatistics": usageStats
         ]
 
         // Send request

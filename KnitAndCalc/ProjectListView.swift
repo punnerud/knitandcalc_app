@@ -151,6 +151,11 @@ struct ProjectListView: View {
                 loadProjects()
                 loadRecipes()
                 loadYarnEntries()
+                UsageStatisticsManager.shared.recordProjectsOpen()
+                UsageStatisticsManager.shared.updateProjectsCount(projects.count)
+            }
+            .onChange(of: projects.count) { newCount in
+                UsageStatisticsManager.shared.updateProjectsCount(newCount)
             }
     }
 

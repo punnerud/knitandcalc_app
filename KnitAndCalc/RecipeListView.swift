@@ -91,6 +91,11 @@ struct RecipeListView: View {
         }
         .onAppear {
             loadRecipes()
+            UsageStatisticsManager.shared.recordRecipesOpen()
+            UsageStatisticsManager.shared.updateRecipesCount(recipes.count)
+        }
+        .onChange(of: recipes.count) { newCount in
+            UsageStatisticsManager.shared.updateRecipesCount(newCount)
         }
     }
 
