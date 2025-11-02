@@ -92,6 +92,41 @@ struct AddYarnStashView: View {
         selectedLocation == Self.newLocationKey ? customLocation : selectedLocation
     }
 
+    var isBrandFilled: Bool {
+        !finalBrand.isEmpty
+    }
+
+    var isTypeFilled: Bool {
+        !finalType.isEmpty
+    }
+
+    var isWeightFilled: Bool {
+        Double(weightPerSkein.replacingOccurrences(of: ",", with: ".")) != nil
+    }
+
+    var isLengthFilled: Bool {
+        Double(lengthPerSkein.replacingOccurrences(of: ",", with: ".")) != nil
+    }
+
+    var isSkeinsCountFilled: Bool {
+        Double(numberOfSkeins.replacingOccurrences(of: ",", with: ".")) != nil
+    }
+
+    var requiredFieldsCount: Int {
+        // Count required fields filled out of 5 total (brand, type, weight, length, number of skeins)
+        var count = 0
+        if isBrandFilled { count += 1 }
+        if isTypeFilled { count += 1 }
+        if isWeightFilled { count += 1 }
+        if isLengthFilled { count += 1 }
+        if isSkeinsCountFilled { count += 1 }
+        return count
+    }
+
+    var allRequiredFieldsFilled: Bool {
+        requiredFieldsCount == 5
+    }
+
     var isFormValid: Bool {
         let basicValid = !finalBrand.isEmpty &&
         !finalType.isEmpty &&
@@ -110,7 +145,12 @@ struct AddYarnStashView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("Merke")) {
+                Section(header: HStack(spacing: 2) {
+                    Text("Merke")
+                    if !isBrandFilled && !allRequiredFieldsFilled {
+                        Text("*").foregroundColor(.red)
+                    }
+                }) {
                     Picker("Merke", selection: $selectedBrand) {
                         ForEach(brandsWithNew, id: \.self) { brand in
                             Text(brand).tag(brand)
@@ -137,7 +177,12 @@ struct AddYarnStashView: View {
                 }
 
                 if !finalBrand.isEmpty {
-                    Section(header: Text("Type")) {
+                    Section(header: HStack(spacing: 2) {
+                        Text("Type")
+                        if !isTypeFilled && !allRequiredFieldsFilled {
+                            Text("*").foregroundColor(.red)
+                        }
+                    }) {
                         Picker("Type", selection: $selectedType) {
                             ForEach(typesWithNew, id: \.self) { type in
                                 Text(type).tag(type)
@@ -153,10 +198,20 @@ struct AddYarnStashView: View {
                     }
                 }
 
-                Section(header: Text("Garninformasjon")) {
+                Section(header: HStack(spacing: 2) {
+                    Text("Garninformasjon")
+                    if (!isWeightFilled || !isLengthFilled || !isSkeinsCountFilled) && !allRequiredFieldsFilled {
+                        Text("*").foregroundColor(.red)
+                    }
+                }) {
                     HStack {
-                        Text(settings.currentUnitSystem == .metric ? "Vekt per nøste (g)" : "Vekt per nøste (oz)")
-                            .frame(width: 160, alignment: .leading)
+                        HStack(spacing: 2) {
+                            Text(settings.currentUnitSystem == .metric ? "Vekt per nøste (g)" : "Vekt per nøste (oz)")
+                            if !isWeightFilled && !allRequiredFieldsFilled {
+                                Text("*").foregroundColor(.red).font(.system(size: 12))
+                            }
+                        }
+                        .frame(width: 160, alignment: .leading)
                         TextField("", text: $weightPerSkein)
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
@@ -167,8 +222,13 @@ struct AddYarnStashView: View {
                     }
 
                     HStack {
-                        Text(settings.currentUnitSystem == .metric ? "Lengde per nøste (m)" : "Lengde per nøste (yd)")
-                            .frame(width: 160, alignment: .leading)
+                        HStack(spacing: 2) {
+                            Text(settings.currentUnitSystem == .metric ? "Lengde per nøste (m)" : "Lengde per nøste (yd)")
+                            if !isLengthFilled && !allRequiredFieldsFilled {
+                                Text("*").foregroundColor(.red).font(.system(size: 12))
+                            }
+                        }
+                        .frame(width: 160, alignment: .leading)
                         TextField("", text: $lengthPerSkein)
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
@@ -176,8 +236,13 @@ struct AddYarnStashView: View {
                     }
 
                     HStack {
-                        Text("Antall nøster")
-                            .frame(width: 160, alignment: .leading)
+                        HStack(spacing: 2) {
+                            Text("Antall nøster")
+                            if !isSkeinsCountFilled && !allRequiredFieldsFilled {
+                                Text("*").foregroundColor(.red).font(.system(size: 12))
+                            }
+                        }
+                        .frame(width: 160, alignment: .leading)
                         TextField("", text: $numberOfSkeins)
                             .keyboardType(.decimalPad)
                             .multilineTextAlignment(.trailing)
@@ -185,6 +250,7 @@ struct AddYarnStashView: View {
                             .onChange(of: numberOfSkeins) { _ in
                                 if !isUpdatingSkeins {
                                     updateTotalWeight()
+                                    updateProjectQuantity()
                                 }
                             }
                     }
@@ -326,18 +392,90 @@ struct AddYarnStashView: View {
                             }
                             .pickerStyle(SegmentedPickerStyle())
 
-                            TextField("Mengde", text: $quantity)
-                                .keyboardType(.decimalPad)
-                                .focused($focusedField, equals: .quantity)
+                            HStack {
+                                Text("Mengde")
+                                    .frame(width: 160, alignment: .leading)
+                                TextField("", text: $quantity)
+                                    .keyboardType(.decimalPad)
+                                    .multilineTextAlignment(.trailing)
+                                    .focused($focusedField, equals: .quantity)
+                            }
+
+                            // Show percentage of stash
+                            if let quantityValue = Double(quantity.replacingOccurrences(of: ",", with: ".")),
+                               quantityValue > 0,
+                               let weight = Double(weightPerSkein.replacingOccurrences(of: ",", with: ".")),
+                               let length = Double(lengthPerSkein.replacingOccurrences(of: ",", with: ".")),
+                               let count = Double(numberOfSkeins.replacingOccurrences(of: ",", with: ".")) {
+                                let calculations = calculateProjectYarnConversions(quantityValue, weight, length, count)
+
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Divider()
+                                        .padding(.vertical, 4)
+
+                                    Text("Du reserverer til prosjektet")
+                                        .font(.system(size: 13, weight: .medium))
+                                        .foregroundColor(.appSecondaryText)
+
+                                    if quantityType != .skeins {
+                                        HStack {
+                                            Text("Nøster:")
+                                                .font(.system(size: 13))
+                                                .foregroundColor(.appSecondaryText)
+                                            Spacer()
+                                            Text(formatNorwegian(calculations.skeins))
+                                                .font(.system(size: 13, weight: .medium))
+                                                .foregroundColor(.appText)
+                                        }
+                                    }
+
+                                    if quantityType != .meters {
+                                        HStack {
+                                            Text(settings.currentUnitSystem == .metric ? "Meter:" : "Yards:")
+                                                .font(.system(size: 13))
+                                                .foregroundColor(.appSecondaryText)
+                                            Spacer()
+                                            Text(UnitConverter.formatLength(calculations.meters, unit: settings.currentUnitSystem))
+                                                .font(.system(size: 13, weight: .medium))
+                                                .foregroundColor(.appText)
+                                        }
+                                    }
+
+                                    if quantityType != .grams {
+                                        HStack {
+                                            Text(settings.currentUnitSystem == .metric ? "Gram:" : "Ounces:")
+                                                .font(.system(size: 13))
+                                                .foregroundColor(.appSecondaryText)
+                                            Spacer()
+                                            Text(UnitConverter.formatWeight(calculations.grams, unit: settings.currentUnitSystem))
+                                                .font(.system(size: 13, weight: .medium))
+                                                .foregroundColor(.appText)
+                                        }
+                                    }
+
+                                    HStack {
+                                        Text("Prosent av lager:")
+                                            .font(.system(size: 13))
+                                            .foregroundColor(.appSecondaryText)
+                                        Spacer()
+                                        Text("\(Int(calculations.percentage))%")
+                                            .font(.system(size: 13, weight: .semibold))
+                                            .foregroundColor(calculations.percentage > 100 ? .red : .appIconTint)
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
-            .navigationTitle("Nytt garn")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 if linkToProjectId != nil {
                     linkToProject = true
+                    // Set quantity to 100% if valid skeins count exists
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        updateProjectQuantity()
+                    }
                 }
 
                 // Pre-fill from detected info
@@ -411,6 +549,22 @@ struct AddYarnStashView: View {
                 }
             }
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    if requiredFieldsCount > 0 && requiredFieldsCount < 5 {
+                        HStack(spacing: 0) {
+                            Text("Nytt garn (")
+                            Text("\(requiredFieldsCount)/5")
+                            Text("*")
+                                .foregroundColor(.red)
+                            Text(")")
+                        }
+                        .font(.headline)
+                    } else {
+                        Text("Nytt garn")
+                            .font(.headline)
+                    }
+                }
+
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Avbryt") {
                         dismiss()
@@ -460,6 +614,56 @@ struct AddYarnStashView: View {
         isUpdatingSkeins = true
         numberOfSkeins = String(format: "%.1f", count).replacingOccurrences(of: ".", with: ",")
         isUpdatingSkeins = false
+    }
+
+    func calculateProjectYarnConversions(_ quantityValue: Double, _ weight: Double, _ length: Double, _ count: Double) -> (skeins: Double, meters: Double, grams: Double, percentage: Double) {
+        let grams: Double
+        let meters: Double
+        let skeins: Double
+
+        switch quantityType {
+        case .grams:
+            grams = quantityValue
+            skeins = grams / weight
+            meters = grams * (length / weight)
+        case .skeins:
+            skeins = quantityValue
+            grams = skeins * weight
+            meters = skeins * length
+        case .meters:
+            meters = quantityValue
+            grams = meters * (weight / length)
+            skeins = grams / weight
+        }
+
+        let totalAvailableGrams = count * weight
+        let percentage = (grams / totalAvailableGrams) * 100
+
+        return (skeins, meters, grams, percentage)
+    }
+
+    func updateProjectQuantity() {
+        // Auto-set quantity to 100% of stash when all required fields are filled
+        guard linkToProject,
+              let count = Double(numberOfSkeins.replacingOccurrences(of: ",", with: ".")) else {
+            return
+        }
+
+        // Only auto-set if quantity is empty or zero
+        let currentQuantity = Double(quantity.replacingOccurrences(of: ",", with: ".")) ?? 0
+        if currentQuantity == 0 {
+            quantity = formatNorwegian(count)
+        }
+    }
+
+    func formatNorwegian(_ value: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 1
+        formatter.decimalSeparator = ","
+        formatter.groupingSeparator = " "
+        return formatter.string(from: NSNumber(value: value)) ?? String(format: "%.1f", value).replacingOccurrences(of: ".", with: ",")
     }
 
     func saveYarn() {

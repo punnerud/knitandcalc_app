@@ -133,6 +133,12 @@
         }
       }
     },
+    ")" : {
+
+    },
+    "*" : {
+
+    },
     "*%@ 1 maske* %lld %@" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -744,6 +750,9 @@
           }
         }
       }
+    },
+    "%lld/5" : {
+
     },
     "%lld%%" : {
       "localizations" : {
@@ -2033,6 +2042,9 @@
           }
         }
       }
+    },
+    "Du reserverer til prosjektet" : {
+
     },
     "Du trenger %@ nøster med løpelengde %@%@" : {
       "extractionState" : "stale",
@@ -6439,6 +6451,9 @@
           }
         }
       }
+    },
+    "Nytt garn (" : {
+
     },
     "Nytt prosjekt" : {
       "localizations" : {
