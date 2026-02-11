@@ -346,19 +346,16 @@ struct SettingsView: View {
         var projects: [Project] = []
         var recipes: [Recipe] = []
 
-        if let yarnData = UserDefaults.standard.data(forKey: "savedYarnStash"),
-           let decodedYarn = try? JSONDecoder().decode([YarnStashEntry].self, from: yarnData) {
-            yarnStash = decodedYarn
+        if let decoded = DataPersistenceManager.shared.load([YarnStashEntry].self, forKey: .yarnStash) {
+            yarnStash = decoded
         }
 
-        if let projectData = UserDefaults.standard.data(forKey: "savedProjects"),
-           let decodedProjects = try? JSONDecoder().decode([Project].self, from: projectData) {
-            projects = decodedProjects
+        if let decoded = DataPersistenceManager.shared.load([Project].self, forKey: .projects) {
+            projects = decoded
         }
 
-        if let recipeData = UserDefaults.standard.data(forKey: "savedRecipes"),
-           let decodedRecipes = try? JSONDecoder().decode([Recipe].self, from: recipeData) {
-            recipes = decodedRecipes
+        if let decoded = DataPersistenceManager.shared.load([Recipe].self, forKey: .recipes) {
+            recipes = decoded
         }
 
         // Collect files if requested
@@ -440,18 +437,10 @@ struct SettingsView: View {
                 restoreFiles(files)
             }
 
-            // Save to UserDefaults
-            if let yarnData = try? JSONEncoder().encode(backup.yarnStash) {
-                UserDefaults.standard.set(yarnData, forKey: "savedYarnStash")
-            }
-
-            if let projectData = try? JSONEncoder().encode(backup.projects) {
-                UserDefaults.standard.set(projectData, forKey: "savedProjects")
-            }
-
-            if let recipeData = try? JSONEncoder().encode(backup.recipes) {
-                UserDefaults.standard.set(recipeData, forKey: "savedRecipes")
-            }
+            // Save using DataPersistenceManager (both UserDefaults and file backup)
+            DataPersistenceManager.shared.save(backup.yarnStash, forKey: .yarnStash)
+            DataPersistenceManager.shared.save(backup.projects, forKey: .projects)
+            DataPersistenceManager.shared.save(backup.recipes, forKey: .recipes)
 
             showImportSuccess = true
         } catch {

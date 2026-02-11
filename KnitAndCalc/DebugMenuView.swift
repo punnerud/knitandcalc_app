@@ -308,8 +308,7 @@ struct DebugMenuView: View {
     }
 
     func calculateIdempotencyKey() -> String? {
-        guard let data = UserDefaults.standard.data(forKey: "savedYarnStash"),
-              let yarnEntries = try? JSONDecoder().decode([YarnStashEntry].self, from: data) else {
+        guard let yarnEntries = DataPersistenceManager.shared.load([YarnStashEntry].self, forKey: .yarnStash) else {
             return nil
         }
 

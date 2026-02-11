@@ -178,7 +178,17 @@ struct ProjectDetailView: View {
                     get: { project.status },
                     set: { newValue in
                         if let index = projectIndex {
+                            let oldValue = projects[index].status
                             projects[index].status = newValue
+                            if newValue == .completed && projects[index].completedDate == nil {
+                                projects[index].completedDate = Date()
+                            }
+                            // Adjust yarn stash when completing or un-completing
+                            if oldValue != .completed && newValue == .completed {
+                                deductYarnFromStash(for: projects[index])
+                            } else if oldValue == .completed && newValue != .completed {
+                                restoreYarnToStash(for: projects[index])
+                            }
                         }
                     }
                 )) {
@@ -536,9 +546,48 @@ struct ProjectDetailView: View {
         projects[projectIdx].needleSizes.remove(at: index)
     }
 
+    func deductYarnFromStash(for project: Project) {
+        for linkedYarn in project.linkedYarns {
+            if let yarnIdx = yarnEntries.firstIndex(where: { $0.id == linkedYarn.yarnStashId }) {
+                let skeinsToDeduct: Double
+                switch linkedYarn.quantityType {
+                case .skeins:
+                    skeinsToDeduct = linkedYarn.quantity
+                case .grams:
+                    skeinsToDeduct = yarnEntries[yarnIdx].weightPerSkein > 0
+                        ? linkedYarn.quantity / yarnEntries[yarnIdx].weightPerSkein : 0
+                case .meters:
+                    skeinsToDeduct = yarnEntries[yarnIdx].lengthPerSkein > 0
+                        ? linkedYarn.quantity / yarnEntries[yarnIdx].lengthPerSkein : 0
+                }
+                yarnEntries[yarnIdx].numberOfSkeins = max(0, yarnEntries[yarnIdx].numberOfSkeins - skeinsToDeduct)
+            }
+        }
+        DataPersistenceManager.shared.save(yarnEntries, forKey: .yarnStash)
+    }
+
+    func restoreYarnToStash(for project: Project) {
+        for linkedYarn in project.linkedYarns {
+            if let yarnIdx = yarnEntries.firstIndex(where: { $0.id == linkedYarn.yarnStashId }) {
+                let skeinsToRestore: Double
+                switch linkedYarn.quantityType {
+                case .skeins:
+                    skeinsToRestore = linkedYarn.quantity
+                case .grams:
+                    skeinsToRestore = yarnEntries[yarnIdx].weightPerSkein > 0
+                        ? linkedYarn.quantity / yarnEntries[yarnIdx].weightPerSkein : 0
+                case .meters:
+                    skeinsToRestore = yarnEntries[yarnIdx].lengthPerSkein > 0
+                        ? linkedYarn.quantity / yarnEntries[yarnIdx].lengthPerSkein : 0
+                }
+                yarnEntries[yarnIdx].numberOfSkeins += skeinsToRestore
+            }
+        }
+        DataPersistenceManager.shared.save(yarnEntries, forKey: .yarnStash)
+    }
+
     func loadYarnEntries() {
-        if let data = UserDefaults.standard.data(forKey: "savedYarnStash"),
-           let decoded = try? JSONDecoder().decode([YarnStashEntry].self, from: data) {
+        if let decoded = DataPersistenceManager.shared.load([YarnStashEntry].self, forKey: .yarnStash) {
             yarnEntries = decoded
         }
     }
@@ -707,8 +756,7 @@ struct RecipePickerView: View {
     }
 
     func loadProjects() {
-        if let data = UserDefaults.standard.data(forKey: "savedProjects"),
-           let decoded = try? JSONDecoder().decode([Project].self, from: data) {
+        if let decoded = DataPersistenceManager.shared.load([Project].self, forKey: .projects) {
             projects = decoded
         }
     }
@@ -752,11 +800,19 @@ struct ProjectYarnItemView: View {
     var quantityText: String {
         switch linkedYarn.quantityType {
         case .skeins:
-            return "\(Int(linkedYarn.quantity)) nøster"
+            return "\(formatSkeins(linkedYarn.quantity)) nøster"
         case .meters:
             return UnitConverter.formatLength(linkedYarn.quantity, unit: settings.currentUnitSystem)
         case .grams:
             return UnitConverter.formatWeight(linkedYarn.quantity, unit: settings.currentUnitSystem)
+        }
+    }
+
+    func formatSkeins(_ count: Double) -> String {
+        if count.truncatingRemainder(dividingBy: 1) == 0 {
+            return String(format: "%.0f", count)
+        } else {
+            return String(format: "%.1f", count).replacingOccurrences(of: ".", with: ",")
         }
     }
 

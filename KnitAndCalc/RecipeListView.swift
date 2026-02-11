@@ -231,22 +231,20 @@ struct CategoryTabButton: View {
 
 extension RecipeListView {
     func deleteRecipe(_ recipe: Recipe) {
+        AnnotationPersistenceManager.shared.delete(for: recipe.id)
         recipes.removeAll { $0.id == recipe.id }
         recipeToDelete = nil
         saveRecipes()
     }
 
     func loadRecipes() {
-        if let data = UserDefaults.standard.data(forKey: "savedRecipes"),
-           let decoded = try? JSONDecoder().decode([Recipe].self, from: data) {
+        if let decoded = DataPersistenceManager.shared.load([Recipe].self, forKey: .recipes) {
             recipes = decoded
         }
     }
 
     func saveRecipes() {
-        if let encoded = try? JSONEncoder().encode(recipes) {
-            UserDefaults.standard.set(encoded, forKey: "savedRecipes")
-        }
+        DataPersistenceManager.shared.save(recipes, forKey: .recipes)
     }
 }
 

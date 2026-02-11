@@ -102,22 +102,14 @@ class NotificationManager {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [notificationIdentifier])
     }
 
-    // Load projects from UserDefaults
+    // Load projects
     private func loadProjects() -> [Project] {
-        if let data = UserDefaults.standard.data(forKey: "savedProjects"),
-           let decoded = try? JSONDecoder().decode([Project].self, from: data) {
-            return decoded
-        }
-        return []
+        return DataPersistenceManager.shared.load([Project].self, forKey: .projects) ?? []
     }
 
-    // Load yarn stash from UserDefaults
+    // Load yarn stash
     private func loadYarnStash() -> [YarnStashEntry] {
-        if let data = UserDefaults.standard.data(forKey: "savedYarnStash"),
-           let decoded = try? JSONDecoder().decode([YarnStashEntry].self, from: data) {
-            return decoded
-        }
-        return []
+        return DataPersistenceManager.shared.load([YarnStashEntry].self, forKey: .yarnStash) ?? []
     }
 
     // Get random notification text from 10 variations

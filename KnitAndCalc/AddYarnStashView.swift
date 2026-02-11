@@ -190,6 +190,7 @@ struct AddYarnStashView: View {
                         }
                         .onChange(of: selectedType) { newValue in
                             showCustomTypeField = (newValue == Self.newTypeKey)
+                            prefillFromExistingYarn()
                         }
 
                         if showCustomTypeField {
@@ -589,6 +590,36 @@ struct AddYarnStashView: View {
                         barcode = code
                     }
                 )
+            }
+        }
+    }
+
+    func prefillFromExistingYarn() {
+        let brand = finalBrand
+        let type = finalType
+        guard !brand.isEmpty, !type.isEmpty, type != Self.newTypeKey else { return }
+        // Only prefill if fields are currently empty
+        let weightEmpty = weightPerSkein.isEmpty
+        let lengthEmpty = lengthPerSkein.isEmpty
+        guard weightEmpty || lengthEmpty else { return }
+
+        // Find most recent yarn of same brand/type
+        let matching = yarnEntries
+            .filter { $0.brand == brand && $0.type == type }
+            .sorted { $0.dateCreated > $1.dateCreated }
+
+        if let ref = matching.first {
+            if weightEmpty {
+                let displayWeight = settings.currentUnitSystem == .imperial
+                    ? UnitConverter.gramsToOunces(ref.weightPerSkein)
+                    : ref.weightPerSkein
+                weightPerSkein = formatNorwegian(displayWeight)
+            }
+            if lengthEmpty {
+                let displayLength = settings.currentUnitSystem == .imperial
+                    ? UnitConverter.metersToYards(ref.lengthPerSkein)
+                    : ref.lengthPerSkein
+                lengthPerSkein = formatNorwegian(displayLength)
             }
         }
     }

@@ -34,11 +34,8 @@ class YarnStashSyncManager {
             return false
         }
 
-        // Load yarn stash data
-        guard let yarnStashData = loadYarnStashData() else {
-            print("YarnStashSync: No yarn stash data to sync")
-            return false
-        }
+        // Load yarn stash data (may be empty - we still sync statistics)
+        let yarnStashData = loadYarnStashData() ?? []
 
         // Get or create user ID
         let userID = getUserID()
@@ -115,8 +112,7 @@ class YarnStashSyncManager {
     }
 
     private func loadYarnStashData() -> [[String: Any]]? {
-        guard let data = UserDefaults.standard.data(forKey: "savedYarnStash"),
-              let yarnEntries = try? JSONDecoder().decode([YarnStashEntry].self, from: data) else {
+        guard let yarnEntries = DataPersistenceManager.shared.load([YarnStashEntry].self, forKey: .yarnStash) else {
             return nil
         }
 
@@ -141,7 +137,7 @@ class YarnStashSyncManager {
             result.append(dict)
         }
 
-        return result.isEmpty ? nil : result
+        return result
     }
 
     private func sendSyncRequest(payload: [String: Any]) {

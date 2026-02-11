@@ -19,6 +19,10 @@ struct AddProjectYarnView: View {
     @State private var quantityType: YarnQuantityType = .skeins
     @State private var showCreateYarn: Bool = false
 
+    var availableYarnEntries: [YarnStashEntry] {
+        yarnEntries.filter { $0.numberOfSkeins > 0 }
+    }
+
     var selectedYarn: YarnStashEntry? {
         yarnEntries.first { $0.id == selectedYarnId }
     }
@@ -31,13 +35,13 @@ struct AddProjectYarnView: View {
         NavigationView {
             Form {
                 Section(header: Text("Velg garn")) {
-                    if yarnEntries.isEmpty {
+                    if availableYarnEntries.isEmpty {
                         Text("Ingen garn på lager")
                             .foregroundColor(.appSecondaryText)
                     } else {
                         Picker("Garn", selection: $selectedYarnId) {
                             Text("Velg garn").tag(nil as UUID?)
-                            ForEach(yarnEntries) { yarn in
+                            ForEach(availableYarnEntries) { yarn in
                                 let totalGrams = Double(yarn.numberOfSkeins) * yarn.weightPerSkein
                                 let colorText = yarn.color.isEmpty ? "" : " - \(yarn.color)"
                                 Text("\(yarn.brand) \(yarn.type)\(colorText) (\(Int(totalGrams))g)")
@@ -86,7 +90,7 @@ struct AddProjectYarnView: View {
                                         .font(.system(size: 13))
                                         .foregroundColor(.appSecondaryText)
                                     Spacer()
-                                    Text("\(yarn.numberOfSkeins) \(String(localized: "nøster")) (\(UnitConverter.formatWeight(Double(yarn.numberOfSkeins) * yarn.weightPerSkein, unit: settings.currentUnitSystem)))")
+                                    Text("\(formatNorwegian(yarn.numberOfSkeins)) \(String(localized: "nøster")) (\(UnitConverter.formatWeight(Double(yarn.numberOfSkeins) * yarn.weightPerSkein, unit: settings.currentUnitSystem)))")
                                         .font(.system(size: 13, weight: .medium))
                                         .foregroundColor(.appText)
                                 }
@@ -170,7 +174,14 @@ struct AddProjectYarnView: View {
             }
         }
         .sheet(isPresented: $showCreateYarn, onDismiss: {
+            let oldIds = Set(yarnEntries.map { $0.id })
             loadYarnEntries()
+            // Auto-select newly created yarn and set quantity to 100%
+            if let newYarn = yarnEntries.first(where: { !oldIds.contains($0.id) }) {
+                selectedYarnId = newYarn.id
+                quantityType = .skeins
+                quantity = formatNorwegian(newYarn.numberOfSkeins)
+            }
         }) {
             AddYarnStashView(
                 yarnEntries: Binding(
@@ -190,16 +201,13 @@ struct AddProjectYarnView: View {
     }
 
     func loadYarnEntries() {
-        if let data = UserDefaults.standard.data(forKey: "savedYarnStash"),
-           let decoded = try? JSONDecoder().decode([YarnStashEntry].self, from: data) {
+        if let decoded = DataPersistenceManager.shared.load([YarnStashEntry].self, forKey: .yarnStash) {
             yarnEntries = decoded
         }
     }
 
     func saveYarnEntries() {
-        if let encoded = try? JSONEncoder().encode(yarnEntries) {
-            UserDefaults.standard.set(encoded, forKey: "savedYarnStash")
-        }
+        DataPersistenceManager.shared.save(yarnEntries, forKey: .yarnStash)
     }
 
     func calculateConversions(_ quantityValue: Double, _ yarn: YarnStashEntry) -> (skeins: Double, meters: Double, grams: Double, percentage: Double) {

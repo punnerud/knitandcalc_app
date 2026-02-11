@@ -547,16 +547,13 @@ struct EditYarnStashView: View {
     }
 
     func loadProjects() {
-        if let data = UserDefaults.standard.data(forKey: "savedProjects"),
-           let decoded = try? JSONDecoder().decode([Project].self, from: data) {
+        if let decoded = DataPersistenceManager.shared.load([Project].self, forKey: .projects) {
             localProjects = decoded
         }
     }
 
     func saveProjects() {
-        if let encoded = try? JSONEncoder().encode(localProjects) {
-            UserDefaults.standard.set(encoded, forKey: "savedProjects")
-        }
+        DataPersistenceManager.shared.save(localProjects, forKey: .projects)
     }
 
     func formatProjectYarnQuantity(_ projectYarn: ProjectYarn) -> String {
@@ -658,7 +655,7 @@ struct EditProjectYarnQuantityView: View {
                                     .font(.system(size: 13))
                                     .foregroundColor(.appSecondaryText)
                                 Spacer()
-                                Text("\(yarn.numberOfSkeins) nøster (\(UnitConverter.formatWeight(Double(yarn.numberOfSkeins) * yarn.weightPerSkein, unit: settings.currentUnitSystem)))")
+                                Text("\(formatNorwegian(yarn.numberOfSkeins)) nøster (\(UnitConverter.formatWeight(Double(yarn.numberOfSkeins) * yarn.weightPerSkein, unit: settings.currentUnitSystem)))")
                                     .font(.system(size: 13, weight: .medium))
                                     .foregroundColor(.appText)
                             }

@@ -769,9 +769,7 @@ struct YarnCountingSessionView: View {
     }
 
     func saveYarnEntries() {
-        if let encoded = try? JSONEncoder().encode(yarnEntries) {
-            UserDefaults.standard.set(encoded, forKey: "savedYarnStash")
-        }
+        DataPersistenceManager.shared.save(yarnEntries, forKey: .yarnStash)
     }
 
     func finishCounting() {
@@ -1205,9 +1203,7 @@ struct YarnCountingAddView: View {
     }
 
     func saveYarnEntries() {
-        if let encoded = try? JSONEncoder().encode(yarnEntries) {
-            UserDefaults.standard.set(encoded, forKey: "savedYarnStash")
-        }
+        DataPersistenceManager.shared.save(yarnEntries, forKey: .yarnStash)
     }
 
     func formatSkeins(_ count: Double) -> String {

@@ -1,0 +1,112 @@
+# Knit&Calc In-App Message API
+
+## Endpoint
+GET https://knitandcalc.com/message.php
+
+## Request Parameters (query string)
+- `userId` (string) — User's unique UUID (same as YarnStashSyncUserID)
+- `version` (string) — App version, e.g. "1.1.8"
+
+## Response Format (JSON)
+```json
+{
+  "messages": [
+    {
+      "id": 42,
+      "title": "Oppdatering tilgjengelig",
+      "text": "Versjon 1.2.0 er ute med nye funksjoner!",
+      "type": "info",
+      "minVersion": "1.0.0",
+      "maxVersion": "1.1.9",
+      "userId": null,
+      "url": null
+    }
+  ]
+}
+```
+
+## Field Specification
+
+### id (int, required)
+Unique message ID. The app remembers the last dismissed ID.
+A message will only be shown if its ID is higher than the previously dismissed ID.
+To show a new message after a user has dismissed one, use a higher ID.
+
+### title (string, optional)
+Bold header text displayed above the message body.
+If null or missing, no title is shown.
+
+### text (string, required)
+The message body text.
+
+### type (string, optional, default: "info")
+Controls the banner color in the app:
+- "info" — Blue background (default)
+- "warning" — Orange background
+- "important" — Red background
+
+### minVersion (string, optional)
+Minimum app version (inclusive) that should see this message.
+Uses semantic versioning comparison (e.g. "1.0.0").
+If null, no lower bound — all versions match.
+
+### maxVersion (string, optional)
+Maximum app version (inclusive) that should see this message.
+If null, no upper bound — all versions match.
+
+### userId (string, optional)
+Target a specific user by their UUID.
+If null, the message is shown to all users.
+If set, only the user with this exact UUID sees the message.
+
+### url (string, optional)
+If set, tapping the message opens this URL in Safari.
+If null, tapping does nothing (only the dismiss X button is interactive).
+
+## Behavior
+
+### Caching
+The app caches the response in memory for 20 minutes.
+Subsequent calls within 20 minutes use the cached data.
+
+### Error Handling
+If the request fails (network error, invalid JSON, non-200 status), the app shows nothing.
+No error messages or alerts are displayed to the user.
+
+### Dismissal
+- Each message has an integer ID
+- When the user taps the X button, the message ID is saved to UserDefaults
+- The app skips messages with the same ID as the last dismissed one
+- To show the same message again, use a different ID (any number, not necessarily higher)
+- IDs can be reused/recycled — only the exact last-dismissed ID is blocked
+
+### Filtering
+The server receives userId and version as query parameters and can filter server-side.
+The app also performs client-side filtering:
+- Version range check (minVersion/maxVersion via semver comparison)
+- UserId match check
+
+### Example: Target all users
+```json
+{"messages": [{"id": 1, "text": "Velkommen!", "type": "info"}]}
+```
+
+### Example: Target specific version range
+```json
+{"messages": [{"id": 2, "text": "Oppdater appen!", "minVersion": "1.0.0", "maxVersion": "1.1.5", "type": "warning"}]}
+```
+
+### Example: Target specific user
+```json
+{"messages": [{"id": 3, "text": "Hei Morten!", "userId": "ABC-123-DEF", "type": "info"}]}
+```
+
+### Example: Message with link
+```json
+{"messages": [{"id": 4, "title": "Ny versjon!", "text": "Last ned 1.2.0 nå", "url": "https://apps.apple.com/...", "type": "important"}]}
+```
+
+### Example: Empty response (no messages)
+```json
+{"messages": []}
+```

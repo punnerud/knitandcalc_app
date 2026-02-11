@@ -163,6 +163,7 @@ struct EditRecipeView: View {
     }
 
     func deleteRecipe() {
+        AnnotationPersistenceManager.shared.delete(for: recipe.id)
         recipes.removeAll { $0.id == recipe.id }
         dismiss()
     }

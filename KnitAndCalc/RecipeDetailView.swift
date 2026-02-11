@@ -32,6 +32,17 @@ struct RecipeDetailView: View {
     @Binding var recipes: [Recipe]
     @Environment(\.dismiss) var dismiss
 
+    // Annotation state
+    @State private var annotationMode = false
+    @State private var activeTool: AnnotationTool = .none
+    @State private var recipeAnnotations = RecipeAnnotations()
+    @State private var selectedColor: String = "FF0000"
+    @State private var annotationLineWidth: CGFloat = 3.0
+    @State private var undoStack: [PageAnnotations] = []
+    @State private var redoStack: [PageAnnotations] = []
+    @State private var saveWorkItem: DispatchWorkItem?
+    @State private var imageCurrentIndex: Int = 0
+
     init(recipe: Recipe, recipes: Binding<[Recipe]> = .constant([])) {
         self.recipe = recipe
         self._recipes = recipes
@@ -44,6 +55,16 @@ struct RecipeDetailView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack(spacing: 16) {
+                        if recipe.type != .link {
+                            Button(action: {
+                                annotationMode.toggle()
+                                if !annotationMode { activeTool = .none }
+                            }) {
+                                Image(systemName: annotationMode ? "pencil.circle.fill" : "pencil.circle")
+                                    .foregroundColor(.appIconTint)
+                            }
+                        }
+
                         Button(action: { isFullscreen = true }) {
                             Image(systemName: "arrow.up.left.and.arrow.down.right")
                                 .foregroundColor(.appIconTint)
@@ -62,14 +83,59 @@ struct RecipeDetailView: View {
             .fullScreenCover(isPresented: $isFullscreen) {
                 fullscreenView
             }
+            .onAppear {
+                recipeAnnotations = AnnotationPersistenceManager.shared.load(for: recipe.id)
+                // Restore saved rotation
+                switch recipe.type {
+                case .images:
+                    imageRotation = recipeAnnotations.savedRotation
+                case .pdf:
+                    pdfRotation = recipeAnnotations.savedRotation
+                default:
+                    break
+                }
+            }
+            .onDisappear {
+                saveWorkItem?.cancel()
+                AnnotationPersistenceManager.shared.save(recipeAnnotations, for: recipe.id)
+            }
+            .onChange(of: imageRotation) { newRotation in
+                if recipe.type == .images {
+                    transformAnnotationsForRotation(newRotation: newRotation)
+                }
+            }
+            .onChange(of: pdfRotation) { newRotation in
+                if recipe.type == .pdf {
+                    transformAnnotationsForRotation(newRotation: newRotation)
+                }
+            }
     }
 
     var normalView: some View {
-        recipeContent
+        VStack(spacing: 0) {
+            recipeContent
+
+            if annotationMode {
+                AnnotationToolbarView(
+                    activeTool: $activeTool,
+                    isLocked: currentPageIsLockedBinding,
+                    selectedColor: $selectedColor,
+                    lineWidth: $annotationLineWidth,
+                    hasRuler: currentPageAnnotations.rulerPositionY != nil,
+                    onToggleRuler: toggleRuler,
+                    onClearAll: clearCurrentPage,
+                    onClearAllPages: clearAllPages,
+                    onUndo: undoLastAction,
+                    onRedo: redoLastAction,
+                    canUndo: !undoStack.isEmpty,
+                    canRedo: !redoStack.isEmpty
+                )
+            }
+        }
     }
 
     var fullscreenView: some View {
-        FullscreenRecipeView(recipe: recipe, isFullscreen: $isFullscreen, pdfRotation: $pdfRotation, pdfCurrentPage: $pdfCurrentPage, imageRotation: $imageRotation, webRotation: $webRotation)
+        FullscreenRecipeView(recipe: recipe, isFullscreen: $isFullscreen, pdfRotation: $pdfRotation, pdfCurrentPage: $pdfCurrentPage, imageRotation: $imageRotation, webRotation: $webRotation, recipeAnnotations: $recipeAnnotations)
     }
 
     var recipeContent: some View {
@@ -79,11 +145,32 @@ struct RecipeDetailView: View {
                 RotatableWebView(urlString: recipe.content, rotation: $webRotation)
 
             case .images:
-                ImageGalleryView(imagePaths: getImagePaths(), rotation: $imageRotation, isZoomed: $isZoomed, showControls: true)
+                ImageGalleryView(
+                    imagePaths: getImagePaths(),
+                    currentIndex: $imageCurrentIndex,
+                    rotation: $imageRotation,
+                    isZoomed: $isZoomed,
+                    showControls: true,
+                    recipeAnnotations: $recipeAnnotations,
+                    activeTool: activeTool,
+                    currentColor: selectedColor,
+                    lineWidth: annotationLineWidth,
+                    onAnnotationsChanged: handleAnnotationChange
+                )
 
             case .pdf:
                 if let url = resolvePDFURL() {
-                    PDFViewerView(url: url, currentPage: $pdfCurrentPage, rotation: $pdfRotation, isZoomed: $isZoomed)
+                    PDFViewerView(
+                        url: url,
+                        currentPage: $pdfCurrentPage,
+                        rotation: $pdfRotation,
+                        isZoomed: $isZoomed,
+                        recipeAnnotations: $recipeAnnotations,
+                        activeTool: activeTool,
+                        currentColor: selectedColor,
+                        lineWidth: annotationLineWidth,
+                        onAnnotationsChanged: handleAnnotationChange
+                    )
                 } else {
                     Text("Kunne ikke laste PDF - ugyldig URL")
                         .foregroundColor(.appSecondaryText)
@@ -111,6 +198,119 @@ struct RecipeDetailView: View {
 
         // Fallback to direct URL
         return URL(string: recipe.content)
+    }
+
+    // MARK: - Annotation helpers
+
+    var currentPageKey: String {
+        switch recipe.type {
+        case .images:
+            let paths = getImagePaths()
+            if imageCurrentIndex < paths.count {
+                return paths[imageCurrentIndex]
+            }
+            return "image_0"
+        case .pdf:
+            return "page_\(pdfCurrentPage)"
+        case .link:
+            return "page_0"
+        }
+    }
+
+    var currentPageAnnotations: PageAnnotations {
+        recipeAnnotations.pages[currentPageKey] ?? PageAnnotations()
+    }
+
+    var currentPageIsLockedBinding: Binding<Bool> {
+        Binding<Bool>(
+            get: { recipeAnnotations.pages[currentPageKey]?.isLocked ?? false },
+            set: { newValue in
+                var page = recipeAnnotations.pages[currentPageKey] ?? PageAnnotations()
+                page.isLocked = newValue
+                recipeAnnotations.pages[currentPageKey] = page
+                debouncedSave()
+            }
+        )
+    }
+
+    func handleAnnotationChange(_ newAnnotations: PageAnnotations, pageKey: String) {
+        undoStack.append(recipeAnnotations.pages[pageKey] ?? PageAnnotations())
+        if undoStack.count > 30 { undoStack.removeFirst() }
+        redoStack.removeAll()
+        recipeAnnotations.pages[pageKey] = newAnnotations
+        debouncedSave()
+    }
+
+    func toggleRuler() {
+        var page = recipeAnnotations.pages[currentPageKey] ?? PageAnnotations()
+        if page.rulerPositionY != nil {
+            page.rulerPositionY = nil
+        } else {
+            page.rulerPositionY = 0.3
+        }
+        recipeAnnotations.pages[currentPageKey] = page
+        debouncedSave()
+    }
+
+    func clearCurrentPage() {
+        undoStack.append(recipeAnnotations.pages[currentPageKey] ?? PageAnnotations())
+        redoStack.removeAll()
+        recipeAnnotations.pages[currentPageKey] = PageAnnotations()
+        debouncedSave()
+    }
+
+    func clearAllPages() {
+        let savedRotation = recipeAnnotations.savedRotation
+        recipeAnnotations = RecipeAnnotations(savedRotation: savedRotation)
+        undoStack.removeAll()
+        redoStack.removeAll()
+        debouncedSave()
+    }
+
+    func undoLastAction() {
+        guard let last = undoStack.popLast() else { return }
+        redoStack.append(recipeAnnotations.pages[currentPageKey] ?? PageAnnotations())
+        recipeAnnotations.pages[currentPageKey] = last
+        debouncedSave()
+    }
+
+    func redoLastAction() {
+        guard let last = redoStack.popLast() else { return }
+        undoStack.append(recipeAnnotations.pages[currentPageKey] ?? PageAnnotations())
+        recipeAnnotations.pages[currentPageKey] = last
+        debouncedSave()
+    }
+
+    func transformAnnotationsForRotation(newRotation: Int) {
+        let delta = ((newRotation - recipeAnnotations.savedRotation) % 360 + 360) % 360
+        let steps = delta / 90
+        guard steps > 0 && steps < 4 else { return }
+
+        var newPages: [String: PageAnnotations] = [:]
+        for (key, page) in recipeAnnotations.pages {
+            var transformed = page
+            for _ in 0..<steps {
+                transformed = transformed.rotatedCW90()
+            }
+            newPages[key] = transformed
+        }
+        recipeAnnotations.pages = newPages
+        recipeAnnotations.savedRotation = newRotation % 360
+        // Clear undo/redo — old snapshots are in previous coordinate space
+        undoStack.removeAll()
+        redoStack.removeAll()
+        debouncedSave()
+    }
+
+    func debouncedSave() {
+        saveWorkItem?.cancel()
+        let annotations = recipeAnnotations
+        let recipeId = recipe.id
+        let item = DispatchWorkItem {
+            AnnotationPersistenceManager.shared.save(annotations, for: recipeId)
+        }
+        saveWorkItem = item
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: item)
     }
 }
 
@@ -174,11 +374,18 @@ struct RotatableWebView: View {
 // Image Gallery View
 struct ImageGalleryView: View {
     let imagePaths: [String]
-    @State private var currentIndex: Int = 0
+    @Binding var currentIndex: Int
     @Binding var rotation: Int
     @Binding var isZoomed: Bool
     var showControls: Bool = false
     var isFullscreen: Bool = false
+
+    // Optional annotation support
+    var recipeAnnotations: Binding<RecipeAnnotations>? = nil
+    var activeTool: AnnotationTool = .none
+    var currentColor: String = "FF0000"
+    var lineWidth: CGFloat = 3.0
+    var onAnnotationsChanged: ((PageAnnotations, String) -> Void)? = nil
 
     var body: some View {
         ZStack {
@@ -189,8 +396,25 @@ struct ImageGalleryView: View {
                 TabView(selection: $currentIndex) {
                     ForEach(0..<imagePaths.count, id: \.self) { index in
                         if let image = loadImage(imagePaths[index]) {
-                            RotatableImageView(image: image, rotation: rotation, isZoomed: $isZoomed, isFullscreen: isFullscreen)
+                            if let annotationsBinding = recipeAnnotations {
+                                AnnotatableImageView(
+                                    image: image,
+                                    rotation: rotation,
+                                    isZoomed: $isZoomed,
+                                    isFullscreen: isFullscreen,
+                                    pageAnnotations: pageBinding(for: imagePaths[index], in: annotationsBinding),
+                                    activeTool: activeTool,
+                                    currentColor: currentColor,
+                                    currentLineWidth: lineWidth,
+                                    onAnnotationsChanged: { newAnnotations in
+                                        onAnnotationsChanged?(newAnnotations, imagePaths[index])
+                                    }
+                                )
                                 .tag(index)
+                            } else {
+                                RotatableImageView(image: image, rotation: rotation, isZoomed: $isZoomed, isFullscreen: isFullscreen)
+                                    .tag(index)
+                            }
                         }
                     }
                 }
@@ -235,6 +459,13 @@ struct ImageGalleryView: View {
                 }
             }
         }
+    }
+
+    func pageBinding(for key: String, in annotations: Binding<RecipeAnnotations>) -> Binding<PageAnnotations> {
+        Binding<PageAnnotations>(
+            get: { annotations.wrappedValue.pages[key] ?? PageAnnotations() },
+            set: { annotations.wrappedValue.pages[key] = $0 }
+        )
     }
 
     func loadImage(_ filename: String) -> UIImage? {
@@ -355,6 +586,10 @@ struct FullscreenRecipeView: View {
     @Binding var imageRotation: Int
     @Binding var webRotation: Int
     @State private var isZoomed: Bool = false
+    @State private var imageCurrentIndex: Int = 0
+    @Binding var recipeAnnotations: RecipeAnnotations
+    @State private var showShareSheet = false
+    @State private var shareImage: UIImage?
 
     var body: some View {
         ZStack {
@@ -373,11 +608,11 @@ struct FullscreenRecipeView: View {
                             .frame(width: geometry.size.width, height: geometry.size.height)
 
                     case .images:
-                        ImageGalleryView(imagePaths: getImagePaths(), rotation: $imageRotation, isZoomed: $isZoomed, showControls: false, isFullscreen: true)
+                        ImageGalleryView(imagePaths: getImagePaths(), currentIndex: $imageCurrentIndex, rotation: $imageRotation, isZoomed: $isZoomed, showControls: false, isFullscreen: true, recipeAnnotations: $recipeAnnotations)
 
                     case .pdf:
                         if let url = resolvePDFURL() {
-                            PDFViewerView(url: url, isFullscreen: true, currentPage: $pdfCurrentPage, rotation: $pdfRotation, isZoomed: $isZoomed)
+                            PDFViewerView(url: url, isFullscreen: true, currentPage: $pdfCurrentPage, rotation: $pdfRotation, isZoomed: $isZoomed, recipeAnnotations: $recipeAnnotations)
                         } else {
                             Text("Kunne ikke laste PDF")
                                 .foregroundColor(.white)
@@ -389,7 +624,22 @@ struct FullscreenRecipeView: View {
 
             VStack {
                 HStack {
+                    // Share/save button
+                    if recipe.type != .link {
+                        Button(action: prepareShareImage) {
+                            Image(systemName: "square.and.arrow.up.circle.fill")
+                                .font(.system(size: 32))
+                                .foregroundColor(.white)
+                                .shadow(color: .black.opacity(0.5), radius: 4)
+                                .opacity(isZoomed ? 0 : 1)
+                        }
+                        .allowsHitTesting(!isZoomed)
+                        .padding(.top, 50)
+                        .padding(.leading, 20)
+                    }
+
                     Spacer()
+
                     Button(action: { isFullscreen = false }) {
                         Image(systemName: "xmark.circle.fill")
                             .font(.system(size: 32))
@@ -406,6 +656,121 @@ struct FullscreenRecipeView: View {
         }
         .edgesIgnoringSafeArea(.all)
         .statusBar(hidden: true)
+        .sheet(isPresented: $showShareSheet) {
+            if let image = shareImage {
+                ShareSheet(activityItems: [image])
+            }
+        }
+    }
+
+    func prepareShareImage() {
+        switch recipe.type {
+        case .images:
+            let paths = getImagePaths()
+            guard imageCurrentIndex < paths.count else { return }
+            let filename = paths[imageCurrentIndex]
+            guard let baseImage = loadImage(filename) else { return }
+            let rotated = baseImage.rotate(degrees: imageRotation)
+            let pageKey = filename
+            let annotations = recipeAnnotations.pages[pageKey] ?? PageAnnotations()
+            shareImage = renderImageWithAnnotations(image: rotated, annotations: annotations)
+            showShareSheet = true
+
+        case .pdf:
+            if let url = resolvePDFURL() {
+                _ = url.startAccessingSecurityScopedResource()
+                defer { url.stopAccessingSecurityScopedResource() }
+                guard let doc = PDFDocument(url: url),
+                      let page = doc.page(at: pdfCurrentPage) else { return }
+                let pageCopy = page.copy() as? PDFPage
+                pageCopy?.rotation = pdfRotation
+                if let pdfPage = pageCopy {
+                    let pageRect = pdfPage.bounds(for: .mediaBox)
+                    let renderer = UIGraphicsImageRenderer(size: pageRect.size)
+                    let pdfImage = renderer.image { ctx in
+                        UIColor.white.setFill()
+                        ctx.fill(pageRect)
+                        ctx.cgContext.translateBy(x: 0, y: pageRect.height)
+                        ctx.cgContext.scaleBy(x: 1, y: -1)
+                        pdfPage.draw(with: .mediaBox, to: ctx.cgContext)
+                    }
+                    let pageKey = "page_\(pdfCurrentPage)"
+                    let annotations = recipeAnnotations.pages[pageKey] ?? PageAnnotations()
+                    shareImage = renderImageWithAnnotations(image: pdfImage, annotations: annotations)
+                    showShareSheet = true
+                }
+            }
+
+        case .link:
+            break
+        }
+    }
+
+    func renderImageWithAnnotations(image: UIImage, annotations: PageAnnotations) -> UIImage {
+        let size = image.size
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { ctx in
+            image.draw(at: .zero)
+            let w = size.width
+            let h = size.height
+
+            // Draw freehand paths (with eraser support via transparency layer)
+            ctx.cgContext.beginTransparencyLayer(auxiliaryInfo: nil)
+            for path in annotations.drawings {
+                guard path.points.count >= 2 else { continue }
+                let bezier = UIBezierPath()
+                bezier.move(to: CGPoint(x: path.points[0].x * w, y: path.points[0].y * h))
+                for i in 1..<path.points.count {
+                    bezier.addLine(to: CGPoint(x: path.points[i].x * w, y: path.points[i].y * h))
+                }
+                bezier.lineWidth = path.lineWidth * (w / 400) // Scale line width to image size
+                bezier.lineCapStyle = .round
+                bezier.lineJoinStyle = .round
+                if path.isEraser {
+                    ctx.cgContext.setBlendMode(.clear)
+                } else {
+                    ctx.cgContext.setBlendMode(.normal)
+                    UIColor(hex: path.colorHex).setStroke()
+                }
+                bezier.stroke()
+            }
+            ctx.cgContext.setBlendMode(.normal)
+            ctx.cgContext.endTransparencyLayer()
+
+            // Draw rectangles
+            for rect in annotations.rectangles {
+                let color = UIColor(hex: rect.colorHex).withAlphaComponent(rect.opacity)
+                let r = CGRect(x: rect.origin.x * w, y: rect.origin.y * h,
+                              width: rect.size.width * w, height: rect.size.height * h)
+                color.setFill()
+                ctx.cgContext.fill(r)
+                UIColor(hex: rect.colorHex).withAlphaComponent(0.8).setStroke()
+                ctx.cgContext.setLineWidth(2 * (w / 400))
+                ctx.cgContext.stroke(r)
+            }
+
+            // Draw ruler
+            if let rulerY = annotations.rulerPositionY {
+                let actualY = rulerY * h
+                ctx.cgContext.setFillColor(UIColor.black.withAlphaComponent(0.3).cgColor)
+                ctx.cgContext.fill(CGRect(x: 0, y: actualY + 2, width: w, height: h - actualY - 2))
+                let rulerColor = UIColor(red: 0.42, green: 0.32, blue: 0.64, alpha: 0.9)
+                ctx.cgContext.setStrokeColor(rulerColor.cgColor)
+                ctx.cgContext.setLineWidth(4 * (w / 400))
+                ctx.cgContext.move(to: CGPoint(x: 0, y: actualY))
+                ctx.cgContext.addLine(to: CGPoint(x: w, y: actualY))
+                ctx.cgContext.strokePath()
+            }
+        }
+    }
+
+    func loadImage(_ filename: String) -> UIImage? {
+        let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let fileURL = documentsPath.appendingPathComponent(filename)
+        if let data = try? Data(contentsOf: fileURL) {
+            return UIImage(data: data)
+        }
+        return nil
     }
 
     func getImagePaths() -> [String] {
@@ -440,13 +805,37 @@ struct PDFViewerView: View {
     @Binding var isZoomed: Bool
     @State private var isAccessing = false
 
+    // Optional annotation support
+    var recipeAnnotations: Binding<RecipeAnnotations>? = nil
+    var activeTool: AnnotationTool = .none
+    var currentColor: String = "FF0000"
+    var lineWidth: CGFloat = 3.0
+    var onAnnotationsChanged: ((PageAnnotations, String) -> Void)? = nil
+
     var body: some View {
         VStack(spacing: 0) {
             if let doc = document, doc.pageCount > 0 {
                 // PDF Page Display
                 GeometryReader { geometry in
                     if let page = doc.page(at: currentPage) {
-                        PDFPageView(page: page, rotation: rotation, isZoomed: $isZoomed)
+                        Group {
+                            if let annotationsBinding = recipeAnnotations {
+                                AnnotatablePDFPageView(
+                                    page: page,
+                                    rotation: rotation,
+                                    isZoomed: $isZoomed,
+                                    pageAnnotations: pdfPageBinding(for: currentPage, in: annotationsBinding),
+                                    activeTool: activeTool,
+                                    currentColor: currentColor,
+                                    currentLineWidth: lineWidth,
+                                    onAnnotationsChanged: { newAnnotations in
+                                        onAnnotationsChanged?(newAnnotations, "page_\(currentPage)")
+                                    }
+                                )
+                            } else {
+                                PDFPageView(page: page, rotation: rotation, isZoomed: $isZoomed)
+                            }
+                        }
                             .frame(width: geometry.size.width, height: geometry.size.height)
                             .gesture(
                                 DragGesture(minimumDistance: 50)
@@ -535,6 +924,14 @@ struct PDFViewerView: View {
                 isAccessing = false
             }
         }
+    }
+
+    func pdfPageBinding(for pageIndex: Int, in annotations: Binding<RecipeAnnotations>) -> Binding<PageAnnotations> {
+        let key = "page_\(pageIndex)"
+        return Binding<PageAnnotations>(
+            get: { annotations.wrappedValue.pages[key] ?? PageAnnotations() },
+            set: { annotations.wrappedValue.pages[key] = $0 }
+        )
     }
 
     private func loadPDF() {

@@ -2,10 +2,13 @@ import SwiftUI
 
 struct StitchCalculatorView: View {
     @State private var currentMode: StitchMode = .increase
+    @State private var knittingStyle: KnittingStyle = .flat
     @State private var stitchesOnNeedle: String = "20"
     @State private var changes: String = "11"
-    @State private var instructionLines: [String] = []
-    @State private var checkedLines: [Bool] = []
+    @State private var groupTexts: [String] = []
+    @State private var groupCounts: [Int] = []
+    @State private var checkedSubSteps: [Bool] = []
+    @State private var currentStep: Int = 0
     @State private var totalStitches: String = ""
     @State private var showResult: Bool = false
     @FocusState private var isFocused: Bool
@@ -29,10 +32,22 @@ struct StitchCalculatorView: View {
         }
     }
 
+    enum KnittingStyle: String, CaseIterable {
+        case flat = "Flatt"
+        case circular = "Rundt"
+
+        var localizedName: LocalizedStringKey {
+            switch self {
+            case .flat: return "Flatt"
+            case .circular: return "Rundt"
+            }
+        }
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                // Mode selector
+                // Mode selector (Øke/Felle)
                 HStack(spacing: 8) {
                     ForEach(StitchMode.allCases, id: \.self) { mode in
                         Button(action: {
@@ -53,10 +68,31 @@ struct StitchCalculatorView: View {
                 }
                 .padding(.horizontal)
 
+                // Knitting style selector (Flatt/Rundt)
+                HStack(spacing: 8) {
+                    ForEach(KnittingStyle.allCases, id: \.self) { style in
+                        Button(action: {
+                            knittingStyle = style
+                            showResult = false
+                        }) {
+                            Text(style.localizedName)
+                                .font(.system(size: 14))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                                .background(knittingStyle == style ?
+                                    Color.appButtonBackgroundSelected.opacity(0.7) :
+                                    Color.appButtonBackgroundUnselected)
+                                .foregroundColor(knittingStyle == style ? .appButtonText : .appButtonTextUnselected)
+                                .cornerRadius(8)
+                        }
+                    }
+                }
+                .padding(.horizontal)
+
                 // Input fields
                 VStack(alignment: .leading, spacing: 16) {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("Antall masker på pinnen:")
+                        Text(knittingStyle == .flat ? "Antall masker på pinnen:" : "Antall masker i omgangen:")
                             .font(.system(size: 14))
                             .foregroundColor(.appSecondaryText)
                         TextField("", text: $stitchesOnNeedle)
@@ -93,36 +129,94 @@ struct StitchCalculatorView: View {
                 // Result
                 if showResult {
                     VStack(alignment: .leading, spacing: 16) {
-                        if instructionLines.count > 2 {
-                            // Show checkboxes for multiple lines
-                            ForEach(0..<instructionLines.count, id: \.self) { index in
-                                Button(action: {
-                                    checkedLines[index].toggle()
-                                }) {
+                        // Step-by-step navigation
+                        if totalSubSteps > 1 {
+                            HStack {
+                                Button(action: stepBackward) {
+                                    Image(systemName: "minus.circle.fill")
+                                        .font(.system(size: 28))
+                                        .foregroundColor(currentStep > 0 ? .appIconTint : .appTertiaryText)
+                                }
+                                .disabled(currentStep <= 0)
+
+                                Spacer()
+
+                                Text("Steg \(currentStep + 1) av \(totalSubSteps)")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundColor(.appSecondaryText)
+
+                                Spacer()
+
+                                Button(action: stepForward) {
+                                    Image(systemName: "plus.circle.fill")
+                                        .font(.system(size: 28))
+                                        .foregroundColor(currentStep < totalSubSteps - 1 ? .appIconTint : .appTertiaryText)
+                                }
+                                .disabled(currentStep >= totalSubSteps - 1)
+                            }
+                            .padding(.bottom, 4)
+                        }
+
+                        // Instruction groups with sub-step progress
+                        ForEach(0..<groupTexts.count, id: \.self) { groupIndex in
+                            let startIdx = groupStartIndex(for: groupIndex)
+                            let count = groupCounts[groupIndex]
+                            let checkedCount = (startIdx..<startIdx + count).filter { checkedSubSteps[$0] }.count
+                            let allChecked = checkedCount == count
+                            let isActiveGroup = currentStep >= startIdx && currentStep < startIdx + count
+
+                            Button(action: {
+                                jumpToGroup(groupIndex)
+                            }) {
+                                VStack(alignment: .leading, spacing: 4) {
                                     HStack(alignment: .top, spacing: 12) {
-                                        Image(systemName: checkedLines[index] ? "checkmark.square.fill" : "square")
+                                        Image(systemName: allChecked ? "checkmark.square.fill" : "square")
                                             .font(.system(size: 22))
-                                            .foregroundColor(checkedLines[index] ?
+                                            .foregroundColor(allChecked ?
                                                 Color.appCheckmarkActive :
                                                 Color.appCheckmarkInactive)
 
-                                        Text(instructionLines[index])
-                                            .font(.system(size: 16))
-                                            .foregroundColor(.appText)
-                                            .strikethrough(checkedLines[index], color: .appSecondaryText)
-                                            .opacity(checkedLines[index] ? 0.5 : 1.0)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text(groupTexts[groupIndex])
+                                                .font(.system(size: 16))
+                                                .foregroundColor(.appText)
+                                                .strikethrough(allChecked, color: .appSecondaryText)
+                                                .opacity(allChecked ? 0.5 : 1.0)
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+
+                                            if count > 1 {
+                                                HStack(spacing: 3) {
+                                                    // Sub-step dots (max 20, otherwise just text)
+                                                    if count <= 20 {
+                                                        ForEach(0..<count, id: \.self) { i in
+                                                            let subIdx = startIdx + i
+                                                            Circle()
+                                                                .fill(checkedSubSteps[subIdx] ?
+                                                                    Color.appIconTint :
+                                                                    (subIdx == currentStep ?
+                                                                        Color.appIconTint.opacity(0.4) :
+                                                                        Color.appSecondaryText.opacity(0.2)))
+                                                                .frame(width: 8, height: 8)
+                                                        }
+                                                    }
+                                                    Text("\(checkedCount)/\(count)")
+                                                        .font(.system(size: 12))
+                                                        .foregroundColor(.appSecondaryText)
+                                                }
+                                            }
+                                        }
                                     }
                                 }
-                                .buttonStyle(PlainButtonStyle())
+                                .padding(.vertical, 6)
+                                .padding(.horizontal, 8)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 6)
+                                        .fill(isActiveGroup && !allChecked ?
+                                            Color.appIconTint.opacity(0.12) :
+                                            Color.clear)
+                                )
                             }
-                        } else {
-                            // Show plain text for 1-2 lines
-                            ForEach(instructionLines, id: \.self) { line in
-                                Text(line)
-                                    .font(.system(size: 16))
-                                    .foregroundColor(.appText)
-                            }
+                            .buttonStyle(PlainButtonStyle())
                         }
 
                         if !totalStitches.isEmpty {
@@ -143,7 +237,7 @@ struct StitchCalculatorView: View {
             }
             .padding(.vertical)
         }
-        .navigationTitle("Strikkekalkulator")
+        .navigationTitle(NSLocalizedString("menu.stitch_calculator", comment: ""))
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             UsageStatisticsManager.shared.recordStitchCalculatorOpen()
@@ -151,7 +245,6 @@ struct StitchCalculatorView: View {
     }
 
     func calculate() {
-        // Hide keyboard
         isFocused = false
 
         guard let S = Int(stitchesOnNeedle),
@@ -164,102 +257,169 @@ struct StitchCalculatorView: View {
         // No changes case
         if D == 0 {
             let actionText = currentMode == .increase ? "økninger" : "fellinger"
-            instructionLines = [String(localized: "Ingen \(actionText) valgt. Du har fortsatt \(S) masker på pinnen.")]
-            checkedLines = [false]
+            groupTexts = [String(localized: "Ingen \(actionText) valgt. Du har fortsatt \(S) masker på pinnen.")]
+            groupCounts = [1]
+            checkedSubSteps = [false]
+            currentStep = 0
             totalStitches = ""
             showResult = true
             return
         }
 
-        if currentMode == .decrease {
-            // Validation: max fellinger er floor(S/2)
+        let isDecrease = (currentMode == .decrease)
+        let isFlat = (knittingStyle == .flat)
+
+        if isDecrease {
             let maxDecrease = S / 2
             if D > maxDecrease {
-                instructionLines = [String(localized: "Du prøver å felle for mange masker. Maks antall fellinger for \(S) masker er \(maxDecrease).")]
-                checkedLines = [false]
+                groupTexts = [String(localized: "Du prøver å felle for mange masker. Maks antall fellinger for \(S) masker er \(maxDecrease).")]
+                groupCounts = [1]
+                checkedSubSteps = [false]
+                currentStep = 0
                 totalStitches = ""
                 showResult = true
                 return
             }
+        }
 
-            // Felle-logikk fra HTML
-            let totalKnit = S - 2 * D
-            let base = totalKnit / D
-            let extra = totalKnit % D
-            let startExtra = extra / 2
-            let endExtra = extra - startExtra
-            let middleCount = D - extra
+        // Calculate total stitches to distribute
+        // For decrease: each "strikk 2 sammen" consumes 2 stitches from the total
+        let totalSts = isDecrease ? (S - 2 * D) : S
 
-            var seq: [String] = []
-
-            // Start ekstra (base+1)
-            for _ in 0..<startExtra {
-                seq.append(instruksjonTekst(mode: .decrease, knitBefore: base + 1))
-            }
-            // Midtre (base)
-            for _ in 0..<middleCount {
-                seq.append(instruksjonTekst(mode: .decrease, knitBefore: base))
-            }
-            // Slutt ekstra (base+1)
-            for _ in 0..<endExtra {
-                seq.append(instruksjonTekst(mode: .decrease, knitBefore: base + 1))
-            }
-
-            let grouped = groupRuns(seq)
-            instructionLines = grouped.map { g in
-                let timesWord = g.count == 1 ? "gang" : "ganger"
-                return "*\(g.text)* \(g.count) \(timesWord)"
-            }
-            checkedLines = Array(repeating: false, count: instructionLines.count)
-            totalStitches = String(localized: "Du har nå \(S - D) masker på pinnen")
+        if totalSts < 0 {
+            groupTexts = [String(localized: "Ikke nok masker for denne beregningen.")]
+            groupCounts = [1]
+            checkedSubSteps = [false]
+            currentStep = 0
+            totalStitches = ""
             showResult = true
+            return
+        }
 
-        } else { // increase
-            // Øke-logikk fra HTML
-            let totalKnit = S
-            let base = totalKnit / D
-            let extra = totalKnit % D
-            let startExtra = extra / 2
-            let endExtra = extra - startExtra
-            let middleCount = D - extra
+        // Key difference: flat = changes + 1 segments, circular = changes segments
+        let segmentsCount = isFlat ? D + 1 : D
 
-            var seq: [String] = []
+        guard segmentsCount > 0 else { return }
 
-            for _ in 0..<startExtra {
-                seq.append(instruksjonTekst(mode: .increase, knitBefore: base + 1))
-            }
-            for _ in 0..<middleCount {
-                seq.append(instruksjonTekst(mode: .increase, knitBefore: base))
-            }
-            for _ in 0..<endExtra {
-                seq.append(instruksjonTekst(mode: .increase, knitBefore: base + 1))
-            }
+        let base = totalSts / segmentsCount
+        let remainder = totalSts % segmentsCount
 
-            let grouped = groupRuns(seq)
-            instructionLines = grouped.map { g in
-                let timesWord = g.count == 1 ? "gang" : "ganger"
-                return "*\(g.text)* \(g.count) \(timesWord)"
+        // Bresenham-like distribution for even spreading of remainder
+        var segments = Array(repeating: base, count: segmentsCount)
+        var err = 0
+        for i in 0..<segmentsCount {
+            err += remainder
+            if err >= segmentsCount {
+                segments[i] += 1
+                err -= segmentsCount
             }
-            checkedLines = Array(repeating: false, count: instructionLines.count)
-            totalStitches = String(localized: "Du har nå \(S + D) masker på pinnen")
-            showResult = true
+        }
+
+        // Build instruction sequence
+        var seq: [String] = []
+        for i in 0..<segments.count {
+            let isLastSegment = isFlat && (i == segments.count - 1)
+            if isLastSegment {
+                // Last segment in flat mode: just knit remaining stitches, no action
+                if segments[i] > 0 {
+                    let word = segments[i] == 1 ? "maske" : "masker"
+                    seq.append("Strikk \(segments[i]) \(word)")
+                }
+            } else {
+                seq.append(instruksjonTekst(mode: currentMode, knitBefore: segments[i]))
+            }
+        }
+
+        // Group consecutive identical instructions
+        let grouped = groupRuns(seq)
+        groupTexts = grouped.map { g in
+            let timesWord = g.count == 1 ? "gang" : "ganger"
+            return "\(g.text) — \(g.count) \(timesWord)"
+        }
+        groupCounts = grouped.map { $0.count }
+        let total = groupCounts.reduce(0, +)
+        checkedSubSteps = Array(repeating: false, count: total)
+        currentStep = 0
+
+        let newTotal = isDecrease ? (S - D) : (S + D)
+        let stitchWord = knittingStyle == .flat ? "pinnen" : "omgangen"
+        totalStitches = String(localized: "Du har nå \(newTotal) masker på \(stitchWord)")
+        showResult = true
+    }
+
+    var totalSubSteps: Int {
+        checkedSubSteps.count
+    }
+
+    func groupStartIndex(for groupIndex: Int) -> Int {
+        groupCounts[0..<groupIndex].reduce(0, +)
+    }
+
+    func stepForward() {
+        guard totalSubSteps > 0 else { return }
+        if currentStep < totalSubSteps {
+            checkedSubSteps[currentStep] = true
+            if let next = (currentStep + 1..<totalSubSteps).first(where: { !checkedSubSteps[$0] }) {
+                currentStep = next
+            } else {
+                currentStep = min(currentStep + 1, totalSubSteps - 1)
+            }
         }
     }
 
-    // Lag human-friendly tekst for et repeat-element (fra HTML)
+    func stepBackward() {
+        guard totalSubSteps > 0 else { return }
+        if currentStep > 0 {
+            if checkedSubSteps[currentStep] {
+                checkedSubSteps[currentStep] = false
+            } else {
+                currentStep -= 1
+                checkedSubSteps[currentStep] = false
+            }
+        } else {
+            checkedSubSteps[0] = false
+        }
+    }
+
+    func jumpToGroup(_ groupIndex: Int) {
+        let startIdx = groupStartIndex(for: groupIndex)
+        let count = groupCounts[groupIndex]
+        let endIdx = startIdx + count
+        let allChecked = (startIdx..<endIdx).allSatisfy { checkedSubSteps[$0] }
+
+        if allChecked {
+            // Uncheck all in group, jump there
+            for i in startIdx..<endIdx {
+                checkedSubSteps[i] = false
+            }
+            currentStep = startIdx
+        } else {
+            // Check all in group, advance to next unchecked
+            for i in startIdx..<endIdx {
+                checkedSubSteps[i] = true
+            }
+            if let next = (endIdx..<totalSubSteps).first(where: { !checkedSubSteps[$0] }) {
+                currentStep = next
+            } else if let next = (0..<totalSubSteps).first(where: { !checkedSubSteps[$0] }) {
+                currentStep = next
+            } else {
+                currentStep = max(0, totalSubSteps - 1)
+            }
+        }
+    }
+
     func instruksjonTekst(mode: StitchMode, knitBefore: Int) -> String {
         if mode == .decrease {
             if knitBefore <= 0 { return "Strikk 2 sammen" }
             if knitBefore == 1 { return "Strikk 1 maske, strikk 2 sammen" }
             return "Strikk \(knitBefore) masker, strikk 2 sammen"
-        } else { // increase
+        } else {
             if knitBefore <= 0 { return "Øk 1 maske" }
             if knitBefore == 1 { return "Strikk 1 maske, øk 1 maske" }
             return "Strikk \(knitBefore) masker, øk 1 maske"
         }
     }
 
-    // Funksjon for å slå sammen like instruksjoner til "X ganger" (fra HTML)
     func groupRuns(_ arr: [String]) -> [(text: String, count: Int)] {
         guard !arr.isEmpty else { return [] }
         var out: [(text: String, count: Int)] = []

@@ -34,7 +34,7 @@ struct YarnStashDetailView: View {
     }
 
     var linkedProjects: [(project: Project, yarns: [ProjectYarn])] {
-        projects.compactMap { project in
+        projects.filter { $0.status != .completed }.compactMap { project in
             let projectYarns = project.linkedYarns.filter { $0.yarnStashId == yarn.id }
             return projectYarns.isEmpty ? nil : (project, projectYarns)
         }
@@ -42,7 +42,7 @@ struct YarnStashDetailView: View {
 
     var totalReservedGrams: Double {
         var total: Double = 0.0
-        for project in projects {
+        for project in projects where project.status != .completed {
             for linkedYarn in project.linkedYarns {
                 if linkedYarn.yarnStashId == yarn.id {
                     switch linkedYarn.quantityType {

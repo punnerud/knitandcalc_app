@@ -296,28 +296,23 @@ struct ProjectListView: View {
     }
 
     func loadProjects() {
-        if let data = UserDefaults.standard.data(forKey: "savedProjects"),
-           let decoded = try? JSONDecoder().decode([Project].self, from: data) {
+        if let decoded = DataPersistenceManager.shared.load([Project].self, forKey: .projects) {
             projects = decoded
         }
     }
 
     func loadRecipes() {
-        if let data = UserDefaults.standard.data(forKey: "savedRecipes"),
-           let decoded = try? JSONDecoder().decode([Recipe].self, from: data) {
+        if let decoded = DataPersistenceManager.shared.load([Recipe].self, forKey: .recipes) {
             recipes = decoded
         }
     }
 
     func saveProjects() {
-        if let encoded = try? JSONEncoder().encode(projects) {
-            UserDefaults.standard.set(encoded, forKey: "savedProjects")
-        }
+        DataPersistenceManager.shared.save(projects, forKey: .projects)
     }
 
     func loadYarnEntries() {
-        if let data = UserDefaults.standard.data(forKey: "savedYarnStash"),
-           let decoded = try? JSONDecoder().decode([YarnStashEntry].self, from: data) {
+        if let decoded = DataPersistenceManager.shared.load([YarnStashEntry].self, forKey: .yarnStash) {
             yarnEntries = decoded
         }
     }
@@ -536,6 +531,16 @@ enum YarnQuantityType: String, Codable, CaseIterable {
     }
 }
 
+struct YarnUsageRecord: Codable, Equatable {
+    var yarnStashId: UUID
+    var brand: String
+    var type: String
+    var color: String
+    var skeinsUsed: Double
+    var gramsUsed: Double
+    var metersUsed: Double
+}
+
 struct ProjectYarn: Identifiable, Codable, Equatable {
     var id: UUID
     var yarnStashId: UUID
@@ -567,9 +572,10 @@ struct Project: Identifiable, Codable, Equatable {
     var linkedYarns: [ProjectYarn]
     var images: [String]
     var primaryImageIndex: Int?
+    var yarnUsageHistory: [YarnUsageRecord]
     var dateCreated: Date
 
-    init(id: UUID = UUID(), name: String, status: ProjectStatus = .planned, recipeId: UUID? = nil, size: String = "", gauge: String = "", needleSizes: [String] = [], startDate: Date? = nil, completedDate: Date? = nil, notes: String = "", rowCounters: [RowCounter] = [], linkedYarns: [ProjectYarn] = [], images: [String] = [], primaryImageIndex: Int? = nil, dateCreated: Date = Date()) {
+    init(id: UUID = UUID(), name: String, status: ProjectStatus = .planned, recipeId: UUID? = nil, size: String = "", gauge: String = "", needleSizes: [String] = [], startDate: Date? = nil, completedDate: Date? = nil, notes: String = "", rowCounters: [RowCounter] = [], linkedYarns: [ProjectYarn] = [], images: [String] = [], primaryImageIndex: Int? = nil, yarnUsageHistory: [YarnUsageRecord] = [], dateCreated: Date = Date()) {
         self.id = id
         self.name = name
         self.status = status
@@ -584,6 +590,7 @@ struct Project: Identifiable, Codable, Equatable {
         self.linkedYarns = linkedYarns
         self.images = images
         self.primaryImageIndex = primaryImageIndex
+        self.yarnUsageHistory = yarnUsageHistory
         self.dateCreated = dateCreated
     }
 
@@ -614,6 +621,7 @@ struct Project: Identifiable, Codable, Equatable {
         // New fields with defaults for backward compatibility
         images = try container.decodeIfPresent([String].self, forKey: .images) ?? []
         primaryImageIndex = try container.decodeIfPresent(Int.self, forKey: .primaryImageIndex)
+        yarnUsageHistory = try container.decodeIfPresent([YarnUsageRecord].self, forKey: .yarnUsageHistory) ?? []
         dateCreated = try container.decode(Date.self, forKey: .dateCreated)
     }
 
@@ -633,13 +641,14 @@ struct Project: Identifiable, Codable, Equatable {
         try container.encode(linkedYarns, forKey: .linkedYarns)
         try container.encode(images, forKey: .images)
         try container.encodeIfPresent(primaryImageIndex, forKey: .primaryImageIndex)
+        try container.encode(yarnUsageHistory, forKey: .yarnUsageHistory)
         try container.encode(dateCreated, forKey: .dateCreated)
     }
 
     enum CodingKeys: String, CodingKey {
         case id, name, status, recipeId, size, gauge, needleSize, needleSizes
         case startDate, completedDate, notes, rowCounters, linkedYarns
-        case images, primaryImageIndex, dateCreated
+        case images, primaryImageIndex, yarnUsageHistory, dateCreated
     }
 }
 

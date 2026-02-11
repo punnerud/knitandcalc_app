@@ -27,10 +27,11 @@ struct YarnStashListView: View {
     }
 
     var filteredYarnEntries: [YarnStashEntry] {
+        let base: [YarnStashEntry]
         if searchText.isEmpty {
-            return yarnEntries
+            base = yarnEntries
         } else {
-            return yarnEntries.filter { yarn in
+            base = yarnEntries.filter { yarn in
                 yarn.brand.localizedCaseInsensitiveContains(searchText) ||
                 yarn.type.localizedCaseInsensitiveContains(searchText) ||
                 yarn.color.localizedCaseInsensitiveContains(searchText) ||
@@ -39,6 +40,8 @@ struct YarnStashListView: View {
                 yarn.notes.localizedCaseInsensitiveContains(searchText)
             }
         }
+        // Hide yarns with zero or negative skeins
+        return base.filter { $0.numberOfSkeins > 0 }
     }
 
     var groupedYarnEntries: [(key: String, yarns: [YarnStashEntry])] {
@@ -315,29 +318,23 @@ struct YarnStashListView: View {
     }
 
     func loadYarnEntries() {
-        if let data = UserDefaults.standard.data(forKey: "savedYarnStash"),
-           let decoded = try? JSONDecoder().decode([YarnStashEntry].self, from: data) {
+        if let decoded = DataPersistenceManager.shared.load([YarnStashEntry].self, forKey: .yarnStash) {
             yarnEntries = decoded
         }
     }
 
     func loadProjects() {
-        if let data = UserDefaults.standard.data(forKey: "savedProjects"),
-           let decoded = try? JSONDecoder().decode([Project].self, from: data) {
+        if let decoded = DataPersistenceManager.shared.load([Project].self, forKey: .projects) {
             projects = decoded
         }
     }
 
     func saveYarnEntries() {
-        if let encoded = try? JSONEncoder().encode(yarnEntries) {
-            UserDefaults.standard.set(encoded, forKey: "savedYarnStash")
-        }
+        DataPersistenceManager.shared.save(yarnEntries, forKey: .yarnStash)
     }
 
     func saveProjects() {
-        if let encoded = try? JSONEncoder().encode(projects) {
-            UserDefaults.standard.set(encoded, forKey: "savedProjects")
-        }
+        DataPersistenceManager.shared.save(projects, forKey: .projects)
     }
 
     func calculateMaxColorWidth(for yarns: [YarnStashEntry]) -> CGFloat {
@@ -359,20 +356,23 @@ struct YarnStashListView: View {
     }
 
     func calculateReservedPercentage(for yarn: YarnStashEntry) -> Double {
-        // Calculate total reserved in grams across all projects
-        var totalReservedGrams: Double = 0.0
+        return calculateYarnPercentage(for: yarn, statuses: [.planned, .active])
+    }
 
-        for project in projects {
+    private func calculateYarnPercentage(for yarn: YarnStashEntry, statuses: [ProjectStatus]) -> Double {
+        var totalGrams: Double = 0.0
+
+        for project in projects where statuses.contains(project.status) {
             for linkedYarn in project.linkedYarns {
                 if linkedYarn.yarnStashId == yarn.id {
                     switch linkedYarn.quantityType {
                     case .grams:
-                        totalReservedGrams += linkedYarn.quantity
+                        totalGrams += linkedYarn.quantity
                     case .skeins:
-                        totalReservedGrams += linkedYarn.quantity * yarn.weightPerSkein
+                        totalGrams += linkedYarn.quantity * yarn.weightPerSkein
                     case .meters:
                         let gramsPerMeter = yarn.weightPerSkein / yarn.lengthPerSkein
-                        totalReservedGrams += linkedYarn.quantity * gramsPerMeter
+                        totalGrams += linkedYarn.quantity * gramsPerMeter
                     }
                 }
             }
@@ -383,7 +383,7 @@ struct YarnStashListView: View {
             return 0
         }
 
-        return (totalReservedGrams / totalAvailableGrams) * 100
+        return (totalGrams / totalAvailableGrams) * 100
     }
 }
 
@@ -454,11 +454,10 @@ struct YarnColorRowView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
 
             if reservedPercentage > 0 {
-                VStack(alignment: .trailing, spacing: 1) {
+                HStack(spacing: 2) {
                     Text("\(Int(reservedPercentage))%")
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundColor(reservedPercentage > 100 ? .red : .appSecondary)
-
                     Text("reservert")
                         .font(.system(size: 8))
                         .foregroundColor(.appSecondaryText)

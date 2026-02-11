@@ -271,16 +271,13 @@ struct YarnStockCounterView: View {
     }
 
     func loadYarnEntries() {
-        if let data = UserDefaults.standard.data(forKey: "savedYarnStash"),
-           let decoded = try? JSONDecoder().decode([YarnStashEntry].self, from: data) {
+        if let decoded = DataPersistenceManager.shared.load([YarnStashEntry].self, forKey: .yarnStash) {
             yarnEntries = decoded
         }
     }
 
     func saveYarnEntries() {
-        if let encoded = try? JSONEncoder().encode(yarnEntries) {
-            UserDefaults.standard.set(encoded, forKey: "savedYarnStash")
-        }
+        DataPersistenceManager.shared.save(yarnEntries, forKey: .yarnStash)
     }
 }
 

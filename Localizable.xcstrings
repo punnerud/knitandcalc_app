@@ -274,6 +274,16 @@
         }
       }
     },
+    "%@ %@ (%@)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@ (%3$@)"
+          }
+        }
+      }
+    },
     "%@ %@%@ (%lldg)" : {
       "localizations" : {
         "en" : {
@@ -424,32 +434,22 @@
     "%@ nøster" : {
 
     },
+    "%@ nøster (%@)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ nøster (%2$@)"
+          }
+        }
+      }
+    },
     "%@%@ nøster" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$@%2$@ nøster"
-          }
-        }
-      }
-    },
-    "%lf %@ (%@)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$lf %2$@ (%3$@)"
-          }
-        }
-      }
-    },
-    "%lf nøster (%@)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$lf nøster (%2$@)"
           }
         }
       }
@@ -751,6 +751,16 @@
         }
       }
     },
+    "%lld/%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld/%2$lld"
+          }
+        }
+      }
+    },
     "%lld/5" : {
 
     },
@@ -1009,6 +1019,9 @@
     "Angi verdi" : {
 
     },
+    "Angre" : {
+
+    },
     "Annet" : {
       "localizations" : {
         "da" : {
@@ -1091,6 +1104,9 @@
           }
         }
       }
+    },
+    "Antall masker i omgangen:" : {
+
     },
     "Antall masker på pinnen:" : {
       "localizations" : {
@@ -1950,7 +1966,18 @@
     "Dette vil nullstille all synkroniseringsstatistikk og la deg teste synkronisering på nytt." : {
 
     },
+    "Du har nå %lld masker på %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Du har nå %1$lld masker på %2$@"
+          }
+        }
+      }
+    },
     "Du har nå %lld masker på pinnen" : {
+      "extractionState" : "stale",
       "localizations" : {
         "da" : {
           "stringUnit" : {
@@ -2384,6 +2411,9 @@
     "Er du sikker på at du vil slette \"%@\"?\n\nTips: Du kan også trekke til venstre på oversikten for å redigere eller slette. Det er raskere enn å bruke denne knappen." : {
 
     },
+    "Er du sikker på at du vil slette alle markeringer på alle sider?" : {
+
+    },
     "Er du sikker på at du vil slette denne brukt garn-registreringen (%@ g)?" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2788,6 +2818,9 @@
           }
         }
       }
+    },
+    "Flatt" : {
+
     },
     "For morro skyld" : {
       "localizations" : {
@@ -3388,6 +3421,9 @@
         }
       }
     },
+    "Gjør om" : {
+
+    },
     "gram" : {
       "localizations" : {
         "da" : {
@@ -3599,6 +3635,9 @@
 
     },
     "Idempotency Key:" : {
+
+    },
+    "Ikke nok masker for denne beregningen." : {
 
     },
     "Importer backup" : {
@@ -4662,6 +4701,9 @@
 
     },
     "Lagt til i økten: %lld garn" : {
+
+    },
+    "Lås" : {
 
     },
     "Laster PDF..." : {
@@ -5756,43 +5798,43 @@
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Strikberegner"
+            "value" : "Øge/fælde beregner"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Maschenrechner"
+            "value" : "Zunahme/Abnahme Rechner"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Stitch Calculator"
+            "value" : "Increase/Decrease Calculator"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Neulelaskuri"
+            "value" : "Lisäys/vähennys laskuri"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Calculateur de tricot"
+            "value" : "Calculateur augmentation/diminution"
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Strikkekalkulator"
+            "value" : "Øke/felle kalkulator"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Stickkalkylator"
+            "value" : "Öka/fälla kalkylator"
           }
         }
       }
@@ -7618,6 +7660,9 @@
     "Roter (%lld°)" : {
 
     },
+    "Rundt" : {
+
+    },
     "Scan Barcode" : {
 
     },
@@ -8374,6 +8419,12 @@
         }
       }
     },
+    "Slett alle markeringer" : {
+
+    },
+    "Slett alt" : {
+
+    },
     "Slett bilde" : {
 
     },
@@ -8747,6 +8798,16 @@
         }
       }
     },
+    "Steg %lld av %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Steg %1$lld av %2$lld"
+          }
+        }
+      }
+    },
     "Størrelse" : {
       "localizations" : {
         "da" : {
@@ -8960,6 +9021,7 @@
 
     },
     "Strikkekalkulator" : {
+      "extractionState" : "stale",
       "localizations" : {
         "da" : {
           "stringUnit" : {
@@ -9228,6 +9290,9 @@
           }
         }
       }
+    },
+    "Trykk for å åpne" : {
+
     },
     "Trykk på garn for å telle og legge til i '%@'" : {
 
