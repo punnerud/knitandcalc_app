@@ -139,7 +139,9 @@ struct ProjectDetailView: View {
                     Text("Er du sikker på at du vil fjerne dette garnet?")
                 }
             }
-            .sheet(isPresented: $showAddYarn) {
+            .sheet(isPresented: $showAddYarn, onDismiss: {
+                loadYarnEntries()
+            }) {
                 AddProjectYarnView(projects: $projects, projectId: projectId)
             }
             .sheet(isPresented: $showImagePicker, onDismiss: {

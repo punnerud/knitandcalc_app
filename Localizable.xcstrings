@@ -234,6 +234,16 @@
         }
       }
     },
+    "%@ / %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ / %2$@"
+          }
+        }
+      }
+    },
     "%@ %@" : {
       "localizations" : {
         "da" : {
@@ -2566,6 +2576,9 @@
           }
         }
       }
+    },
+    "Farge:" : {
+
     },
     "Fargenummer" : {
       "localizations" : {
@@ -5364,6 +5377,9 @@
     "Lokasjon" : {
 
     },
+    "Lokasjon:" : {
+
+    },
     "Lokasjon: %@" : {
 
     },
@@ -5409,6 +5425,9 @@
           }
         }
       }
+    },
+    "Løpelengde:" : {
+
     },
     "Lot:" : {
 
@@ -5633,6 +5652,9 @@
           }
         }
       }
+    },
+    "Mengde til bruk i prosjektet" : {
+
     },
     "menu.advanced" : {
       "extractionState" : "manual",
@@ -5991,6 +6013,9 @@
       }
     },
     "Merke/Type" : {
+
+    },
+    "Merke/Type:" : {
 
     },
     "meter" : {

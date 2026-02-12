@@ -17,7 +17,10 @@ struct AddProjectYarnView: View {
     @State private var selectedYarnId: UUID?
     @State private var quantity: String = ""
     @State private var quantityType: YarnQuantityType = .skeins
+    @State private var previousQuantityType: YarnQuantityType = .skeins
     @State private var showCreateYarn: Bool = false
+    @State private var newlyCreatedYarnId: UUID?
+    @FocusState private var quantityFieldFocused: Bool
 
     var availableYarnEntries: [YarnStashEntry] {
         yarnEntries.filter { $0.numberOfSkeins > 0 }
@@ -28,7 +31,10 @@ struct AddProjectYarnView: View {
     }
 
     var isFormValid: Bool {
-        selectedYarnId != nil && Double(quantity) != nil && Double(quantity)! > 0
+        guard selectedYarnId != nil,
+              let q = Double(quantity.replacingOccurrences(of: ",", with: ".")),
+              q > 0 else { return false }
+        return true
     }
 
     var body: some View {
@@ -61,26 +67,34 @@ struct AddProjectYarnView: View {
                 }
 
                 if selectedYarn != nil {
-                    Section(header: Text("Mengde")) {
+                    Section(header: Text("Mengde til bruk i prosjektet")) {
                         Picker("Type", selection: $quantityType) {
                             ForEach(YarnQuantityType.allCases, id: \.self) { type in
                                 Text(type.displayName).tag(type)
                             }
                         }
                         .pickerStyle(SegmentedPickerStyle())
+                        .onChange(of: quantityType) { newType in
+                            quantityFieldFocused = false
+                            if let yarn = selectedYarn,
+                               let currentValue = Double(quantity.replacingOccurrences(of: ",", with: ".")),
+                               currentValue > 0 {
+                                let converted = convertQuantity(currentValue, from: previousQuantityType, to: newType, yarn: yarn)
+                                quantity = formatNorwegian(converted)
+                            }
+                            previousQuantityType = newType
+                        }
 
                         TextField(text: $quantity) {
                             Text(quantityType.displayName)
                         }
                         .keyboardType(.decimalPad)
+                        .focused($quantityFieldFocused)
 
-                        if let quantityValue = Double(quantity),
+                        if let quantityValue = Double(quantity.replacingOccurrences(of: ",", with: ".")),
                            quantityValue > 0,
                            let yarn = selectedYarn {
                             VStack(alignment: .leading, spacing: 8) {
-                                Divider()
-                                    .padding(.vertical, 4)
-
                                 Text("Garninformasjon")
                                     .font(.system(size: 13, weight: .medium))
                                     .foregroundColor(.appSecondaryText)
@@ -104,40 +118,34 @@ struct AddProjectYarnView: View {
 
                                 let calculations = calculateConversions(quantityValue, yarn)
 
-                                if quantityType != .skeins {
-                                    HStack {
-                                        Text("Nøster:")
-                                            .font(.system(size: 13))
-                                            .foregroundColor(.appSecondaryText)
-                                        Spacer()
-                                        Text(formatNorwegian(calculations.skeins))
-                                            .font(.system(size: 13, weight: .medium))
-                                            .foregroundColor(.appText)
-                                    }
+                                HStack {
+                                    Text("Nøster:")
+                                        .font(.system(size: 13))
+                                        .foregroundColor(.appSecondaryText)
+                                    Spacer()
+                                    Text(formatNorwegian(calculations.skeins))
+                                        .font(.system(size: 13, weight: .medium))
+                                        .foregroundColor(.appText)
                                 }
 
-                                if quantityType != .meters {
-                                    HStack {
-                                        Text(settings.currentUnitSystem == .metric ? "Meter:" : "Yards:")
-                                            .font(.system(size: 13))
-                                            .foregroundColor(.appSecondaryText)
-                                        Spacer()
-                                        Text(UnitConverter.formatLength(calculations.meters, unit: settings.currentUnitSystem))
-                                            .font(.system(size: 13, weight: .medium))
-                                            .foregroundColor(.appText)
-                                    }
+                                HStack {
+                                    Text(settings.currentUnitSystem == .metric ? "Meter:" : "Yards:")
+                                        .font(.system(size: 13))
+                                        .foregroundColor(.appSecondaryText)
+                                    Spacer()
+                                    Text(UnitConverter.formatLength(calculations.meters, unit: settings.currentUnitSystem))
+                                        .font(.system(size: 13, weight: .medium))
+                                        .foregroundColor(.appText)
                                 }
 
-                                if quantityType != .grams {
-                                    HStack {
-                                        Text(settings.currentUnitSystem == .metric ? "Gram:" : "Ounces:")
-                                            .font(.system(size: 13))
-                                            .foregroundColor(.appSecondaryText)
-                                        Spacer()
-                                        Text(UnitConverter.formatWeight(calculations.grams, unit: settings.currentUnitSystem))
-                                            .font(.system(size: 13, weight: .medium))
-                                            .foregroundColor(.appText)
-                                    }
+                                HStack {
+                                    Text(settings.currentUnitSystem == .metric ? "Gram:" : "Ounces:")
+                                        .font(.system(size: 13))
+                                        .foregroundColor(.appSecondaryText)
+                                    Spacer()
+                                    Text(UnitConverter.formatWeight(calculations.grams, unit: settings.currentUnitSystem))
+                                        .font(.system(size: 13, weight: .medium))
+                                        .foregroundColor(.appText)
                                 }
 
                                 HStack {
@@ -149,6 +157,72 @@ struct AddProjectYarnView: View {
                                         .font(.system(size: 13, weight: .semibold))
                                         .foregroundColor(calculations.percentage > 100 ? .red : .appIconTint)
                                 }
+                            }
+                        }
+                    }
+                }
+
+                if let yarn = selectedYarn,
+                   (Double(quantity.replacingOccurrences(of: ",", with: ".")) ?? 0) <= 0 {
+                    Section(header: Text("Garninformasjon")) {
+                        HStack {
+                            Text("Merke/Type:")
+                                .font(.system(size: 13))
+                                .foregroundColor(.appSecondaryText)
+                            Spacer()
+                            Text("\(yarn.brand) \(yarn.type)")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(.appText)
+                        }
+                        if !yarn.color.isEmpty || !yarn.colorNumber.isEmpty {
+                            HStack {
+                                Text("Farge:")
+                                    .font(.system(size: 13))
+                                    .foregroundColor(.appSecondaryText)
+                                Spacer()
+                                Text([yarn.color, yarn.colorNumber].filter { !$0.isEmpty }.joined(separator: " / "))
+                                    .font(.system(size: 13, weight: .medium))
+                                    .foregroundColor(.appText)
+                            }
+                        }
+                        if !yarn.lotNumber.isEmpty {
+                            HStack {
+                                Text("Parti:")
+                                    .font(.system(size: 13))
+                                    .foregroundColor(.appSecondaryText)
+                                Spacer()
+                                Text(yarn.lotNumber)
+                                    .font(.system(size: 13, weight: .medium))
+                                    .foregroundColor(.appText)
+                            }
+                        }
+                        HStack {
+                            Text("På lager:")
+                                .font(.system(size: 13))
+                                .foregroundColor(.appSecondaryText)
+                            Spacer()
+                            Text("\(formatNorwegian(yarn.numberOfSkeins)) nøster (\(UnitConverter.formatWeight(Double(yarn.numberOfSkeins) * yarn.weightPerSkein, unit: settings.currentUnitSystem)))")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(.appText)
+                        }
+                        HStack {
+                            Text("Løpelengde:")
+                                .font(.system(size: 13))
+                                .foregroundColor(.appSecondaryText)
+                            Spacer()
+                            Text("\(UnitConverter.formatLength(yarn.lengthPerSkein, unit: settings.currentUnitSystem)) / \(UnitConverter.formatWeight(yarn.weightPerSkein, unit: settings.currentUnitSystem))")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(.appText)
+                        }
+                        if !yarn.location.isEmpty {
+                            HStack {
+                                Text("Lokasjon:")
+                                    .font(.system(size: 13))
+                                    .foregroundColor(.appSecondaryText)
+                                Spacer()
+                                Text(yarn.location)
+                                    .font(.system(size: 13, weight: .medium))
+                                    .foregroundColor(.appText)
                             }
                         }
                     }
@@ -174,13 +248,13 @@ struct AddProjectYarnView: View {
             }
         }
         .sheet(isPresented: $showCreateYarn, onDismiss: {
-            let oldIds = Set(yarnEntries.map { $0.id })
             loadYarnEntries()
-            // Auto-select newly created yarn and set quantity to 100%
-            if let newYarn = yarnEntries.first(where: { !oldIds.contains($0.id) }) {
+            if let newId = newlyCreatedYarnId,
+               let newYarn = yarnEntries.first(where: { $0.id == newId }) {
                 selectedYarnId = newYarn.id
                 quantityType = .skeins
                 quantity = formatNorwegian(newYarn.numberOfSkeins)
+                newlyCreatedYarnId = nil
             }
         }) {
             AddYarnStashView(
@@ -191,8 +265,9 @@ struct AddProjectYarnView: View {
                         saveYarnEntries()
                     }
                 ),
-                projects: $projects,
-                linkToProjectId: projectId
+                onYarnCreated: { yarn in
+                    newlyCreatedYarnId = yarn.id
+                }
             )
         }
         .onAppear {
@@ -208,6 +283,22 @@ struct AddProjectYarnView: View {
 
     func saveYarnEntries() {
         DataPersistenceManager.shared.save(yarnEntries, forKey: .yarnStash)
+    }
+
+    func convertQuantity(_ value: Double, from: YarnQuantityType, to: YarnQuantityType, yarn: YarnStashEntry) -> Double {
+        // First convert to skeins (common base)
+        let skeins: Double
+        switch from {
+        case .skeins: skeins = value
+        case .grams: skeins = value / yarn.weightPerSkein
+        case .meters: skeins = value / yarn.lengthPerSkein
+        }
+        // Then convert from skeins to target
+        switch to {
+        case .skeins: return skeins
+        case .grams: return skeins * yarn.weightPerSkein
+        case .meters: return skeins * yarn.lengthPerSkein
+        }
     }
 
     func calculateConversions(_ quantityValue: Double, _ yarn: YarnStashEntry) -> (skeins: Double, meters: Double, grams: Double, percentage: Double) {
@@ -238,7 +329,7 @@ struct AddProjectYarnView: View {
 
     func addYarnToProject() {
         guard let selectedYarnId = selectedYarnId,
-              let quantityValue = Double(quantity),
+              let quantityValue = Double(quantity.replacingOccurrences(of: ",", with: ".")),
               quantityValue > 0,
               let projectIndex = projects.firstIndex(where: { $0.id == projectId }) else {
             return
