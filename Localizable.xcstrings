@@ -1569,6 +1569,9 @@
         }
       }
     },
+    "Bakgrunn" : {
+
+    },
     "Beregn" : {
       "localizations" : {
         "da" : {
@@ -2167,6 +2170,9 @@
         }
       }
     },
+    "Egendefinert tema" : {
+
+    },
     "Eksporter backup" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2620,6 +2626,9 @@
         }
       }
     },
+    "Fargetema" : {
+
+    },
     "Feil" : {
 
     },
@@ -2874,6 +2883,9 @@
           }
         }
       }
+    },
+    "Forhåndsvisning" : {
+
     },
     "Forsøk i dag:" : {
 
@@ -3219,6 +3231,7 @@
       }
     },
     "Garnkalkulator" : {
+      "extractionState" : "stale",
       "localizations" : {
         "da" : {
           "stringUnit" : {
@@ -3599,6 +3612,9 @@
       }
     },
     "Har data:" : {
+
+    },
+    "Hovedbakgrunn" : {
 
     },
     "Hovedbilde" : {
@@ -4623,6 +4639,9 @@
           }
         }
       }
+    },
+    "Kort/seksjon" : {
+
     },
     "Kunne ikke laste PDF" : {
       "localizations" : {
@@ -5897,7 +5916,7 @@
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Garnkalkulator"
+            "value" : "Mengdekalkulator"
           }
         },
         "sv" : {
@@ -7066,6 +7085,12 @@
           }
         }
       }
+    },
+    "Piler" : {
+
+    },
+    "Piler / ikonfarge" : {
+
     },
     "Pinnestørrelse" : {
       "localizations" : {
@@ -9095,6 +9120,12 @@
     "Talt i denne økten (%lld)" : {
 
     },
+    "Tekst" : {
+
+    },
+    "Tekstfarge" : {
+
+    },
     "Test idempotency key" : {
 
     },
@@ -9140,6 +9171,9 @@
           }
         }
       }
+    },
+    "Tilbakestill til standard" : {
+
     },
     "Tilgjengelig garn" : {
 

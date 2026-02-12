@@ -1,56 +1,71 @@
 import SwiftUI
 
 extension Color {
-    // MARK: - App Color Palette
-    // Based on: #f4ecff, #6b52a3
+    // MARK: - Dynamic Theme Colors
 
-    // Primary brand color - light lavender
-    static let appPrimary = Color(hex: "f4ecff")
+    private static var settings: AppSettings { AppSettings.shared }
 
-    // Secondary brand color - purple
-    static let appSecondary = Color(hex: "6b52a3")
+    private static var currentAccentHex: String {
+        settings.currentTheme.accentHex
+    }
 
-    // Accent color - purple (same as secondary for consistency)
-    static let appAccent = Color(hex: "6b52a3")
+    // Secondary brand color - the accent
+    static var appSecondary: Color {
+        Color(hex: currentAccentHex)
+    }
 
-    // MARK: - Semantic Colors (Dark Mode Compatible)
+    // Accent color
+    static var appAccent: Color {
+        Color(hex: currentAccentHex)
+    }
+
+    // MARK: - Semantic Colors
 
     // Background colors
-    static let appBackground = Color(UIColor.systemBackground)
-    static let appSecondaryBackground = Color(UIColor.secondarySystemBackground)
+    static var appBackground: Color {
+        Color(hex: settings.currentTheme.backgroundHex)
+    }
+
+    static var appSecondaryBackground: Color {
+        Color(hex: settings.currentTheme.cardBackgroundHex)
+    }
+
     static let appTertiaryBackground = Color(UIColor.tertiarySystemBackground)
 
     // Text colors
-    static let appText = Color(UIColor.label)
+    static var appText: Color {
+        Color(hex: settings.currentTheme.textHex)
+    }
+
     static let appSecondaryText = Color(UIColor.secondaryLabel)
     static let appTertiaryText = Color(UIColor.tertiaryLabel)
 
     // MARK: - Component-Specific Colors
 
     // Buttons
-    static let appButtonBackground = Color.appAccent
-    static let appButtonBackgroundSelected = Color.appSecondary
+    static var appButtonBackground: Color { appAccent }
+    static var appButtonBackgroundSelected: Color { appSecondary }
     static let appButtonBackgroundUnselected = Color(UIColor.systemGray5)
     static let appButtonText = Color.white
     static let appButtonTextUnselected = Color(UIColor.secondaryLabel)
 
     // Text fields
     static let appTextFieldBackground = Color(UIColor.systemBackground)
-    static let appTextFieldBorder = Color.appAccent.opacity(0.5)
-    static let appTextFieldText = Color.appText
+    static var appTextFieldBorder: Color { appAccent.opacity(0.5) }
+    static let appTextFieldText = Color(UIColor.label)
 
     // Result boxes
     static let appResultBackground = Color(UIColor.secondarySystemBackground)
 
     // Checkmarks and interactive elements
-    static let appCheckmarkActive = Color.appSecondary
+    static var appCheckmarkActive: Color { appSecondary }
     static let appCheckmarkInactive = Color(UIColor.systemGray3)
 
     // Hint/Info text
-    static let appHintText = Color.appSecondary
+    static var appHintText: Color { appSecondary }
 
     // Icons and accents
-    static let appIconTint = Color.appSecondary
+    static var appIconTint: Color { appSecondary }
 
     // Ruler background
     static let appRulerBackground = Color(UIColor.systemBackground)
@@ -78,5 +93,15 @@ extension Color {
             blue: Double(b) / 255,
             opacity: 1
         )
+    }
+
+    // Convert Color to hex string
+    var hexString: String {
+        let uiColor = UIColor(self)
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        uiColor.getRed(&r, green: &g, blue: &b, alpha: nil)
+        return String(format: "%02X%02X%02X", Int(r * 255), Int(g * 255), Int(b * 255))
     }
 }

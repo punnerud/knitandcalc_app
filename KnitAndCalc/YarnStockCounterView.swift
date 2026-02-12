@@ -65,6 +65,7 @@ struct YarnStockCounterView: View {
                 yarnListView
             }
         }
+        .themedForm()
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

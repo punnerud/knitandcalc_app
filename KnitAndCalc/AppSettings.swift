@@ -42,6 +42,88 @@ enum UnitSystem: String, CaseIterable {
     }
 }
 
+enum AppTheme: String, CaseIterable {
+    case standard = "standard"
+    case ocean = "ocean"
+    case forest = "forest"
+    case sunset = "sunset"
+    case raspberry = "raspberry"
+    case sky = "sky"
+    case sand = "sand"
+    case midnight = "midnight"
+    case custom = "custom"
+
+    var displayName: String {
+        switch self {
+        case .standard: return "Standard"
+        case .ocean: return "Havblå"
+        case .forest: return "Skoggrønn"
+        case .sunset: return "Solnedgang"
+        case .raspberry: return "Bringebær"
+        case .sky: return "Himmelblå"
+        case .sand: return "Varm sand"
+        case .midnight: return "Nattblå"
+        case .custom: return "Egendefinert"
+        }
+    }
+
+    var accentHex: String {
+        switch self {
+        case .standard: return "6b52a3"
+        case .ocean: return "2E86AB"
+        case .forest: return "2E7D32"
+        case .sunset: return "E65100"
+        case .raspberry: return "AD1457"
+        case .sky: return "0277BD"
+        case .sand: return "795548"
+        case .midnight: return "1A237E"
+        case .custom: return AppSettings.shared.customAccentHex
+        }
+    }
+
+    var backgroundHex: String {
+        switch self {
+        case .standard: return "f4ecff"
+        case .ocean: return "e8f4f8"
+        case .forest: return "e8f5e9"
+        case .sunset: return "fff3e0"
+        case .raspberry: return "fce4ec"
+        case .sky: return "e1f5fe"
+        case .sand: return "efebe9"
+        case .midnight: return "e8eaf6"
+        case .custom: return AppSettings.shared.customBackgroundHex
+        }
+    }
+
+    var textHex: String {
+        switch self {
+        case .standard: return "2D1F54"
+        case .ocean: return "1B3A4B"
+        case .forest: return "1B4D1F"
+        case .sunset: return "4E2600"
+        case .raspberry: return "4A0A2A"
+        case .sky: return "0A3050"
+        case .sand: return "3E2C23"
+        case .midnight: return "0D1242"
+        case .custom: return AppSettings.shared.customTextHex
+        }
+    }
+
+    var cardBackgroundHex: String {
+        switch self {
+        case .standard: return "FAF6FF"
+        case .ocean: return "F3FAFB"
+        case .forest: return "F3FAF4"
+        case .sunset: return "FFF9F2"
+        case .raspberry: return "FEF2F5"
+        case .sky: return "F0FAFF"
+        case .sand: return "F7F5F4"
+        case .midnight: return "F2F3FA"
+        case .custom: return AppSettings.shared.customCardBackgroundHex
+        }
+    }
+}
+
 class AppSettings: ObservableObject {
     static let shared = AppSettings()
 
@@ -49,7 +131,31 @@ class AppSettings: ObservableObject {
     @AppStorage("unitSystem") var unitSystem: String = ""
     @AppStorage("hasSetDefaults") private var hasSetDefaults: Bool = false
 
+    // Theme properties use @Published so objectWillChange fires and all views update
+    @Published var theme: String {
+        didSet { UserDefaults.standard.set(theme, forKey: "appTheme") }
+    }
+    @Published var customAccentHex: String {
+        didSet { UserDefaults.standard.set(customAccentHex, forKey: "customAccentColor") }
+    }
+    @Published var customCardBackgroundHex: String {
+        didSet { UserDefaults.standard.set(customCardBackgroundHex, forKey: "customCardBackground") }
+    }
+    @Published var customTextHex: String {
+        didSet { UserDefaults.standard.set(customTextHex, forKey: "customTextColor") }
+    }
+    @Published var customBackgroundHex: String {
+        didSet { UserDefaults.standard.set(customBackgroundHex, forKey: "customBackgroundColor") }
+    }
+
     init() {
+        let defaults = UserDefaults.standard
+        self.theme = defaults.string(forKey: "appTheme") ?? AppTheme.standard.rawValue
+        self.customAccentHex = defaults.string(forKey: "customAccentColor") ?? "6b52a3"
+        self.customCardBackgroundHex = defaults.string(forKey: "customCardBackground") ?? "f4ecff"
+        self.customTextHex = defaults.string(forKey: "customTextColor") ?? "000000"
+        self.customBackgroundHex = defaults.string(forKey: "customBackgroundColor") ?? "FFFFFF"
+
         if !hasSetDefaults {
             setDefaultsFromLocale()
             hasSetDefaults = true
@@ -64,6 +170,11 @@ class AppSettings: ObservableObject {
     var currentUnitSystem: UnitSystem {
         get { UnitSystem(rawValue: unitSystem) ?? .metric }
         set { unitSystem = newValue.rawValue }
+    }
+
+    var currentTheme: AppTheme {
+        get { AppTheme(rawValue: theme) ?? .standard }
+        set { theme = newValue.rawValue }
     }
 
     func setLanguage(_ lang: AppLanguage) {

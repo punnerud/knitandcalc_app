@@ -73,6 +73,42 @@ struct SettingsView: View {
                 }
             }
 
+            Section(header: Text("Fargetema")) {
+                let presetThemes = AppTheme.allCases.filter { $0 != .custom }
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 70), spacing: 12)], spacing: 12) {
+                    ForEach(presetThemes, id: \.self) { theme in
+                        themeButton(theme)
+                    }
+                }
+                .padding(.vertical, 8)
+
+                NavigationLink(destination: CustomThemeView()) {
+                    HStack {
+                        Circle()
+                            .fill(
+                                AngularGradient(
+                                    gradient: Gradient(colors: [.red, .orange, .yellow, .green, .blue, .purple, .red]),
+                                    center: .center
+                                )
+                            )
+                            .frame(width: 28, height: 28)
+                            .overlay(
+                                settings.currentTheme == .custom ?
+                                Image(systemName: "checkmark")
+                                    .font(.system(size: 12, weight: .bold))
+                                    .foregroundColor(.white) : nil
+                            )
+                        Text("Egendefinert")
+                            .foregroundColor(.primary)
+                        Spacer()
+                        if settings.currentTheme == .custom {
+                            Image(systemName: "checkmark")
+                                .foregroundColor(.appIconTint)
+                        }
+                    }
+                }
+            }
+
             Section(header: Text(NSLocalizedString("settings.units.header", comment: ""))) {
                 Picker(NSLocalizedString("settings.units.system", comment: ""), selection: $settings.unitSystem) {
                     ForEach(UnitSystem.allCases, id: \.self) { unit in
@@ -259,6 +295,7 @@ struct SettingsView: View {
                 }
             }
         }
+        .themedForm()
         .navigationTitle(NSLocalizedString("settings.title", comment: ""))
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
@@ -322,6 +359,35 @@ struct SettingsView: View {
         .sheet(isPresented: $showDebugMenu) {
             DebugMenuView()
         }
+    }
+
+    @ViewBuilder
+    func themeButton(_ theme: AppTheme) -> some View {
+        Button(action: {
+            withAnimation { settings.currentTheme = theme }
+        }) {
+            VStack(spacing: 6) {
+                ZStack {
+                    Circle()
+                        .fill(Color(hex: theme.accentHex))
+                        .frame(width: 40, height: 40)
+                    if settings.currentTheme == theme {
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(.white)
+                    }
+                }
+                .overlay(
+                    Circle()
+                        .strokeBorder(Color.primary, lineWidth: settings.currentTheme == theme ? 3 : 0)
+                )
+                Text(theme.displayName)
+                    .font(.system(size: 11))
+                    .foregroundColor(.primary)
+                    .lineLimit(1)
+            }
+        }
+        .buttonStyle(PlainButtonStyle())
     }
 
     func handleRating(_ rating: Int) {

@@ -101,6 +101,7 @@ struct ProjectListView: View {
             }
             projectContentView
         }
+        .themedForm()
         .navigationTitle("Prosjekter")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

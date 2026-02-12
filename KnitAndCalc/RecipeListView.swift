@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct RecipeListView: View {
+    @ObservedObject private var settings = AppSettings.shared
     @State private var recipes: [Recipe] = []
     @State private var selectedCategory: RecipeCategory = .all
     @State private var selectedCustomCategory: String?
@@ -43,6 +44,7 @@ struct RecipeListView: View {
             categoryTabsView
             recipeContentView
         }
+        .themedForm()
         .navigationTitle("Oppskrifter")
         .navigationBarTitleDisplayMode(.large)
         .toolbar {

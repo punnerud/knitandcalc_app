@@ -13,6 +13,7 @@ struct AddRecipeView: View {
     @Binding var recipes: [Recipe]
     var onRecipeCreated: ((Recipe) -> Void)?
 
+    @ObservedObject private var settings = AppSettings.shared
     @State private var name: String = ""
     @State private var selectedCategory: RecipeCategory = .sweaters
     @State private var newCategoryName: String = ""
@@ -111,6 +112,7 @@ struct AddRecipeView: View {
                     }
                 }
             }
+            .themedForm()
             .navigationTitle("Ny oppskrift")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -118,6 +118,7 @@ struct YarnCountingSessionView: View {
                     countingInterfaceView
                 }
             }
+            .themedForm()
             .navigationTitle(selectedLocation.isEmpty ? NSLocalizedString("yarn_stock.start_count", comment: "") : NSLocalizedString("yarn_stock.counting", comment: ""))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

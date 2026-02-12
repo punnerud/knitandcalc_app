@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentView: View {
     @State private var showAdvanced: Bool = false
     @State private var currentMessage: AppMessage? = nil
+    @ObservedObject private var settings = AppSettings.shared
 
     var body: some View {
         NavigationView {
@@ -67,12 +68,13 @@ struct ContentView: View {
                                 .font(.system(size: 32))
                             Text(NSLocalizedString("menu.advanced", comment: ""))
                                 .font(.system(size: 18, weight: .medium))
-                                .foregroundColor(.primary)
+                                .foregroundColor(.appText)
                         }
                         .padding(.vertical, 8)
                     }
                 }
             }
+            .themedForm()
             .navigationTitle("Knit&Calc")
             .listStyle(InsetGroupedListStyle())
             .toolbar {
@@ -163,7 +165,7 @@ struct CalculatorRow: View {
                 .font(.system(size: 32))
             Text(title)
                 .font(.system(size: 18, weight: .medium))
-                .foregroundColor(.primary)
+                .foregroundColor(.appText)
         }
         .padding(.vertical, 8)
     }

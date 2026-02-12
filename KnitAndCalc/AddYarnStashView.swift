@@ -469,6 +469,7 @@ struct AddYarnStashView: View {
                     }
                 }
             }
+            .themedForm()
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 if linkToProjectId != nil {

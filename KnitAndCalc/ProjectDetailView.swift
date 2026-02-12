@@ -80,6 +80,7 @@ struct ProjectDetailView: View {
 
     var body: some View {
         mainForm
+            .themedForm()
             .navigationTitle(project.name)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

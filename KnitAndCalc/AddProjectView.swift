@@ -13,6 +13,7 @@ struct AddProjectView: View {
     let recipes: [Recipe]
     var onProjectCreated: ((Project) -> Void)?
 
+    @ObservedObject private var settings = AppSettings.shared
     @State private var name: String = ""
     @State private var selectedStatus: ProjectStatus = .active
     @FocusState private var isNameFieldFocused: Bool
@@ -31,6 +32,7 @@ struct AddProjectView: View {
                     }
                 }
             }
+            .themedForm()
             .navigationTitle("Nytt prosjekt")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -13,6 +13,7 @@ struct EditProjectView: View {
     let project: Project
     let recipes: [Recipe]
 
+    @ObservedObject private var settings = AppSettings.shared
     @State private var name: String = ""
     @State private var selectedStatus: ProjectStatus = .planned
 
@@ -29,6 +30,7 @@ struct EditProjectView: View {
                     }
                 }
             }
+            .themedForm()
             .navigationTitle("Rediger prosjekt")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

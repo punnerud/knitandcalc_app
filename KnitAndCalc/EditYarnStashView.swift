@@ -346,6 +346,7 @@ struct EditYarnStashView: View {
                     }
                 }
             }
+            .themedForm()
             .navigationTitle("Rediger garn")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

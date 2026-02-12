@@ -164,7 +164,7 @@ struct YarnCalculatorView: View {
             }
             .padding(.vertical)
             }
-            .navigationTitle("Garnkalkulator")
+            .navigationTitle(NSLocalizedString("menu.yarn_calculator", comment: ""))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {

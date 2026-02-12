@@ -69,6 +69,7 @@ struct YarnStashListView: View {
             searchBar
             yarnContentView
         }
+        .themedForm()
         .navigationTitle("Garnlager")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

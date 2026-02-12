@@ -228,6 +228,7 @@ struct AddProjectYarnView: View {
                     }
                 }
             }
+            .themedForm()
             .navigationTitle("Legg til garn")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -13,6 +13,7 @@ struct EditRecipeView: View {
     @Binding var recipes: [Recipe]
     let recipe: Recipe
 
+    @ObservedObject private var settings = AppSettings.shared
     @State private var name: String = ""
     @State private var selectedCategory: RecipeCategory = .sweaters
     @State private var newCategoryName: String = ""
@@ -124,6 +125,7 @@ struct EditRecipeView: View {
                     }
                 }
             }
+            .themedForm()
             .navigationTitle("Rediger oppskrift")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
