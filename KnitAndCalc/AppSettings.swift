@@ -55,15 +55,15 @@ enum AppTheme: String, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .standard: return "Standard"
-        case .ocean: return "Havblå"
-        case .forest: return "Skoggrønn"
-        case .sunset: return "Solnedgang"
-        case .raspberry: return "Bringebær"
-        case .sky: return "Himmelblå"
-        case .sand: return "Varm sand"
-        case .midnight: return "Nattblå"
-        case .custom: return "Egendefinert"
+        case .standard: return NSLocalizedString("theme.standard", comment: "")
+        case .ocean: return NSLocalizedString("theme.ocean", comment: "")
+        case .forest: return NSLocalizedString("theme.forest", comment: "")
+        case .sunset: return NSLocalizedString("theme.sunset", comment: "")
+        case .raspberry: return NSLocalizedString("theme.raspberry", comment: "")
+        case .sky: return NSLocalizedString("theme.sky", comment: "")
+        case .sand: return NSLocalizedString("theme.sand", comment: "")
+        case .midnight: return NSLocalizedString("theme.midnight", comment: "")
+        case .custom: return NSLocalizedString("theme.custom", comment: "")
         }
     }
 

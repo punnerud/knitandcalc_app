@@ -223,7 +223,7 @@ struct YarnStashListView: View {
                                         sum + (Double(yarn.numberOfSkeins) * yarn.weightPerSkein)
                                     }
 
-                                    Text("\(entryCount) \(entryCount == 1 ? "farge" : "farger")")
+                                    Text("\(entryCount) \(entryCount == 1 ? NSLocalizedString("yarn.color_singular", comment: "") : NSLocalizedString("yarn.color_plural", comment: ""))")
                                         .font(.system(size: 13))
                                         .foregroundColor(.appSecondaryText)
 

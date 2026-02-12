@@ -141,7 +141,7 @@ struct StitchCalculatorView: View {
 
                                 Spacer()
 
-                                Text("Steg \(currentStep + 1) av \(totalSubSteps)")
+                                Text(String(format: NSLocalizedString("stitch.step_of", comment: ""), currentStep + 1, totalSubSteps))
                                     .font(.system(size: 15, weight: .semibold))
                                     .foregroundColor(.appSecondaryText)
 
@@ -256,8 +256,8 @@ struct StitchCalculatorView: View {
 
         // No changes case
         if D == 0 {
-            let actionText = currentMode == .increase ? "økninger" : "fellinger"
-            groupTexts = [String(localized: "Ingen \(actionText) valgt. Du har fortsatt \(S) masker på pinnen.")]
+            let actionText = currentMode == .increase ? NSLocalizedString("stitch.increases", comment: "") : NSLocalizedString("stitch.decreases", comment: "")
+            groupTexts = [String(format: NSLocalizedString("stitch.no_changes", comment: ""), actionText, S)]
             groupCounts = [1]
             checkedSubSteps = [false]
             currentStep = 0
@@ -272,7 +272,7 @@ struct StitchCalculatorView: View {
         if isDecrease {
             let maxDecrease = S / 2
             if D > maxDecrease {
-                groupTexts = [String(localized: "Du prøver å felle for mange masker. Maks antall fellinger for \(S) masker er \(maxDecrease).")]
+                groupTexts = [String(format: NSLocalizedString("stitch.too_many_decreases", comment: ""), S, maxDecrease)]
                 groupCounts = [1]
                 checkedSubSteps = [false]
                 currentStep = 0
@@ -322,8 +322,8 @@ struct StitchCalculatorView: View {
             if isLastSegment {
                 // Last segment in flat mode: just knit remaining stitches, no action
                 if segments[i] > 0 {
-                    let word = segments[i] == 1 ? "maske" : "masker"
-                    seq.append("Strikk \(segments[i]) \(word)")
+                    let word = segments[i] == 1 ? NSLocalizedString("stitch.stitch_singular", comment: "") : NSLocalizedString("stitch.stitch_plural", comment: "")
+                    seq.append(String(format: NSLocalizedString("stitch.knit_x", comment: ""), segments[i], word))
                 }
             } else {
                 seq.append(instruksjonTekst(mode: currentMode, knitBefore: segments[i]))
@@ -333,7 +333,7 @@ struct StitchCalculatorView: View {
         // Group consecutive identical instructions
         let grouped = groupRuns(seq)
         groupTexts = grouped.map { g in
-            let timesWord = g.count == 1 ? "gang" : "ganger"
+            let timesWord = g.count == 1 ? NSLocalizedString("stitch.time_singular", comment: "") : NSLocalizedString("stitch.time_plural", comment: "")
             return "\(g.text) — \(g.count) \(timesWord)"
         }
         groupCounts = grouped.map { $0.count }
@@ -342,8 +342,8 @@ struct StitchCalculatorView: View {
         currentStep = 0
 
         let newTotal = isDecrease ? (S - D) : (S + D)
-        let stitchWord = knittingStyle == .flat ? "pinnen" : "omgangen"
-        totalStitches = String(localized: "Du har nå \(newTotal) masker på \(stitchWord)")
+        let stitchWord = knittingStyle == .flat ? NSLocalizedString("stitch.the_needle", comment: "") : NSLocalizedString("stitch.the_round", comment: "")
+        totalStitches = String(format: NSLocalizedString("stitch.you_now_have", comment: ""), newTotal, stitchWord)
         showResult = true
     }
 
@@ -410,13 +410,13 @@ struct StitchCalculatorView: View {
 
     func instruksjonTekst(mode: StitchMode, knitBefore: Int) -> String {
         if mode == .decrease {
-            if knitBefore <= 0 { return "Strikk 2 sammen" }
-            if knitBefore == 1 { return "Strikk 1 maske, strikk 2 sammen" }
-            return "Strikk \(knitBefore) masker, strikk 2 sammen"
+            if knitBefore <= 0 { return NSLocalizedString("stitch.k2tog", comment: "") }
+            if knitBefore == 1 { return String(format: NSLocalizedString("stitch.k1_k2tog", comment: ""), 1) }
+            return String(format: NSLocalizedString("stitch.kn_k2tog", comment: ""), knitBefore)
         } else {
-            if knitBefore <= 0 { return "Øk 1 maske" }
-            if knitBefore == 1 { return "Strikk 1 maske, øk 1 maske" }
-            return "Strikk \(knitBefore) masker, øk 1 maske"
+            if knitBefore <= 0 { return NSLocalizedString("stitch.inc1", comment: "") }
+            if knitBefore == 1 { return String(format: NSLocalizedString("stitch.k1_inc1", comment: ""), 1) }
+            return String(format: NSLocalizedString("stitch.kn_inc1", comment: ""), knitBefore)
         }
     }
 
